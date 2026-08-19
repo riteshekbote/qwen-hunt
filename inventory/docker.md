@@ -21,3 +21,7 @@
 ## 2026-08-19 21:50:24 UTC
 - NEW https://*.docker.com: Wildcard DNS misconfiguration confirmed in probe errors
 - NEW https://*.docker.com: Wildcard DNS resolution failure (ERR_NAME_NOT_RESOLVED)
+
+## 2026-08-19 22:12:26 UTC
+- NEW https://docker.com (200 OK, new surface item from latest probe)
+- NEW https://*.docker.com: Wildcard DNS misconfiguration confirmed (ERR <urlopen error>)

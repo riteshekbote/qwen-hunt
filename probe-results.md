@@ -48,3 +48,8 @@ https://api.coxautoinc.com/endpoint -> HTTP 403
 https://api.coxautoinc.com/endpoint?param=10.0.0.1 -> HTTP 403
 https://docker.com -> 200 len=345747 type=text/html; charset=UTF-8
 https://api.coxautoinc.com/endpoint?param=127.0.0.1 -> HTTP 403
+
+## 2026-08-19 22:12:26 UTC
+https://*.docker.com -> ERR <urlopen error [Errno -2] Name or service not know
+https://docker-registry.docker.com -> ERR <urlopen error [Errno -2] Name or service not know
+https://github.com/posit/.github/workflows -> HTTP 404

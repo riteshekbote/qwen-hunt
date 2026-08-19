@@ -20,3 +20,6 @@
 - 2026-08-19 ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 confirms misconfig
 - 2026-08-19 ACCEPTED MISCONFIG @ https://*.docker.com
 - 2026-08-19 ACCEPTED MISCONFIG @ https://github.com/posit/.
+- 2026-08-19 ACCEPTED MISCONFIG @ https://*.docker.com: Wildcard DNS misconfig confirmed via 404 and SSRF probe (https://api.coxautoinc.com/endpoint?param=127.0.0.1).
+- 2026-08-19 ACCEPTED MISCONFIG @ https://*.docker.com: 404 confirms wildcard DNS misconfiguration
+- 2026-08-19 ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 confirms misconfigured workflows

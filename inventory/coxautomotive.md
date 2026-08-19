@@ -16,3 +16,6 @@
 ## 2026-08-19 21:50:24 UTC
 - CHANGED https://api.coxautoinc.com/endpoint: SSRF attempts still 403 (prior REJECTED)
 - CHANGED https://api.coxautoinc.com/endpoint: SSRF attempts (127.0.0.1/192.168.1.1) return 403
+
+## 2026-08-19 22:12:26 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=127.0.0.1: 403 confirmed (SSRF attempt)
