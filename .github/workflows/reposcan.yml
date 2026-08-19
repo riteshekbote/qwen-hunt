@@ -162,6 +162,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
+          mkdir -p reposcan-raw leads reports
           git add reposcan-raw leads reports || true
           stamp=$(date -u +'%Y-%m-%d-%H-%M')
           cp reposcan-raw/grep-hits.md leads/reposcan-$stamp.md 2>/dev/null || true
