@@ -13,3 +13,4 @@
 ## ACCEPTED CLASSES (known to pay)
 
 - (seed empty — populate from real triage outcomes)- 2026-08-19 REJECTED SSO-domain-discovery oracle @ docker: confirmed by Spare Labs triage 2026-08-19
+- 2026-08-19 REJECTED OATH @ *.docker.com: confirmed by Spare Labs triage 2026-08-19
