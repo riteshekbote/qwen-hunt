@@ -38,6 +38,7 @@ jobs:
           echo "LOCAL_MODEL=$(ollama list | tail -n +2 | awk '{print $1}' | head -1)" >> $GITHUB_ENV
 
       - name: Collect UNVALIDATED leads
+        id: collect
         run: |
           mkdir -p triage reports
           grep -h "\[UNVALIDATED\]" leads/lead-*.md leads/reposcan-*.md 2>/dev/null | sort -u | head -25 > new-leads.txt
@@ -45,19 +46,17 @@ jobs:
             grep -hE '^\[HYP\]|^\[LEAD\]' leads/lead-*.md leads/reposcan-*.md 2>/dev/null | sort -u | head -25 > new-leads.txt
           fi
           wc -l new-leads.txt
-          # hard stop — do NOT run the model on empty input (prevents hallucinated VALIDs)
-          if [ ! -s new-leads.txt ]; then
+          # hard gate: NO leads -> mark outputs, skip all downstream model steps
+          if [ ! -s new-leads.txt ] || ! grep -qE '[A-Za-z0-9]' new-leads.txt; then
             echo "NO_LEADS" > triage-output.txt
             echo "triage skipped: no leads to validate"
+            echo "has_leads=false" >> "$GITHUB_OUTPUTS"
             exit 0
           fi
-          # empty-file gate: refuse to pass an empty lead set to the model
-          if ! grep -qE '[A-Za-z0-9]' new-leads.txt; then
-            echo "NO_LEADS" > triage-output.txt
-            exit 0
-          fi
+          echo "has_leads=true" >> "$GITHUB_OUTPUTS"
 
       - name: Passive live probe of endpoint leads
+        if: steps.collect.outputs.has_leads == 'true'
         run: |
           : > probe-results.txt
           python3 -c "import yaml; print(yaml.safe_load(open('scope.yml'))['probe_allow'].lower())" > probe-allow.txt
@@ -73,6 +72,7 @@ jobs:
           cat probe-results.txt
 
       - name: Validate with second model (7-Question Gate)
+        if: steps.collect.outputs.has_leads == 'true'
         run: |
           cat > triage-prompt.txt << 'PROMPT_START'
           You are a strict triager. A hunt bot produced the leads below for FIVE
@@ -115,6 +115,7 @@ jobs:
           echo "=== triage preview ==="; head -40 triage-output.txt
 
       - name: Update valid-bugs counter
+        if: steps.collect.outputs.has_leads == 'true'
         run: |
           mkdir -p triage reports
           {
@@ -145,6 +146,7 @@ jobs:
           PY
 
       - name: Append learnings to knowledge base
+        if: steps.collect.outputs.has_leads == 'true'
         run: |
           python3 << 'PY'
           import re, os, datetime
@@ -172,6 +174,7 @@ jobs:
           PY
 
       - name: Commit
+        if: steps.collect.outputs.has_leads == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
