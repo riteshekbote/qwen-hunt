@@ -50,10 +50,10 @@ jobs:
           if [ ! -s new-leads.txt ] || ! grep -qE '[A-Za-z0-9]' new-leads.txt; then
             echo "NO_LEADS" > triage-output.txt
             echo "triage skipped: no leads to validate"
-            echo "has_leads=false" >> "$GITHUB_OUTPUTS"
+            echo "has_leads=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "has_leads=true" >> "$GITHUB_OUTPUTS"
+          echo "has_leads=true" >> "$GITHUB_OUTPUT"
 
       - name: Passive live probe of endpoint leads
         if: steps.collect.outputs.has_leads == 'true'
