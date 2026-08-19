@@ -12,3 +12,8 @@
 ## 2026-08-19 20:54:05 UTC
 - NEW https://*.docker.com (ERR [Errno -2] Name or service not known)
 - CHANGED *.docker.com: DNS probe failed with name error (from reports/hypotheses-qwen8b.txt)
+
+## 2026-08-19 21:18:24 UTC
+- CHANGED https://*.docker.com (ERR Name or service not known)
+- NEW https://*.docker.com: Docker wildcard DNS misconfigured (ERR DNS)
+- CHANGED https://*.docker.com: DNS error (was 200)

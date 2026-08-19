@@ -107,3 +107,23 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed by Spare Labs triage 2026-08-19  
 [LEARN] REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 confirmed by Spare Labs triage 2026-08-19  
 [RISK] 65  
+## 2026-08-19 21:18:14 UTC (model qwen14b)
+[NEW] https://github.com/posit/.github/workflows (404)  
+[CHANGED] https://*.docker.com (ERR Name or service not known)  
+asset: https://github.com/posit/.github/workflows  
+asset: https://*.docker.com  
+asset: https://api.coxautoinc.com/endpoint  
+[HYP] Posit GitHub Workflows Misconfiguration  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 60  
+reasoning: 404 response for a public GitHub workflow file suggests potential misconfiguration or lack of access controls.  
+evidence_needed: Verification of workflow file access permissions or presence of secrets in `.github/workflows`.  
+verify_steps:  
+impact: Exposure of CI/CD secrets or misconfigured workflows.  
+testability: PASSIVE  
+[HYP] Docker Misconfigured Wildcard DNS  
+class: MISCONFIG  
+asset: https://*.docker.com  
+confidence: 75  
+reasoning: Persistent DNS resolution
