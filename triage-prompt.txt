@@ -124,3 +124,6 @@ targets:
 # passive-only boundary — host patterns the verifier may probe (union of all domains)
 probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantmigration|mailflowmonitoring|alumniforwarding|nureply|inboxissue|emsisoft|docker|posit|shinyapps|rstudio|coxautoinc|autotrader|kbb|manheim|dealertrack|dealer|vauto|vinsolutions|dhi.io"
 LEADS:
+[HYP] Cox Automotive SSRF via API Endpoints
+[HYP] Docker Misconfigured Wildcard DNS Records
+[HYP] Posit GitHub Org Misconfigurations
