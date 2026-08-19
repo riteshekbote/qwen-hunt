@@ -1,0 +1,70 @@
+name: Qwen Hunt - Sync Leads to Issues
+
+on:
+  schedule:
+    - cron: "37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Sync leads to GH issues
+        run: |
+          python3 << 'PY'
+          import os, glob, re, json, urllib.request
+
+          token = os.environ.get('GH_TOKEN')
+          if not token:
+              print('no GH_TOKEN'); exit(0)
+          repo = os.environ.get('GITHUB_REPOSITORY')
+
+          def api(path, data=None, method=None):
+              req = urllib.request.Request(
+                  f'https://api.github.com/repos/{repo}/{path}',
+                  data=json.dumps(data).encode() if data is not None else None,
+                  headers={'Authorization': f'Bearer {token}',
+                           'Accept': 'application/vnd.github+json',
+                           'User-Agent': 'qwen-hunt'},
+                  method=method)
+              try:
+                  with urllib.request.urlopen(req, timeout=20) as r:
+                      return json.loads(r.read())
+              except urllib.error.HTTPError as e:
+                  return {'error': e.code}
+
+          existing = api('issues?state=open&per_page=100')
+          existing_titles = {i.get('title','') for i in existing} if isinstance(existing, list) else set()
+
+          leads = []
+          for f in glob.glob('reports/hypotheses-*.txt'):
+              for m in re.finditer(r'^\[HYP\] (.*)$', open(f).read(), re.M):
+                  leads.append(m.group(1).strip()[:120])
+          for f in glob.glob('reports/valid-bugs.md'):
+              leads.append('VALID-BUGS updated')
+
+          created = 0
+          for title in leads:
+              if not title or title in existing_titles:
+                  continue
+              r = api('issues', {'title': title, 'body': 'Automated lead from qwen-hunt cycle — human validation required.'}, method='POST')
+              if not r.get('error'):
+                  created += 1
+          print(f'created {created} issues')
+          PY
+
+      - name: Commit any state change
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          if ! git diff --cached --quiet; then
+            git commit -m "issue sync $(date -u +'%Y-%m-%d-%H-%M')"
+          fi

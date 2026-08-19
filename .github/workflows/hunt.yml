@@ -1,0 +1,275 @@
+name: Qwen Hunt - Analyst Pipeline
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  QWEN_8B: "richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
+  QWEN_14B: "richardyoung/Qwen3-14B-Abliterated-GGUF:Q4_K_M"
+
+jobs:
+  analyst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: qwen-hunt-${{ matrix.model.name }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        model:
+          - { tag: "richardyoung/Qwen3-14B-Abliterated-GGUF:Q4_K_M", name: qwen14b }
+          - { tag: "richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M", name: qwen8b }
+
+    env:
+      MODEL_TAG: ${{ matrix.model.tag }}
+      MODEL_NAME: ${{ matrix.model.name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Ollama + pull model (cached GGUF)
+        run: |
+          if ! command -v ollama >/dev/null 2>&1; then
+            curl -fsSL https://ollama.com/install.sh | sh
+          fi
+          nohup ollama serve > /tmp/ollama.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -s http://127.0.0.1:11434/api/version >/dev/null 2>&1 && break
+            sleep 2
+          done
+          ollama pull "$MODEL_TAG" 2>&1 | tail -2
+          ollama list
+
+      - name: Prepare context (RAG + state + inventory + last cycle)
+        run: |
+          mkdir -p knowledge inventory leads reports
+          [ -f knowledge/index.md ] || echo "# Knowledge Base (seed)" > knowledge/index.md
+          [ -f state_${MODEL_NAME}.json ] || echo '{"phase":"RECON"}' > state_${MODEL_NAME}.json
+          PROBE=$(python3 -c "import yaml,sys; print(yaml.safe_load(open('scope.yml'))['probe_allow'])" 2>/dev/null || echo "")
+          echo "PROBE_ALLOW=$PROBE" >> $GITHUB_ENV
+          {
+            echo "=== SCOPE ==="
+            cat scope.yml
+            echo "=== KNOWLEDGE BASE ==="
+            cat knowledge/index.md
+            echo "=== MY STATE ==="
+            cat state_${MODEL_NAME}.json
+            echo "=== MY LAST LEADS (tail) ==="
+            tail -60 leads/lead-${MODEL_NAME}.md 2>/dev/null || echo none
+            echo "=== AGGREGATED HYPOTHESES (tail) ==="
+            tail -40 reports/hypotheses.md 2>/dev/null || echo none
+            echo "=== LATEST ROBOT PROBE RESULTS ==="
+            tail -60 probe-results.md 2>/dev/null || echo none
+          } > ctx.txt
+
+      - name: Analyst run (8-step methodology, Qwen abliterated)
+        run: |
+          cat ctx.txt > analyst-prompt.txt
+          cat >> analyst-prompt.txt << 'PROMPT_EOF'
+          You are a senior bug bounty hunter ANALYST for the program described in SCOPE.
+          Your job is NOT to invent vulnerabilities. Run these 8 steps and output ONLY the structured blocks.
+
+          STEP 1 — DELTA: Compare the inventory + knowledge + your last leads against the current known surface. List only NEW or CHANGED surface items as [NEW]/[CHANGED] (one line each). If nothing is new, state "NO_DELTA".
+
+          STEP 2 — PRIORITIZE: Score the top new assets (or top existing if no delta) on 6 axes 0-10: attack_surface, business_value, tech_exposure (GraphQL/OAuth/JWT/upload/admin/uncommon stacks), gate_ease (10 = no auth needed), cloud_surface (cloud APIs/storage/metadata), freshness. priority = 0.25*attack + 0.25*business + 0.15*tech + 0.15*gate + 0.10*cloud + 0.10*fresh. Emit [PRIO] lines: asset, score, axis breakdown.
+
+          STEP 3 — HYPOTHESES: For the top 3 prioritized assets emit max 1 hypothesis each, strictly this schema:
+          [HYP] <title>
+          class: <IDOR|SSRF|AUTH|XSS|BUSLOGIC|MISCONFIG|OATH|OTHER>
+          asset: <host/endpoint>
+          confidence: <0-100>
+          reasoning: <facts only, 2-3 lines>
+          evidence_needed: <what proves it>
+          verify_steps: <passive-first concrete HTTP requests>
+          impact: <what attacker gets + severity>
+          testability: <PASSIVE|AUTH_HELPED|HUMAN_ONLY>
+
+          HARD FORMAT RULE: one field per line. NEVER put confidence/class/asset inline
+          inside the [HYP] title line. Every field MUST be on its own line as 'key: value'
+          directly under the [HYP] line.
+
+          STEP 4 — SELF-CRITIQUE: Re-read your own hypotheses. Drop any that: confidence < 40, or class on the knowledge REJECTED list, or no concrete verify_steps. For dropped ones emit [PARKED] <title>: <why dropped>. Emit [FINAL] with the surviving hypotheses re-ranked (top first).
+
+          STEP 5 — NEXT ACTION: Choose exactly one and emit [NEXT] <PROBE|SCAN|RAG|HUMAN>: <one concrete action, with the exact endpoint/request if PROBE>.
+
+          STEP 6 — LEARNING: Emit [LEARN] lines for any class newly proven dead or alive (one line each, format: REJECTED/ACCEPTED <class> @ <asset>: <reason>).
+
+          STEP 7 — RISK SCORE: Emit [RISK] <0-100> reason (overall exposure of the program surface, not exploit status).
+
+          RULES: facts vs hypotheses strictly separated; no endpoint-map-only output; no class on the REJECTED list; never mention secrets in full (hash them with sha256sum); all claims must trace to the context provided or your own read-only probes; scope boundary = PROBE_ALLOW only.
+          PROMPT_EOF
+          python3 - << 'PYEOF'
+          import json
+          prompt = open('analyst-prompt.txt').read()
+          req = {'model': '$MODEL_TAG', 'prompt': prompt, 'stream': False, 'think': False,
+                 'options': {'num_predict': 2048, 'temperature': 0.4}}
+          open('req.json','w').write(json.dumps(req))
+          PYEOF
+          timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
+            -d @req.json > analyst-raw.json || true
+          python3 -c "import json; d=json.load(open('analyst-raw.json')); print(d.get('response','[NO RESPONSE]'))" > analyst-out.txt
+          cp analyst-out.txt analyst-${MODEL_NAME}.out
+          grep -E '^\[(NEW|CHANGED|PRIO|HYP|PARKED|FINAL|NEXT|LEARN|RISK)\]|^class:|^confidence:|^asset:|^impact:|^testability:|^verify_steps:|^reasoning:|^evidence_needed:' analyst-out.txt > lead.txt || true
+          {
+            echo "## $(date -u +'%Y-%m-%d %H:%M:%S UTC') (model ${MODEL_NAME})"
+            cat lead.txt
+          } > lead_${MODEL_NAME}.txt
+          echo "lead bytes: $(wc -c < lead.txt) | raw bytes: $(wc -c < analyst-out.txt)"
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-analyst-${{ matrix.model.name }}
+          path: |
+            lead_${{ matrix.model.name }}.txt
+            analyst-${{ matrix.model.name }}.out
+            ctx.txt
+          if-no-files-found: warn
+
+  aggregate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: analyst
+    if: always()
+    concurrency:
+      group: qwen-hunt-aggregate
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download all model artifacts
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          path: art
+          merge-multiple: true
+
+      - name: Merge + rank + knowledge update (single committer)
+        run: |
+          mkdir -p leads reports knowledge inventory
+          for f in art/lead_*.txt; do
+            [ -f "$f" ] || continue
+            cat "$f" >> leads/lead-$(basename "$f" | sed -E 's/lead_([a-z0-9]+)\.txt/\1/').md
+          done
+          python3 << 'PY_EOF'
+          import re, glob, json, os, datetime
+          stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+          for f in glob.glob('art/lead_*.txt'):
+              base = os.path.basename(f)
+              model = re.sub(r'^lead_([a-z0-9]+)\.txt$', r'\1', base)
+              open(f'reports/hypotheses-{model}.txt', 'w').write(open(f).read())
+          all_h = []
+          for f in glob.glob('reports/hypotheses-*.txt'):
+              text = open(f).read()
+              m = re.search(r'^\[HYP\] (.*)$', text, re.M)
+              if not m: continue
+              title = m.group(1).strip()
+              c = re.search(r'^confidence:\s*(\d+)', text, re.M)
+              a = re.search(r'^asset:\s*(\S+)', text, re.M)
+              all_h.append((int(c.group(1)) if c else 0, a.group(1) if a else '?', title, f))
+          all_h.sort(reverse=True)
+          with open('reports/hypotheses.md', 'a') as out:
+              out.write(f"\n## RANKED HYPOTHESES {stamp}\n")
+              seen = set()
+              for conf, asset, title, f in all_h[:8]:
+                  key = title.lower()[:60]
+                  if key in seen: continue
+                  seen.add(key)
+                  out.write(f"- [{conf}] {asset}: {title} (from {f})\n")
+              for f in glob.glob('reports/hypotheses-*.txt'):
+                  n = re.search(r'^\[NEXT\] (.*)$', open(f).read(), re.M)
+                  if n: out.write(f"- NEXT({os.path.basename(f)}): {n.group(1).strip()[:160]}\n")
+              for f in glob.glob('reports/hypotheses-*.txt'):
+                  for l in re.findall(r'^\[LEARN\] (.*)$', open(f).read(), re.M):
+                      out.write(f"- LEARN: {l.strip()[:160]}\n")
+          kpath = 'knowledge/index.md'
+          os.makedirs('knowledge', exist_ok=True)
+          ktext = open(kpath).read() if os.path.exists(kpath) else ''
+          with open(kpath, 'a') as k:
+              for f in glob.glob('reports/hypotheses-*.txt'):
+                  for l in re.findall(r'^\[LEARN\] (.*)$', open(f).read(), re.M):
+                      line = f"- {stamp[:10]} {l.strip()}"
+                      if line not in ktext:
+                          k.write(line + "\n")
+          for sp in glob.glob('state_*.json'):
+              try:
+                  st = json.load(open(sp))
+              except Exception:
+                  st = {}
+              phases = ['RECON','SURFACE','HYPOTHESIS','POC']
+              if st.get('phase') in phases:
+                  st['phase'] = phases[min(phases.index(st['phase'])+1, 3)]
+              json.dump(st, open(sp, 'w'))
+          for f in glob.glob('art/analyst-*.out'):
+              model = re.search(r'art/analyst-([a-z0-9]+)\.out$', f)
+              if model:
+                  with open(f'reports/analyst-{model.group(1)}.log', 'a') as lg:
+                      lg.write(f"===== ANALYST {model.group(1)} {stamp} =====\n")
+                      lg.write(open(f, errors='ignore').read())
+          print('merged', len(all_h), 'hypotheses')
+          PY_EOF
+
+      - name: Run passive verifier on hypotheses (read-only, scope-bound)
+        shell: bash
+        run: |
+          python3 << 'ROBOT_PY'
+          import re, glob, ssl, urllib.request, os, time
+          allow = os.environ.get('PROBE_ALLOW', '').lower()
+          pat = re.compile(r'https://[^\s"\)\]\}]+')
+          urls, seen = [], set()
+          for f in glob.glob('art/lead_*.txt') + glob.glob('lead_*.txt') + glob.glob('analyst-*.out'):
+            try: txt = open(f, errors='ignore').read()
+            except OSError: continue
+            for m in pat.findall(txt):
+              u = m.strip('.,;)]}>')
+              if u in seen: continue
+              seen.add(u)
+              if allow and not any(a in u.lower() for a in allow.split('|')): continue
+              urls.append(u[:300])
+          ctx = ssl.create_default_context()
+          rows = []
+          for u in urls[:12]:
+            try:
+              req = urllib.request.Request(u, method='GET', headers={'User-Agent': 'Mozilla/5.0 (passive verifier)'})
+              with urllib.request.urlopen(req, timeout=12, context=ctx) as r:
+                rows.append('%s -> %s len=%s type=%s' % (u, r.status, r.headers.get('Content-Length', '?'), r.headers.get('Content-Type', '')[:40]))
+            except urllib.error.HTTPError as e:
+              rows.append('%s -> HTTP %s' % (u, e.code))
+            except Exception as e:
+              rows.append('%s -> ERR %s' % (u, str(e)[:50]))
+          print('\n'.join(rows) if rows else 'no probes (allow=%s)' % allow)
+          with open('probe-results.md', 'a') as fo:
+            fo.write('\n## %s\n%s\n' % (time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime()), '\n'.join(rows)))
+          ROBOT_PY
+
+      - name: Commit (single push, no race)
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add leads reports knowledge inventory state_*.json probe-results.md || true
+          if ! git diff --cached --quiet; then
+            git commit -m "analyst cycle $(date -u +'%Y-%m-%d-%H-%M')"
+          fi
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin main && break
+            echo "commit push attempt $i failed, retrying in 20s..."
+            sleep 20
+          done
+          git log --oneline -1
+
+      - name: Dispatch reposcan (once per cycle)
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/reposcan.yml/dispatches" \
+            -d '{"ref":"main"}' || true

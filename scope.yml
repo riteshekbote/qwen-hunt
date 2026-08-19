@@ -1,0 +1,20 @@
+# Qwen Hunt — target scope definition
+# Fill in from the program page (user provides).
+# NOTE: every workflow reads PROBE_ALLOW from here (passive-only boundary).
+
+target:
+  name: "TARGET_PLACEHOLDER"        # e.g. "example-vrp"
+  platform: "hackerone"             # hackerone | bugcrowd | intigriti | email | vrp
+  program_url: ""                   # program page or policy URL
+  disclosure: ""                    # security email if platform=email
+
+scope:
+  domains:
+    - "*.example.com"
+    - "example.com"
+  github_orgs: []                   # orgs for reposcan (e.g. ["google"])
+  npm_packages: []
+  excluded: []                      # OOS / excluded assets
+
+# passive-only boundary — host patterns the verifier may probe
+probe_allow: "example.com|example"

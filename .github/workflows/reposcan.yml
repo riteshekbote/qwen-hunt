@@ -1,0 +1,182 @@
+name: Qwen Hunt - Public Repo Deep Scan
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  QWEN_8B: "richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
+
+jobs:
+  reposcan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: qwen-reposcan
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Ollama + pull Qwen 8B
+        run: |
+          if ! command -v ollama >/dev/null 2>&1; then
+            curl -fsSL https://ollama.com/install.sh | sh
+          fi
+          nohup ollama serve > /tmp/ollama.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -s http://127.0.0.1:11434/api/version >/dev/null 2>&1 && break
+            sleep 2
+          done
+          ollama pull "$QWEN_8B" 2>&1 | tail -2
+          ollama list
+
+      - name: Read scope orgs + probe allow
+        run: |
+          python3 - << 'PYEOF'
+          import yaml
+          d = yaml.safe_load(open('scope.yml'))
+          orgs = d['scope'].get('github_orgs', [])
+          print('ORGS=' + ','.join(orgs))
+          PYEOF
+          ORGS=$(python3 -c "import yaml; d=yaml.safe_load(open('scope.yml')); print(','.join(d['scope'].get('github_orgs', [])))")
+          echo "ORGS=$ORGS"
+
+      - name: Enumerate org repos + clone top candidates
+        run: |
+          mkdir -p reposcan-raw
+          if [ -z "$ORGS" ]; then
+            echo "no github_orgs in scope.yml — skipping clone phase"
+            exit 0
+          fi
+          for ORG in $(echo "$ORGS" | tr ',' ' '); do
+            echo "== $ORG =="
+            curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/orgs/$ORG/repos?per_page=100&sort=updated" -o repos-$ORG.json
+            ORG_NAME=$ORG python3 - << 'PY'
+          import json, os
+          org = os.environ["ORG_NAME"]
+          try:
+              repos = json.load(open(f"repos-{org}.json"))
+              if not isinstance(repos, list):
+                  open(f"cands-{org}.txt", "w").write("")
+                  print("API error:", str(repos)[:200])
+                  exit(0)
+          except Exception as ex:
+              print("parse error:", ex)
+              exit(0)
+          cands = [r for r in repos if not r.get("archived") and r.get("language")
+                   and r.get("stargazers_count", 0) > 20
+                   and r.get("size", 10**9) < 200000]
+          cands.sort(key=lambda r: r["updated_at"], reverse=True)
+          for r in cands[:10]:
+              print(f"{org}/{r['name']} stars={r['stargazers_count']} lang={r['language']}")
+          with open(f"cands-{org}.txt", "w") as f:
+              for r in cands[:20]:
+                  f.write(f"https://github.com/{org}/{r['name']}.git\n")
+          PY
+            if [ -f cands-$ORG.txt ]; then
+              mkdir -p reposcan-raw/$ORG
+              cd reposcan-raw/$ORG
+              xargs -n1 -P3 git clone -q --depth 1 < ../../cands-$ORG.txt 2>&1 | head -5 || true
+              cd ../..
+            fi
+          done
+          ls reposcan-raw/*/ 2>/dev/null | wc -l
+
+      - name: Secret + endpoint grep sweep (50 patterns)
+        run: |
+          OUT=reposcan-raw/grep-hits.txt
+          [ -f $OUT ] && cp $OUT reposcan-raw/grep-hits.prev.txt
+          : > $OUT
+          python3 << 'PY'
+          import os, re
+          ROOT = "reposcan-raw"
+          PATTERNS = [
+              re.compile(r'AKIA[0-9A-Z]{16}'),
+              re.compile(r'AIza[0-9A-Za-z_-]{35}'),
+              re.compile(r'ya29\.[0-9A-Za-z_-]+'),
+              re.compile(r'gh[pousr]_[0-9A-Za-z]{20,}'),
+              re.compile(r'xox[baprs]-[0-9A-Za-z-]{10,}'),
+              re.compile(r'sk-[0-9A-Za-z]{20,}'),
+              re.compile(r'eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}'),
+              re.compile(r'BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY'),
+              re.compile(r'(client_secret|clientSecret|app_secret|secret_key|private_key)\s*[:=]\s*["\'\'\'][^"\'\'\']{10,}["\'\'\']'),
+              re.compile(r'(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|GOOGLE_API_KEY|GCP_SA|AZURE_SUBSCRIPTION|SLACK_TOKEN|DISCORD_TOKEN|TELEGRAM_BOT)\s*[:=]\s*\S{10,}'),
+              re.compile(r'(Authorization|Bearer)\s*[:=]\s*eyJ[a-zA-Z0-9_-]{20,}'),
+              re.compile(r'[a-z0-9-]-(dev|staging|stg|test|qa|prod|internal|corp)\.(googleapis|google|microsoft|azure)\.[a-z]+'),
+              re.compile(r'metadata\.google\.internal|169\.254\.169\.254|100\.100\.100\.200'),
+              re.compile(r'kind:\s*Config|kubeconfig|service-account\.json'),
+              re.compile(r'https?://(?:[a-z0-9-]+\.)*(?:dev|staging|stg|test|qa|internal|corp|intranet|sandbox|preprod)\.(?:[a-z0-9-]+\.)+[a-z]{2,}'),
+              re.compile(r'(password|passwd|secret|token|apikey|api_key)\s*[:=]\s*["\'\'\'][^"\'\'\']{8,}["\'\'\']', re.I),
+          ]
+          EXTS = {'.py','.js','.ts','.go','.java','.rb','.php','.c','.cpp','.h','.cs','.sh','.yml','.yaml','.json','.toml','.ini','.conf','.env','.tf','.tfvars','.tsx','.jsx','.kt','.swift'}
+          BANNED = re.compile(r'(node_modules|/vendor/|dist/|/build/|/out/|/bin/|/obj/|/tests?/|/testdata/|/fixtures/|cassettes|/test/|test_|_test|\.min\.|\.map$|\.lock$|\.png|\.jpg|\.zip|\.jar|\.pdf)', re.I)
+          hits, n_files = [], 0
+          for d, _, files in os.walk(ROOT):
+              for fn in files:
+                  ext = os.path.splitext(fn)[1].lower()
+                  path = os.path.join(d, fn)
+                  if ext not in EXTS or BANNED.search(path):
+                      continue
+                  try:
+                      txt = open(path, errors='ignore').read()
+                  except OSError:
+                      continue
+                  n_files += 1
+                  for p in PATTERNS:
+                      for m in p.finditer(txt):
+                          val = m.group(0)
+                          if len(val) < 8: continue
+                          hits.append(f"{path}:{m.start()}: {val[:120]}")
+          print(f"scanned {n_files} files, {len(hits)} hits")
+          with open("reposcan-raw/grep-hits.txt", "w") as f:
+              f.write("\n".join(hits[:400]))
+          PY
+
+      - name: Qwen triage of grep hits
+        run: |
+          if [ ! -s reposcan-raw/grep-hits.txt ]; then
+            echo "no hits" > reposcan-raw/grep-hits.md
+            exit 0
+          fi
+          {
+            echo "=== SCOPE ==="
+            cat scope.yml
+            echo "=== GREP HITS ==="
+            head -150 reposcan-raw/grep-hits.txt
+          } > scan-prompt.txt
+          cat >> scan-prompt.txt << 'PROMPT_EOF'
+
+          You are a triager for the SCOPE program. Review each grep hit: is it a real
+          leaked credential / internal endpoint / reportable finding, or a false positive
+          (fixture, example, placeholder, docs)? For each real one emit:
+          [LEAD] <path>: <what it is + why reportable + what would prove it>
+          For false positives emit nothing. Output only [LEAD] lines and a one-line
+          [SCAN] <count> summary. Never output secrets in full — hash values with sha256.
+          PROMPT_EOF
+          python3 -c "import json; prompt=open('scan-prompt.txt').read(); req={'model': '$QWEN_8B', 'prompt': prompt, 'stream': False, 'think': False, 'options': {'num_predict': 1024, 'temperature': 0.2}}; open('scan-req.json','w').write(json.dumps(req))"
+          timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
+            -d @scan-req.json > scan-raw.json || true
+          python3 -c "import json; d=json.load(open('scan-raw.json')); print(d.get('response','[NO RESPONSE]'))" > reposcan-raw/grep-hits.md
+
+      - name: Commit
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add reposcan-raw leads reports || true
+          stamp=$(date -u +'%Y-%m-%d-%H-%M')
+          cp reposcan-raw/grep-hits.md leads/reposcan-$stamp.md 2>/dev/null || true
+          git add leads
+          if ! git diff --cached --quiet; then
+            git commit -m "reposcan $stamp"
+          fi
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin main && break
+            echo "reposcan push attempt $i failed, retrying in 20s..."
+            sleep 20
+          done
