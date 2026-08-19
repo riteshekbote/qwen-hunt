@@ -31,3 +31,7 @@
 - NEW https://docker-registry.docker.com
 - NEW https://docker-registry.docker.com: Docker registry endpoint unreachable (DNS error)
 - NEW https://*.docker.com: Wildcard DNS resolution failure (DNS error)
+
+## 2026-08-19 23:15:11 UTC
+- NEW https://docker-registry.docker.com (ERR in latest probe)
+- NEW https://*.docker.com: Wildcard DNS misconfiguration confirmed via 404 and SSRF probe
