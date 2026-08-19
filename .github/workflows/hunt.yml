@@ -2,7 +2,7 @@ name: Qwen Hunt - Analyst Pipeline
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/20 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -136,7 +136,7 @@ jobs:
           prompt = open('analyst-prompt.txt').read()
           model = os.environ.get('LOCAL_MODEL', os.environ.get('MODEL_TAG', ''))
           req = {'model': model, 'prompt': prompt, 'stream': False, 'think': False,
-                 'options': {'num_predict': 2048, 'temperature': 0.4}}
+                 'options': {'num_predict': 1536, 'temperature': 0.4}}
           open('req.json','w').write(json.dumps(req))
           print('using model:', model)
           PYEOF
