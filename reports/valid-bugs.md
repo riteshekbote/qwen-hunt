@@ -29,3 +29,9 @@
   - | **Cox Automotive** | VALID   | SSRF via API endpoints validated.                                    |
   - | **Docker**         | VALID   | Misconfigured wildcard DNS validated.                                |
   - | **Posit**          | VALID   | GitHub org misconfigurations validated.                              |
+
+- 4 lead(s) marked VALID at 2026-08-19 21:06:50 UTC
+  - Verdict: Maybe VALID if the steps are minimal. But need to check the probe results. Wait, the probe results for Cox domains are in the probe_allow, so maybe the SSRF is via a public endpoint. So steps
+  - Next: Docker Misconfigured Wildcard DNS. Q1: domains include docker.com, so yes. Q2: wildcard DNS might be public. Q3: impact is DNS leakage, which is real. Q4: check DNS records via GET/HEAD? Maybe v
+  - **Verdict**: **VALID**
+  - **Verdict**: **VALID**
