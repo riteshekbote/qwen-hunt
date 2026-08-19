@@ -1,20 +1,105 @@
-# Qwen Hunt — target scope definition
-# Fill in from the program page (user provides).
-# NOTE: every workflow reads PROBE_ALLOW from here (passive-only boundary).
+# Qwen Hunt — multi-target scope (all self-hosted, EMAIL-ONLY disclosure)
+# Verified 2026-08-19: NONE of these domains appear in HackerOne/Bugcrowd/
+# Intigriti/YesWeHack/Hackenproof/OpenBugBounty scope dumps.
+# All report via email only. Probe allow-list = union of all target domains.
 
-target:
-  name: "TARGET_PLACEHOLDER"        # e.g. "example-vrp"
-  platform: "hackerone"             # hackerone | bugcrowd | intigriti | email | vrp
-  program_url: ""                   # program page or policy URL
-  disclosure: ""                    # security email if platform=email
+targets:
+  - name: "duocircle"
+    platform: "email"
+    disclosure: "security@duocircle.com"
+    bounty: true
+    program_url: "https://trust.duocircle.com/responsible-disclosure/"
+    domains:
+      - "duocircle.com"
+      - "autospf.com"
+      - "dmarcreport.com"
+      - "phishprotection.com"
+      - "outboundsmtp.com"
+      - "tenantmigration.com"
+      - "mailflowmonitoring.com"
+      - "alumniforwarding.com"
+      - "nureply.com"
+      - "inboxissue.com"
+    github_orgs: []
+    excluded: []
 
-scope:
-  domains:
-    - "*.example.com"
-    - "example.com"
-  github_orgs: []                   # orgs for reposcan (e.g. ["google"])
-  npm_packages: []
-  excluded: []                      # OOS / excluded assets
+  - name: "emsisoft"
+    platform: "email"
+    disclosure: "security@emsisoft.com"
+    bounty: true
+    bounty_amount: "up to $500"
+    program_url: "https://www.emsisoft.com/en/bug-bounty/"
+    domains:
+      - "emsisoft.com"
+      - "static.emsisoft.com"
+      - "blog.emsisoft.com"
+    github_orgs: []
+    excluded: []
 
-# passive-only boundary — host patterns the verifier may probe
-probe_allow: "example.com|example"
+  - name: "docker"
+    platform: "email"
+    disclosure: "security@docker.com"
+    bounty: "swag (critical/high)"
+    program_url: "https://www.docker.com/trust/vulnerability-disclosure-policy/"
+    domains:
+      - "docker.com"
+      - "www.docker.com"
+      - "app.docker.com"
+      - "hub.docker.com"
+      - "build.docker.com"
+      - "scout.docker.com"
+      - "*.docker.com"
+      - "*.docker.io"
+      - "dhi.io"
+    github_orgs:
+      - "docker"
+    excluded:
+      - "3rd-party extensions not owned by Docker"
+
+  - name: "posit"
+    platform: "email"
+    disclosure: "security@posit.co"
+    bounty: false
+    program_url: "https://posit.co/about/product-security/"
+    domains:
+      - "posit.co"
+      - "posit.cloud"
+      - "shinyapps.io"
+      - "connect.cloud"
+      - "rstudio.com"
+      - "www.rstudio.com"
+      - "packagemanager.posit.co"
+      - "public.rstudio.com"
+    github_orgs:
+      - "rstudio"
+      - "posit-dev"
+    excluded: []
+
+  - name: "coxautomotive"
+    platform: "email"
+    disclosure: "securitydisclosure@coxautoinc.com"
+    bounty: false
+    program_url: "https://www.coxautoinc.com/responsible-disclosure/"
+    domains:
+      - "coxautoinc.com"
+      - "autotrader.com"
+      - "www.autotrader.com"
+      - "kbb.com"
+      - "www.kbb.com"
+      - "manheim.com"
+      - "www.manheim.com"
+      - "dealertrack.com"
+      - "www.dealertrack.com"
+      - "dealer.com"
+      - "www.dealer.com"
+      - "vauto.com"
+      - "www.vauto.com"
+      - "vinsolutions.com"
+      - "www.vinsolutions.com"
+    github_orgs: []
+    excluded:
+      - "targeting Cox Automotive customers"
+      - "DoS / resource exhaustion"
+
+# passive-only boundary — host patterns the verifier may probe (union of all domains)
+probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantmigration|mailflowmonitoring|alumniforwarding|nureply|inboxissue|emsisoft|docker|posit|shinyapps|rstudio|coxautoinc|autotrader|kbb|manheim|dealertrack|dealer|vauto|vinsolutions|dhi.io"

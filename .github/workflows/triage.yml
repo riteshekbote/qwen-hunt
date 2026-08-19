@@ -48,15 +48,8 @@ jobs:
       - name: Passive live probe of endpoint leads
         run: |
           : > probe-results.txt
-          python3 << 'PY'
-          import yaml, re
-          try:
-              probe_allow = yaml.safe_load(open('scope.yml'))['probe_allow'].lower()
-          except Exception:
-              probe_allow = ''
-          open('probe-allow.txt','w').write(probe_allow)
-          print('probe_allow:', probe_allow)
-          PY
+          python3 -c "import yaml; print(yaml.safe_load(open('scope.yml'))['probe_allow'].lower())" > probe-allow.txt
+          cat probe-allow.txt
           grep -oE 'https?://[a-zA-Z0-9._/-]+' new-leads.txt | sort -u | head -20 | while read -r url; do
             host=$(echo "$url" | sed -E 's|https?://([^/]+).*|\1|')
             if echo "$host" | grep -qiE "$(cat probe-allow.txt)"; then
@@ -70,9 +63,11 @@ jobs:
       - name: Validate with second model (7-Question Gate)
         run: |
           cat > triage-prompt.txt << 'PROMPT_START'
-          You are a strict triager. A hunt bot produced the leads below. Your job:
-          validate each against the 7-Question Gate. Answer all 7 for each lead:
-          Q1 Is it in the program scope (scope.yml)?
+          You are a strict triager. A hunt bot produced the leads below for FIVE
+          email-only disclosure programs: duocircle, emsisoft, docker, posit,
+          coxautomotive. Your job: validate each against the 7-Question Gate.
+          Answer all 7 for each lead:
+          Q1 Is it in the program scope (scope.yml — target domains)?
           Q2 Can an attacker reach it (public, unauthenticated or low-priv)?
           Q3 Is there real security impact (not just weirdness)?
           Q4 Can you prove it without invasive testing (GET/HEAD only)?
@@ -83,7 +78,7 @@ jobs:
 
           Verdict per lead: VALID / INVALID / HOLD (with one-line reason).
           For VALID: state the minimal read-only proof steps, impact, CVSS 3.1,
-          and the correct reporting channel from scope.yml.
+          and the correct reporting channel (the target's disclosure email from scope.yml).
 
           PROBE RESULTS (passive GET/HEAD, http_code per url):
           PROMPT_START

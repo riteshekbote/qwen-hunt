@@ -38,13 +38,7 @@ jobs:
 
       - name: Read scope orgs + probe allow
         run: |
-          python3 - << 'PYEOF'
-          import yaml
-          d = yaml.safe_load(open('scope.yml'))
-          orgs = d['scope'].get('github_orgs', [])
-          print('ORGS=' + ','.join(orgs))
-          PYEOF
-          ORGS=$(python3 -c "import yaml; d=yaml.safe_load(open('scope.yml')); print(','.join(d['scope'].get('github_orgs', [])))")
+          ORGS=$(python3 -c "import yaml; d=yaml.safe_load(open('scope.yml')); print(','.join(o for t in d['targets'] for o in t.get('github_orgs', [])))")
           echo "ORGS=$ORGS"
 
       - name: Enumerate org repos + clone top candidates

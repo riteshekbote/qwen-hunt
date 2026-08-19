@@ -53,11 +53,28 @@ jobs:
           mkdir -p knowledge inventory leads reports
           [ -f knowledge/index.md ] || echo "# Knowledge Base (seed)" > knowledge/index.md
           [ -f state_${MODEL_NAME}.json ] || echo '{"phase":"RECON"}' > state_${MODEL_NAME}.json
-          PROBE=$(python3 -c "import yaml,sys; print(yaml.safe_load(open('scope.yml'))['probe_allow'])" 2>/dev/null || echo "")
+          PROBE=$(python3 -c "import yaml; print(yaml.safe_load(open('scope.yml'))['probe_allow'])" 2>/dev/null || echo "")
           echo "PROBE_ALLOW=$PROBE" >> $GITHUB_ENV
+          python3 - << 'PYEOF'
+          import yaml
+          d = yaml.safe_load(open('scope.yml'))
+          targets = d['targets']
+          with open('ctx-targets.md', 'w') as f:
+              for t in targets:
+                  f.write(f"## TARGET: {t['name']}\n")
+                  f.write(f"- disclosure email: {t.get('disclosure','')}\n")
+                  f.write(f"- bounty: {t.get('bounty','')}\n")
+                  f.write(f"- program url: {t.get('program_url','')}\n")
+                  f.write(f"- domains: {', '.join(t['domains'])}\n")
+                  f.write(f"- github orgs: {', '.join(t.get('github_orgs',[]))}\n")
+                  f.write(f"- excluded: {', '.join(t.get('excluded',[]))}\n\n")
+          print(f"loaded {len(targets)} targets")
+          PYEOF
           {
             echo "=== SCOPE ==="
             cat scope.yml
+            echo "=== TARGETS ==="
+            cat ctx-targets.md
             echo "=== KNOWLEDGE BASE ==="
             cat knowledge/index.md
             echo "=== MY STATE ==="
@@ -74,8 +91,12 @@ jobs:
         run: |
           cat ctx.txt > analyst-prompt.txt
           cat >> analyst-prompt.txt << 'PROMPT_EOF'
-          You are a senior bug bounty hunter ANALYST for the program described in SCOPE.
-          Your job is NOT to invent vulnerabilities. Run these 8 steps and output ONLY the structured blocks.
+          You are a senior bug bounty hunter ANALYST for the programs described in
+          SCOPE (5 targets: duocircle, emsisoft, docker, posit, coxautomotive — all
+          email-only disclosure, no platform). Your job is NOT to invent
+          vulnerabilities. Run these 8 steps and output ONLY the structured blocks.
+          Tag every [HYP]/[PRIO]/[NEW] line with the target name, e.g. [HYP docker]
+          or [PRIO posit]. Stay within the union scope of the 5 targets (probe_allow).
 
           STEP 1 — DELTA: Compare the inventory + knowledge + your last leads against the current known surface. List only NEW or CHANGED surface items as [NEW]/[CHANGED] (one line each). If nothing is new, state "NO_DELTA".
 
@@ -215,6 +236,27 @@ jobs:
                   with open(f'reports/analyst-{model.group(1)}.log', 'a') as lg:
                       lg.write(f"===== ANALYST {model.group(1)} {stamp} =====\n")
                       lg.write(open(f, errors='ignore').read())
+          # per-target inventory split
+          import yaml as _yaml
+          try:
+              _tnames = [t['name'] for t in _yaml.safe_load(open('scope.yml'))['targets']]
+              _doms = {}
+              for t in _yaml.safe_load(open('scope.yml'))['targets']:
+                  _doms[t['name']] = [d.lstrip('*.').lower() for d in t['domains']]
+          except Exception:
+              _tnames, _doms = ['target'], {'target': []}
+          for tn in _tnames:
+              inv = f'inventory/{tn}.md'
+              with open(inv, 'a') as io:
+                  io.write(f"\n## {stamp}\n")
+                  for f in glob.glob('reports/hypotheses-*.txt'):
+                      for l in re.findall(r'^\[(NEW|CHANGED)\] (.*)$', open(f).read(), re.M):
+                          line = l[1].strip()[:200]
+                          if _doms.get(tn):
+                              dl = [d for d in _doms[tn] if d]
+                              if not any(d in line.lower() for d in dl):
+                                  continue
+                          io.write(f"- {l[0]} {line}\n")
           print('merged', len(all_h), 'hypotheses')
           PY_EOF
 
