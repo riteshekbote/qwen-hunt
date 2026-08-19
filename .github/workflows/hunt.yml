@@ -10,8 +10,8 @@ permissions:
   actions: write
 
 env:
-  QWEN_8B: "richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
-  QWEN_14B: "richardyoung/Qwen3-14B-Abliterated-GGUF:Q4_K_M"
+  QWEN_8B: "hf.co/richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
+  QWEN_14B: "hf.co/richardyoung/Qwen3-14B-abliterated-GGUF:Q4_K_M"
 
 jobs:
   analyst:
@@ -24,8 +24,8 @@ jobs:
       fail-fast: false
       matrix:
         model:
-          - { tag: "richardyoung/Qwen3-14B-Abliterated-GGUF:Q4_K_M", name: qwen14b }
-          - { tag: "richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M", name: qwen8b }
+          - { tag: "hf.co/richardyoung/Qwen3-14B-abliterated-GGUF:Q4_K_M", name: qwen14b }
+          - { tag: "hf.co/richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M", name: qwen8b }
 
     env:
       MODEL_TAG: ${{ matrix.model.tag }}

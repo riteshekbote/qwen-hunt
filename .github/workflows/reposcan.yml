@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  QWEN_8B: "richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
+  QWEN_8B: "hf.co/richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
 
 jobs:
   reposcan:

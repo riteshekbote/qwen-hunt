@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  QWEN_14B: "richardyoung/Qwen3-14B-Abliterated-GGUF:Q4_K_M"
+  QWEN_14B: "hf.co/richardyoung/Qwen3-14B-abliterated-GGUF:Q4_K_M"
 
 jobs:
   triage:
