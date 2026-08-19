@@ -13,3 +13,11 @@
 - 2 lead(s) marked VALID at 2026-08-19 19:08:23 UTC
   - **Verdict:** VALID
   - **Verdict:** VALID
+
+- 6 lead(s) marked VALID at 2026-08-19 20:03:49 UTC
+  - Verdict: Maybe valid. Need to check if the probe shows the endpoint. If the probe for coxautoinc.com's API endpoints is public, then steps would be GET to the endpoint. Impact is SSRF, CVSS around 9.1
+  - Verdict: Valid. Steps: GET to the wildcard DNS endpoint. Impact: DNS misconfig, CVSS 7.5. Report to security@docker.com.
+  - Verdict: Valid. Steps: GET to the GitHub repo. Impact: info disclosure, CVSS 6.5. Report to security@posit.co.
+  - **Verdict**: **VALID**
+  - **Verdict**: **VALID**
+  - **Verdict**: **VALID**
