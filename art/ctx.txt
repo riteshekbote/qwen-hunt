@@ -1,0 +1,169 @@
+=== SCOPE ===
+# Qwen Hunt — multi-target scope (all self-hosted, EMAIL-ONLY disclosure)
+# Verified 2026-08-19: NONE of these domains appear in HackerOne/Bugcrowd/
+# Intigriti/YesWeHack/Hackenproof/OpenBugBounty scope dumps.
+# All report via email only. Probe allow-list = union of all target domains.
+
+targets:
+  - name: "duocircle"
+    platform: "email"
+    disclosure: "security@duocircle.com"
+    bounty: true
+    program_url: "https://trust.duocircle.com/responsible-disclosure/"
+    domains:
+      - "duocircle.com"
+      - "autospf.com"
+      - "dmarcreport.com"
+      - "phishprotection.com"
+      - "outboundsmtp.com"
+      - "tenantmigration.com"
+      - "mailflowmonitoring.com"
+      - "alumniforwarding.com"
+      - "nureply.com"
+      - "inboxissue.com"
+    github_orgs: []
+    excluded: []
+
+  - name: "emsisoft"
+    platform: "email"
+    disclosure: "security@emsisoft.com"
+    bounty: true
+    bounty_amount: "up to $500"
+    program_url: "https://www.emsisoft.com/en/bug-bounty/"
+    domains:
+      - "emsisoft.com"
+      - "static.emsisoft.com"
+      - "blog.emsisoft.com"
+    github_orgs: []
+    excluded: []
+
+  - name: "docker"
+    platform: "email"
+    disclosure: "security@docker.com"
+    bounty: "swag (critical/high)"
+    program_url: "https://www.docker.com/trust/vulnerability-disclosure-policy/"
+    domains:
+      - "docker.com"
+      - "www.docker.com"
+      - "app.docker.com"
+      - "hub.docker.com"
+      - "build.docker.com"
+      - "scout.docker.com"
+      - "*.docker.com"
+      - "*.docker.io"
+      - "dhi.io"
+    github_orgs:
+      - "docker"
+    excluded:
+      - "3rd-party extensions not owned by Docker"
+
+  - name: "posit"
+    platform: "email"
+    disclosure: "security@posit.co"
+    bounty: false
+    program_url: "https://posit.co/about/product-security/"
+    domains:
+      - "posit.co"
+      - "posit.cloud"
+      - "shinyapps.io"
+      - "connect.cloud"
+      - "rstudio.com"
+      - "www.rstudio.com"
+      - "packagemanager.posit.co"
+      - "public.rstudio.com"
+    github_orgs:
+      - "rstudio"
+      - "posit-dev"
+    excluded: []
+
+  - name: "coxautomotive"
+    platform: "email"
+    disclosure: "securitydisclosure@coxautoinc.com"
+    bounty: false
+    program_url: "https://www.coxautoinc.com/responsible-disclosure/"
+    domains:
+      - "coxautoinc.com"
+      - "autotrader.com"
+      - "www.autotrader.com"
+      - "kbb.com"
+      - "www.kbb.com"
+      - "manheim.com"
+      - "www.manheim.com"
+      - "dealertrack.com"
+      - "www.dealertrack.com"
+      - "dealer.com"
+      - "www.dealer.com"
+      - "vauto.com"
+      - "www.vauto.com"
+      - "vinsolutions.com"
+      - "www.vinsolutions.com"
+    github_orgs: []
+    excluded:
+      - "targeting Cox Automotive customers"
+      - "DoS / resource exhaustion"
+
+# passive-only boundary — host patterns the verifier may probe (union of all domains)
+probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantmigration|mailflowmonitoring|alumniforwarding|nureply|inboxissue|emsisoft|docker|posit|shinyapps|rstudio|coxautoinc|autotrader|kbb|manheim|dealertrack|dealer|vauto|vinsolutions|dhi.io"=== TARGETS ===
+## TARGET: duocircle
+- disclosure email: security@duocircle.com
+- bounty: True
+- program url: https://trust.duocircle.com/responsible-disclosure/
+- domains: duocircle.com, autospf.com, dmarcreport.com, phishprotection.com, outboundsmtp.com, tenantmigration.com, mailflowmonitoring.com, alumniforwarding.com, nureply.com, inboxissue.com
+- github orgs: 
+- excluded: 
+
+## TARGET: emsisoft
+- disclosure email: security@emsisoft.com
+- bounty: True
+- program url: https://www.emsisoft.com/en/bug-bounty/
+- domains: emsisoft.com, static.emsisoft.com, blog.emsisoft.com
+- github orgs: 
+- excluded: 
+
+## TARGET: docker
+- disclosure email: security@docker.com
+- bounty: swag (critical/high)
+- program url: https://www.docker.com/trust/vulnerability-disclosure-policy/
+- domains: docker.com, www.docker.com, app.docker.com, hub.docker.com, build.docker.com, scout.docker.com, *.docker.com, *.docker.io, dhi.io
+- github orgs: docker
+- excluded: 3rd-party extensions not owned by Docker
+
+## TARGET: posit
+- disclosure email: security@posit.co
+- bounty: False
+- program url: https://posit.co/about/product-security/
+- domains: posit.co, posit.cloud, shinyapps.io, connect.cloud, rstudio.com, www.rstudio.com, packagemanager.posit.co, public.rstudio.com
+- github orgs: rstudio, posit-dev
+- excluded: 
+
+## TARGET: coxautomotive
+- disclosure email: securitydisclosure@coxautoinc.com
+- bounty: False
+- program url: https://www.coxautoinc.com/responsible-disclosure/
+- domains: coxautoinc.com, autotrader.com, www.autotrader.com, kbb.com, www.kbb.com, manheim.com, www.manheim.com, dealertrack.com, www.dealertrack.com, dealer.com, www.dealer.com, vauto.com, www.vauto.com, vinsolutions.com, www.vinsolutions.com
+- github orgs: 
+- excluded: targeting Cox Automotive customers, DoS / resource exhaustion
+
+=== KNOWLEDGE BASE ===
+# Knowledge Base (seed)
+
+## REJECTED CLASSES (proven dead — do not re-hypothesize)
+
+- REJECTED SSO-domain-discovery oracle (WorkOS/Auth0/Okta style): an unauthenticated
+  endpoint that returns an authorizationUrl/connection for a queried domain is BY
+  DESIGN ("find your IdP" pattern, Microsoft/Okta/Google do the same). client_id,
+  connection IDs, environment IDs and IdP tenant GUIDs are not secrets — they are
+  public in every authorization URL and OIDC metadata. Confirmed by Spare Labs
+  triage 2026-08-19: "expected and intended behavior is by-design". Low-Medium
+  submission rejected. Do not report this class again.
+
+## ACCEPTED CLASSES (known to pay)
+
+- (seed empty — populate from real triage outcomes)=== MY STATE ===
+{"phase":"RECON"}
+=== MY LAST LEADS (tail) ===
+none
+=== AGGREGATED HYPOTHESES (tail) ===
+none
+=== LATEST ROBOT PROBE RESULTS ===
+none
