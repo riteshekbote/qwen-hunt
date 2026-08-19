@@ -92,6 +92,13 @@ jobs:
           python3 -c "import json; prompt=open('triage-prompt.txt').read(); req={'model': '$QWEN_14B', 'prompt': prompt, 'stream': False, 'think': False, 'options': {'num_predict': 2048, 'temperature': 0.2}}; open('triage-req.json','w').write(json.dumps(req))"
           timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
             -d @triage-req.json > triage-raw.json || true
+          for a in 1 2 3 4 5 6; do
+            if python3 -c "import json; d=json.load(open('triage-raw.json')); exit(0 if d.get('response') else 1)" 2>/dev/null; then break; fi
+            echo "triage generate attempt $a failed: $(head -c 200 triage-raw.json)"
+            sleep 15
+            timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
+              -d @triage-req.json > triage-raw.json || true
+          done
           python3 -c "import json; d=json.load(open('triage-raw.json')); print(d.get('response','[NO RESPONSE]'))" > triage-output.txt
           echo "=== triage preview ==="; head -40 triage-output.txt
 

@@ -136,6 +136,14 @@ jobs:
           PYEOF
           timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
             -d @req.json > analyst-raw.json || true
+          # model may still be loading right after pull — retry with backoff
+          for a in 1 2 3 4 5 6; do
+            if python3 -c "import json; d=json.load(open('analyst-raw.json')); exit(0 if d.get('response') else 1)" 2>/dev/null; then break; fi
+            echo "generate attempt $a failed: $(cat analyst-raw.json | head -c 200)"
+            sleep 15
+            timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
+              -d @req.json > analyst-raw.json || true
+          done
           python3 -c "import json; d=json.load(open('analyst-raw.json')); print(d.get('response','[NO RESPONSE]'))" > analyst-out.txt
           cp analyst-out.txt analyst-${MODEL_NAME}.out
           grep -E '^\[(NEW|CHANGED|PRIO|HYP|PARKED|FINAL|NEXT|LEARN|RISK)\]|^class:|^confidence:|^asset:|^impact:|^testability:|^verify_steps:|^reasoning:|^evidence_needed:' analyst-out.txt > lead.txt || true
