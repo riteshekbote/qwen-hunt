@@ -56,3 +56,11 @@
   - First, the lead is "Cox Automotive SSRF Protection". The domains for Cox Automotive include coxautoinc.com, autotrader.com, etc. Q1: Yes, since those domains are in the scope. Q2: SSRF usually require
   - **Verdict**: VALID
   - **Verdict**: VALID
+
+- 6 lead(s) marked VALID at 2026-08-19 23:02:23 UTC
+  - Verdict: VALID. Steps would be GET to the endpoint, impact is SSRF, CVSS maybe 6.5, email to securitydisclosure@coxautoinc.com.
+  - Next: [HYP] Docker Misconfigured Wildcard DNS. Check Docker's domains. The probe allow includes docker.com, dhi.io. Q1: yes. Q2: public DNS records? If the wildcard DNS is public, yes. Q3: impact is i
+  - Now Posit GitHub Org Misconfiguration. Check domains: posit.co, rstudio.com. Q1: yes. Q2: public GitHub repos? If the org is public, yes. Q3: impact is code exposure. Q4: GET/HEAD to the repo. Q5: nov
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
