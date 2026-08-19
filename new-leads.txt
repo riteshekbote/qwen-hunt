@@ -1,4 +1,7 @@
 [HYP] Cox Automotive SSRF via API Endpoints
+[HYP] Cox Automotive SSRF via API Endpoints  
 [HYP] Docker Misconfigured Wildcard DNS Records
+[HYP] Docker Misconfigured Wildcard DNS Records  
 [HYP] Posit GitHub Org Misconfiguration
+[HYP] Posit GitHub Org Misconfiguration  
 [HYP] Posit GitHub Org Misconfigurations

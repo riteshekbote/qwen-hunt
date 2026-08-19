@@ -21,3 +21,11 @@
   - **Verdict**: **VALID**
   - **Verdict**: **VALID**
   - **Verdict**: **VALID**
+
+- 6 lead(s) marked VALID at 2026-08-19 20:29:56 UTC
+  - **Verdict**: VALID
+  - **Verdict**: VALID
+  - **Verdict**: VALID
+  - | **Cox Automotive** | VALID   | SSRF via API endpoints validated.                                    |
+  - | **Docker**         | VALID   | Misconfigured wildcard DNS validated.                                |
+  - | **Posit**          | VALID   | GitHub org misconfigurations validated.                              |
