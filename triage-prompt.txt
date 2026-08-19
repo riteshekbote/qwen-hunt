@@ -134,6 +134,7 @@ LEADS:
 [HYP] Docker Misconfigured Wildcard DNS Records  
 [HYP] Docker Wildcard DNS Misconfiguration
 [HYP] Docker Wildcard DNS Misconfiguration  
+[HYP] GitHub Workflows Misconfiguration
 [HYP] Posit GitHub Org Misconfiguration
 [HYP] Posit GitHub Org Misconfiguration  
 [HYP] Posit GitHub Org Misconfigurations
@@ -141,3 +142,4 @@ LEADS:
 [HYP] Posit GitHub Workflow Misconfiguration
 [HYP] Posit GitHub Workflows Misconfiguration
 [HYP] Posit GitHub Workflows Misconfiguration  
+[HYP] SSRF Vulnerability in CoxAutoInc API
