@@ -45,6 +45,17 @@ jobs:
             grep -hE '^\[HYP\]|^\[LEAD\]' leads/lead-*.md leads/reposcan-*.md 2>/dev/null | sort -u | head -25 > new-leads.txt
           fi
           wc -l new-leads.txt
+          # hard stop — do NOT run the model on empty input (prevents hallucinated VALIDs)
+          if [ ! -s new-leads.txt ]; then
+            echo "NO_LEADS" > triage-output.txt
+            echo "triage skipped: no leads to validate"
+            exit 0
+          fi
+          # empty-file gate: refuse to pass an empty lead set to the model
+          if ! grep -qE '[A-Za-z0-9]' new-leads.txt; then
+            echo "NO_LEADS" > triage-output.txt
+            exit 0
+          fi
 
       - name: Passive live probe of endpoint leads
         run: |

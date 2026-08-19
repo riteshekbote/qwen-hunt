@@ -1,4 +1,2 @@
-
-- 2 lead(s) marked VALID at 2026-08-19 16:44:41 UTC
-  - Verdict: VALID. Steps: GET /config/config.json. Impact: info disclosure. CVSS: 5.5. Reporting email: security@duocircle.com.
-  - **Verdict**: **VALID**
+# Valid Bugs Register
+<!-- Hallucinated 2026-08-19 16:44 entry removed: triage ran on empty lead set (new-leads.txt was 0 lines) and the model invented "GET /config/config.json" for duocircle. Guard added 2026-08-19 to hard-stop triage on empty input. -->
