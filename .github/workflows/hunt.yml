@@ -282,15 +282,21 @@ jobs:
           allow = os.environ.get('PROBE_ALLOW', '').lower()
           pat = re.compile(r'https://[^\s"\)\]\}]+')
           urls, seen = [], set()
-          for f in glob.glob('art/lead_*.txt') + glob.glob('lead_*.txt') + glob.glob('analyst-*.out'):
+          # only structured lead output — NOT analyst-*.out free-form reasoning
+          # (models fabricate example URLs like /endpoint in prose; probing them wastes requests)
+          for f in glob.glob('art/lead_*.txt') + glob.glob('lead_*.txt'):
             try: txt = open(f, errors='ignore').read()
             except OSError: continue
-            for m in pat.findall(txt):
-              u = m.strip('.,;)]}>')
-              if u in seen: continue
-              seen.add(u)
-              if allow and not any(a in u.lower() for a in allow.split('|')): continue
-              urls.append(u[:300])
+            # extract only verify_steps:/NEXT lines, not prose
+            for line in txt.splitlines():
+              if not re.match(r'^[A-Z_]+:|^(verify_steps|impact|reasoning|asset|class|confidence):', line):
+                continue
+              for m in pat.findall(line):
+                u = m.strip('.,;)]}>')
+                if u in seen: continue
+                seen.add(u)
+                if allow and not any(a in u.lower() for a in allow.split('|')): continue
+                urls.append(u[:300])
           ctx = ssl.create_default_context()
           rows = []
           for u in urls[:12]:
@@ -311,7 +317,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add leads reports knowledge inventory state_*.json probe-results.md || true
+          git add -A || true
           if ! git diff --cached --quiet; then
             git commit -m "analyst cycle $(date -u +'%Y-%m-%d-%H-%M')"
           fi
