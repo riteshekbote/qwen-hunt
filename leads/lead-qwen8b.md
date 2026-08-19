@@ -152,3 +152,35 @@ impact: Access to internal systems, potential credential theft
 testability: AUTH_HELPED  
 [PARKED] Posit GitHub Workflows Accessible (404): GitHub workflows endpoint is no longer publicly accessible, reducing evidence value  
 [FINAL]
+## 2026-08-19 20:46:20 UTC (model qwen8b)
+[NEW] posit/.github/workflows: GitHub workflows endpoint 404 (from reports/hypotheses-qwen8b.txt)  
+[CHANGED] *.docker.com: DNS probe failed with name error (from reports/hypotheses-qwen8b.txt)  
+[PRIO] https://github.com/posit/.github/workflows  
+[PRIO] https://*.docker.com  
+[PRIO] https://api.coxautoinc.com/*  
+[HYP] Docker Misconfigured Wildcard DNS Records  
+class: MISCONFIG  
+asset: https://*.docker.com  
+confidence: 75  
+reasoning: Wildcard DNS probe failed with name error, but multi-tenant environment increases misconfig risk.  
+evidence_needed: DNS record inspection showing wildcard A/AAAA records  
+verify_steps: nslookup *.docker.com; dig +noall +answer *.docker.com  
+impact: Potential exposure of internal services, credential leakage, lateral movement  
+testability: PASSIVE  
+[HYP] Posit GitHub Workflows Misconfiguration  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 60  
+reasoning: GitHub workflows endpoint returned 404, suggesting potential misconfiguration or cleanup.  
+evidence_needed: Publicly accessible workflows file with secrets or code  
+verify_steps: curl -v https://github.com/posit/.github/workflows  
+impact: Exposure of CI/CD secrets, code leakage  
+testability: PASSIVE  
+[HYP] Cox Automotive SSRF via API Endpoints  
+class: SSRF  
+asset: https://api.coxautoinc.com/*  
+confidence: 65  
+reasoning: API endpoint returned 403, but SSRF could allow traversal to internal systems via HTTP headers.  
+evidence_needed: Response containing internal hostnames or IPs  
+verify_steps: curl -v "https://api.coxautoinc.com/endpoint?param=12.0.0.1"  
+impact: Access to

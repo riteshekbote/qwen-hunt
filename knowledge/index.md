@@ -15,3 +15,5 @@
 - (seed empty — populate from real triage outcomes)- 2026-08-19 REJECTED SSO-domain-discovery oracle @ docker: confirmed by Spare Labs triage 2026-08-19
 - 2026-08-19 REJECTED OATH @ *.docker.com: confirmed by Spare Labs triage 2026-08-19
 - 2026-08-19 ACCEPTED MISCONFIG @ https://github.com/posit: Public GitHub repo may expose code or secrets if not protected.
+- 2026-08-19 REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed by Spare Labs triage 2026-08-19
+- 2026-08-19 REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 confirmed by Spare Labs triage 2026-08-19

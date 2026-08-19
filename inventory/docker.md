@@ -8,3 +8,7 @@
 ## 2026-08-19 20:18:43 UTC
 - CHANGED https://*.docker.com: Probed with DNS error (ERR), previously ranked as high-priority.
 - NEW https://*.docker.com -> ERR <urlopen error [Errno -2] Name or service not known (CHANGED from previous 200)
+
+## 2026-08-19 20:54:05 UTC
+- NEW https://*.docker.com (ERR [Errno -2] Name or service not known)
+- CHANGED *.docker.com: DNS probe failed with name error (from reports/hypotheses-qwen8b.txt)

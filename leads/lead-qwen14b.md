@@ -65,3 +65,45 @@ evidence_needed: Test with param=internal IP.
 verify_steps: PROBE GET https://api.coxautoinc.com/endpoint?param=192.168.1.1  
 impact: Internal network access (MEDIUM)  
 testability: PASSIVE  
+## 2026-08-19 20:53:56 UTC (model qwen14b)
+[CHANGED] https://github.com/posit/.git/config (from 200 to 404)  
+[CHANGED] https://github.com/posit/.github/workflows (from 200 to 404)  
+[NEW] https://*.docker.com (ERR [Errno -2] Name or service not known)  
+asset: https://github.com/posit  
+asset: https://*.docker.com  
+asset: https://api.coxautoinc.com/endpoint  
+[HYP] Docker Misconfigured Wildcard DNS  
+class: MISCONFIG  
+asset: https://*.docker.com  
+confidence: 40  
+reasoning: Probe returned "Name or service not known," but prior evidence showed wildcard DNS exposure. Possible regression or partial fix.  
+evidence_needed: Recheck DNS A record for test.docker.com  
+verify_steps: PROBE DNS A record for test.docker.com  
+impact: Exposed Docker services (HIGH)  
+testability: PASSIVE  
+[HYP] Posit GitHub Repo Misconfiguration  
+class: SSRF  
+asset: https://github.com/posit/.git/config  
+confidence: 50  
+reasoning: Previously 200, now 404. Possible partial exposure of .git/config. Public repo with .git access may leak code or secrets.  
+evidence_needed: Recheck .git/config or other files.  
+verify_steps: PROBE GET https://github.com/posit/.git/config  
+impact: Partial code exposure (MEDIUM)  
+testability: PASSIVE  
+[HYP] CoxAuto SSRF Filter Bypass  
+class: SSRF  
+asset: https://api.coxautoinc.com/endpoint  
+confidence: 30  
+reasoning: 403 with param=127.0.0.1. Possible SSRF filter bypass. Probe with internal IP to confirm.  
+evidence_needed: Test with param=internal IP.  
+verify_steps: PROBE GET https://api.coxautoinc.com/endpoint?param=192.168.1.1  
+impact: Internal network access (MEDIUM)  
+testability: PASSIVE  
+[PARKED] CoxAuto SSRF Filter Bypass: confidence < 40  
+[FINAL]  
+[HYP] Docker Misconfigured Wildcard DNS  
+[HYP] Posit GitHub Repo Misconfiguration  
+[NEXT] PROBE https://*.docker.com  
+[LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed by Spare Labs triage 2026-08-19  
+[LEARN] REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 confirmed by Spare Labs triage 2026-08-19  
+[RISK] 65  

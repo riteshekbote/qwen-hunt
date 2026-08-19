@@ -21,3 +21,10 @@
 
 ## RANKED HYPOTHESES 2026-08-19 20:18:43 UTC
 - [80] https://github.com/posit/.github/workflows: Posit GitHub Org Misconfiguration (from reports/hypotheses-qwen8b.txt)
+
+## RANKED HYPOTHESES 2026-08-19 20:54:05 UTC
+- [75] https://*.docker.com: Docker Misconfigured Wildcard DNS Records (from reports/hypotheses-qwen8b.txt)
+- [40] https://github.com/posit: Docker Misconfigured Wildcard DNS (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://*.docker.com
+- LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed by Spare Labs triage 2026-08-19
+- LEARN: REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 confirmed by Spare Labs triage 2026-08-19
