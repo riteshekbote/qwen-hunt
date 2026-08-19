@@ -35,3 +35,12 @@
   - Next: Docker Misconfigured Wildcard DNS. Q1: domains include docker.com, so yes. Q2: wildcard DNS might be public. Q3: impact is DNS leakage, which is real. Q4: check DNS records via GET/HEAD? Maybe v
   - **Verdict**: **VALID**
   - **Verdict**: **VALID**
+
+- 7 lead(s) marked VALID at 2026-08-19 21:32:22 UTC
+  - Verdict: VALID. Steps would be accessing the API endpoint with a crafted URL. Impact is SSRF, CVSS around 9.1. Email is securitydisclosure@coxautoinc.com.
+  - Next: [HYP] Docker Misconfigured Wildcard DNS. Check Docker's domains. They include docker.com, hub.docker.com, etc. Q1: yes. Q2: public, so yes. Q3: wildcard DNS misconfig could allow DNS spoofing. Q
+  - Next: [HYP] Posit GitHub Org Misconfiguration. Check Posit's domains. They have posit.co, rstudio.com. Q1: yes. Q2: public GitHub repos. Q3: if the misconfig is a public repo with secrets, impact. Q4:
+  - **Verdict**: **VALID**
+  - **Verdict**: **VALID**
+  - **Verdict**: **VALID**
+  - **Verdict**: **VALID**
