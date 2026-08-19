@@ -4,8 +4,10 @@
 [HYP] Docker Misconfigured Wildcard DNS  
 [HYP] Docker Misconfigured Wildcard DNS Records
 [HYP] Docker Misconfigured Wildcard DNS Records  
+[HYP] Docker Wildcard DNS Misconfiguration
 [HYP] Posit GitHub Org Misconfiguration
 [HYP] Posit GitHub Org Misconfiguration  
 [HYP] Posit GitHub Org Misconfigurations
 [HYP] Posit GitHub Repo Misconfiguration  
+[HYP] Posit GitHub Workflow Misconfiguration
 [HYP] Posit GitHub Workflows Misconfiguration  

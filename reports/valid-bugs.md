@@ -44,3 +44,10 @@
   - **Verdict**: **VALID**
   - **Verdict**: **VALID**
   - **Verdict**: **VALID**
+
+- 5 lead(s) marked VALID at 2026-08-19 22:04:25 UTC
+  - Starting with the Cox Automotive SSRF leads. The domains mentioned in the lead are coxautoinc.com, autotrader.com, etc., which are in the scope. So Q1 is yes. Q2: SSRF usually requires an API endpoint
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
