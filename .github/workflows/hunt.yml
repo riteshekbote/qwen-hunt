@@ -2,7 +2,7 @@ name: Qwen Hunt - Analyst Pipeline
 
 on:
   schedule:
-    - cron: "*/20 * * * *"
+    - cron: "5,35 * * * *"
   workflow_dispatch:
 
 permissions:
