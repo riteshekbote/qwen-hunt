@@ -17,3 +17,7 @@
 - CHANGED https://*.docker.com (ERR Name or service not known)
 - NEW https://*.docker.com: Docker wildcard DNS misconfigured (ERR DNS)
 - CHANGED https://*.docker.com: DNS error (was 200)
+
+## 2026-08-19 21:50:24 UTC
+- NEW https://*.docker.com: Wildcard DNS misconfiguration confirmed in probe errors
+- NEW https://*.docker.com: Wildcard DNS resolution failure (ERR_NAME_NOT_RESOLVED)

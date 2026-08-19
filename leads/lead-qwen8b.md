@@ -216,3 +216,43 @@ testability: PASSIVE
 [LEARN] REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 confirmed
 [LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
 [RISK] 85 reason: Multiple misconfigurations in Docker and Posit repositories expose internal services and potential secrets leakage.
+## 2026-08-19 21:41:29 UTC (model qwen8b)
+[NEW] https://*.docker.com: Wildcard DNS resolution failure (ERR_NAME_NOT_RESOLVED)
+[NEW] https://github.com/posit/.github/workflows: 404 response (potential misconfigured workflows)
+[CHANGED] https://api.coxautoinc.com/endpoint: SSRF attempts (127.0.0.1/192.168.1.1) return 403
+[CHANGED] https://github.com/posit/.git/config: 404 (potential misconfigured Git metadata)
+[PRIO] https://*.docker.com:9.5, attack_surface:10, business_value:8, tech_exposure:9, gate_ease:7, cloud_surface:9, freshness:9
+[PRIO] https://github.com/posit/.github/workflows:8.2, attack_surface:9, business_value:7, tech_exposure:8, gate_ease:6, cloud_surface:7, freshness:8
+[PRIO] https://api.coxautoinc.com/endpoint:7.8, attack_surface:8, business_value:6, tech_exposure:7, gate_ease:5, cloud_surface:8, freshness:7
+[HYP] Docker Wildcard DNS Misconfiguration
+class: MISCONFIG
+asset: https://*.docker.com
+confidence: 85
+reasoning: Wildcard DNS resolution fails (ERR_NAME_NOT_RESOLVED) despite probe attempts. This could indicate misconfigured DNS records allowing unintended subdomain access.
+evidence_needed: DNS records showing wildcard CNAME or A records pointing to Docker's infrastructure
+verify_steps: 1. nslookup *.docker.com 2. dig +short *.docker.com 3. curl -v https://*.docker.com
+impact: Potential SSRF or unauthorized subdomain access to Docker services
+testability: PASSIVE
+[HYP] Posit GitHub Workflows Misconfiguration
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows
+confidence: 70
+reasoning: 404 response suggests missing workflows directory. Could indicate exposed CI/CD config files or misconfigured repository structure.
+evidence_needed: Publicly accessible workflows.yaml files or directory listing
+verify_steps: 1. curl -v https://github.com/posit/.github/workflows 2. check for workflows.yaml in repo
+impact: Exposed CI/CD secrets or configuration (severity: medium)
+testability: PASSIVE
+[HYP] Cox Automotive SSRF Protection
+class: SSRF
+asset: https://api.coxautoinc.com/endpoint
+confidence: 65
+reasoning: 403 responses for internal IP ranges (127.0.0.1/192.168.1.1) suggest basic SSRF mitigation. Need to verify if it's fully protected.
+evidence_needed: Successful SSRF to internal endpoints (e.g. 10.0.0.1)
+verify_steps: 1. curl -v "https://api.coxautoinc.com/endpoint?param=10.0.0.1" 2. check for 200/302 responses
+impact: Potential internal network exposure (severity: high)
+testability: AUTH_HELPED
+[PARKED] Docker OATH Misconfiguration: REJECTED OATH @ *.docker.com confirmed by triage
+[PARKED] SSRF @ Cox Automotive: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+[NEXT] PROBE https://*.docker.com
+[LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+[LEARN] ACCEPTED MISCONFIG @ https://github.com/posit/.

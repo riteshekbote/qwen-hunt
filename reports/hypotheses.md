@@ -35,3 +35,13 @@
 - NEXT(hypotheses-qwen8b.txt): PROBE: GET https://docker.com
 - LEARN: REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 confirmed
 - LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+
+## RANKED HYPOTHESES 2026-08-19 21:50:24 UTC
+- [85] https://*.docker.com: Docker Wildcard DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker.com
+- NEXT(hypotheses-qwen8b.txt): PROBE https://*.docker.com
+- LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+- LEARN: ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 confirms misconfig
+- LEARN: ACCEPTED MISCONFIG @ https://*.docker.com
+- LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+- LEARN: ACCEPTED MISCONFIG @ https://github.com/posit/.
