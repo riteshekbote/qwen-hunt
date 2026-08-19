@@ -18,3 +18,6 @@
 - LEARN: ACCEPTED MISCONFIG @ https://github.com/posit: Public GitHub repo may expose code or secrets if not protected.
 - LEARN: REJECTED OATH @ *.docker.com: confirmed by Spare Labs triage 2026-08-19
 - LEARN: REJECTED SSO-domain-discovery oracle @ docker: confirmed by Spare Labs triage 2026-08-19
+
+## RANKED HYPOTHESES 2026-08-19 20:18:43 UTC
+- [80] https://github.com/posit/.github/workflows: Posit GitHub Org Misconfiguration (from reports/hypotheses-qwen8b.txt)

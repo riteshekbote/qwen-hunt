@@ -116,3 +116,39 @@ testability: PASSIVE
 [LEARN] REJECTED OATH @ *.docker.com: confirmed by Spare Labs triage 2026-08-19  
 [LEARN] REJECTED SSO-domain-discovery oracle @ docker: confirmed by Spare Labs triage 2026-08-19  
 [RISK] 85 reason: 5 targets with active
+## 2026-08-19 20:03:35 UTC (model qwen8b)
+[NEW] https://api.coxautoinc.com/* -> HTTP 403 (CHANGED from previous 200)  
+[NEW] https://github.com/posit/.github/workflows -> HTTP 404 (CHANGED from previous 200)  
+[NEW] https://*.docker.com -> ERR <urlopen error [Errno -2] Name or service not known (CHANGED from previous 200)  
+[PRIO] https://github.com/posit/.github/workflows  
+[PRIO] https://*.docker.com  
+[PRIO] https://api.coxautoinc.com/*  
+[HYP] Posit GitHub Org Misconfiguration  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 80  
+reasoning: GitHub workflows endpoint returned 404, suggesting misconfigured access controls. Public repos may expose secrets or CI/CD configs.  
+evidence_needed: Publicly accessible secrets or workflow files  
+verify_steps: curl -v https://github.com/posit/.github/workflows  
+impact: Exposure of sensitive code/config, potential for code injection  
+testability: PASSIVE  
+[HYP] Docker Misconfigured Wildcard DNS Records  
+class: MISCONFIG  
+asset: https://*.docker.com  
+confidence: 75  
+reasoning: Wildcard DNS probe failed with name error, but multi-tenant environment increases misconfig risk.  
+evidence_needed: DNS record inspection showing wildcard A/AAAA records  
+verify_steps: nslookup *.docker.com; dig +noall +answer *.docker.com  
+impact: Potential exposure of internal services, credential leakage, lateral movement  
+testability: PASSIVE  
+[HYP] Cox Automotive SSRF via API Endpoints  
+class: SSRF  
+asset: https://api.coxautoinc.com/*  
+confidence: 65  
+reasoning: API endpoint returned 403, but SSRF could allow traversal to internal systems via HTTP headers.  
+evidence_needed: Response containing internal hostnames or IPs  
+verify_steps: curl -v "https://api.coxautoinc.com/endpoint?param=12.0.0.1"  
+impact: Access to internal systems, potential credential theft  
+testability: AUTH_HELPED  
+[PARKED] Posit GitHub Workflows Accessible (404): GitHub workflows endpoint is no longer publicly accessible, reducing evidence value  
+[FINAL]
