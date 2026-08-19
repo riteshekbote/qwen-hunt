@@ -47,6 +47,10 @@ jobs:
           done
           ollama pull "$MODEL_TAG" 2>&1 | tail -2
           ollama list
+          # HF-sourced models get a normalized local name — use what ollama list reports
+          LOCAL_MODEL=$(ollama list | tail -n +2 | awk '{print $1}' | head -1)
+          echo "LOCAL_MODEL=$LOCAL_MODEL" >> $GITHUB_ENV
+          echo "resolved local model: $LOCAL_MODEL"
 
       - name: Prepare context (RAG + state + inventory + last cycle)
         run: |
@@ -128,11 +132,13 @@ jobs:
           RULES: facts vs hypotheses strictly separated; no endpoint-map-only output; no class on the REJECTED list; never mention secrets in full (hash them with sha256sum); all claims must trace to the context provided or your own read-only probes; scope boundary = PROBE_ALLOW only.
           PROMPT_EOF
           python3 - << 'PYEOF'
-          import json
+          import json, os
           prompt = open('analyst-prompt.txt').read()
-          req = {'model': '$MODEL_TAG', 'prompt': prompt, 'stream': False, 'think': False,
+          model = os.environ.get('LOCAL_MODEL', os.environ.get('MODEL_TAG', ''))
+          req = {'model': model, 'prompt': prompt, 'stream': False, 'think': False,
                  'options': {'num_predict': 2048, 'temperature': 0.4}}
           open('req.json','w').write(json.dumps(req))
+          print('using model:', model)
           PYEOF
           timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
             -d @req.json > analyst-raw.json || true
