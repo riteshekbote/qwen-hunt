@@ -180,3 +180,6 @@ testability: PASSIVE (via DNS and endpoint probes).
 [NEXT] PROBE: GET https://api.docker.com (check for internal IPs in headers).
 [LEARN] ACCEPTED MISCONFIG @ https://*.docker.com: Wildcard DNS misconfig confirmed via 404 and SSRF probe (https://api.coxautoinc.com/endpoint?param=127.0.0.1).
 [RISK] 85  
+## 2026-08-19 22:50:22 UTC (model qwen14b)
+[NEW] https://docker.com  
+[NEW] https://docker-registry.docker.com  

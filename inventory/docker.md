@@ -25,3 +25,9 @@
 ## 2026-08-19 22:12:26 UTC
 - NEW https://docker.com (200 OK, new surface item from latest probe)
 - NEW https://*.docker.com: Wildcard DNS misconfiguration confirmed (ERR <urlopen error>)
+
+## 2026-08-19 22:50:30 UTC
+- NEW https://docker.com
+- NEW https://docker-registry.docker.com
+- NEW https://docker-registry.docker.com: Docker registry endpoint unreachable (DNS error)
+- NEW https://*.docker.com: Wildcard DNS resolution failure (DNS error)
