@@ -24,3 +24,7 @@
 
 ## 2026-08-19 23:15:11 UTC
 - CHANGED https://api.coxautoinc.com/endpoint?param=127.0.0.1: 403 confirms SSRF misconfig
+
+## 2026-08-19 23:45:57 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=127.0.0.1: 403 (SSRF)
+- CHANGED https://api.coxautoinc.com/endpoint?param=10.0.0.1: 403

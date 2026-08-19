@@ -35,3 +35,9 @@
 ## 2026-08-19 23:15:11 UTC
 - NEW https://docker-registry.docker.com (ERR in latest probe)
 - NEW https://*.docker.com: Wildcard DNS misconfiguration confirmed via 404 and SSRF probe
+
+## 2026-08-19 23:45:57 UTC
+- NEW https://docker.com
+- NEW https://docker-registry.docker.com
+- NEW https://*.docker.com: Wildcard DNS misconfig (ERR)
+- CHANGED https://docker-registry.docker.com: ERR (DNS misconfig)

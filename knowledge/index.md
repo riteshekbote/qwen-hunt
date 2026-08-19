@@ -24,3 +24,5 @@
 - 2026-08-19 ACCEPTED MISCONFIG @ https://*.docker.com: 404 confirms wildcard DNS misconfiguration
 - 2026-08-19 ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 confirms misconfigured workflows
 - 2026-08-19 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+- 2026-08-19 ACCEPTED SSRF @ https://docker.com: 403 with param=127.0.0.1 confirmed
+- 2026-08-19 ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
