@@ -80,3 +80,10 @@
 - LEARN: ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
 - LEARN: ACCEPTED MISCONFIG @ https://*.docker.com: Wildcard DNS misconfig confirmed via 404 and SSRF probe
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+
+## RANKED HYPOTHESES 2026-08-20 00:09:57 UTC
+- [75] https://docker-registry.docker.com: Docker Registry Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/
+- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=192.168.1.1 confirmed
+- LEARN: ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint

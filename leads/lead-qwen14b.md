@@ -261,3 +261,4 @@ testability: PASSIVE
 [LEARN] ACCEPTED SSRF @ https://docker.com: 403 with param=127.0.0.1 confirmed
 [LEARN] ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
 [RISK] 
+## 2026-08-20 00:09:47 UTC (model qwen14b)

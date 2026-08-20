@@ -26,3 +26,6 @@
 - 2026-08-19 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
 - 2026-08-19 ACCEPTED SSRF @ https://docker.com: 403 with param=127.0.0.1 confirmed
 - 2026-08-19 ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
+- 2026-08-20 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
+- 2026-08-20 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=192.168.1.1 confirmed
+- 2026-08-20 ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint

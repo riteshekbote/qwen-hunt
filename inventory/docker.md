@@ -41,3 +41,9 @@
 - NEW https://docker-registry.docker.com
 - NEW https://*.docker.com: Wildcard DNS misconfig (ERR)
 - CHANGED https://docker-registry.docker.com: ERR (DNS misconfig)
+
+## 2026-08-20 00:09:57 UTC
+- NEW https://docker.com
+- NEW https://docker-registry.docker.com
+- CHANGED https://*.docker.com
+- CHANGED https://docker-registry.docker.com/v2/
