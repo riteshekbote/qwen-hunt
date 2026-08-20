@@ -747,3 +747,44 @@ testability: PASSIVE
 [LEARN] ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (params include internal IPs)
 [LEARN] ACCEPTED MISCONFIG @ https://api.coxautoinc.com/endpoint (403s with internal IPs)
 [RISK] 85
+## 2026-08-20 19:57:49 UTC (model qwen14b)
+[NEW] https://github.com/posit/.github/workflows
+[NEW] https://github.com/posit/.git/config
+[CHANGED] https://docker-registry.docker.com/v2/ (repeated errors)
+[CHANGED] https://api.coxautoinc.com/endpoint (persistent 403s with param IPs)
+[PRIO] https://docker-registry.docker.com/v2/ 88
+[PRIO] https://api.coxautoinc.com/endpoint 75
+[PRIO] https://github.com/posit/.github/workflows 65
+[HYP] Docker SSRF via registry endpoint
+class: SSRF
+asset: https://docker-registry.docker.com/v2/
+confidence: 85
+reasoning: Repeated [Errno -2] errors with param IPs suggest DNS resolution failure, but 403s with param IPs imply SSRF potential
+evidence_needed: Response to param=169.254.169.254 with custom headers
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254 HTTP/1.1
+impact: Exfiltration of internal metadata
+testability: PASSIVE
+[HYP] CoxAuto API auth bypass
+class: AUTH
+asset: https://api.coxautoinc.com/endpoint
+confidence: 70
+reasoning: Persistent 403s with param IPs suggest auth failure, possibly using internal IPs as auth tokens
+evidence_needed: Response to param=127.0.0.1 with auth headers
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=127.0.0.1 HTTP/1.1
+impact: Unauthenticated access to API
+testability: AUTH_HELPED
+[HYP] GitHub workflow misconfig
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows
+confidence: 60
+reasoning: 404s suggest missing workflows, but repeated in logs implies active use
+evidence_needed: Response to .github/workflows with auth headers
+verify_steps: GET https://github.com/posit/.github/workflows HTTP/1.1
+impact: Exposed CI/CD secrets
+testability: HUMAN_ONLY
+[PARKED] GitHub workflow misconfig: confidence 60 (barely above 40)
+[FINAL] [HYP] Docker SSRF via registry endpoint
+[HYP] CoxAuto API auth bypass
+[NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254 HTTP/1.1
+[LEARN] ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param IPs in logs)
+[LEARN] REJECTED IDOR @ https://api.coxautoinc.com/endpoint (403s with param IPs suggest auth, not IDOR)

@@ -94,3 +94,7 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=10.0.0.1 (now 403)
 - NEW https://api.coxautoinc.com/endpoint?param=10.0.0.1
 - CHANGED https://api.coxautoinc.com/endpoint?param=192.168.1.1
+
+## 2026-08-20 19:58:23 UTC
+- CHANGED https://api.coxautoinc.com/endpoint (persistent 403s with param IPs)
+- CHANGED https://api.coxautoinc.com/endpoint (persistent 403)

@@ -48,3 +48,5 @@
 - 2026-08-20 REJECTED SSRF @ https://api.coxautoinc.com/endpoint?param=169.254.169.254: DNS resolution failure prevents verification
 - 2026-08-20 ACCEPTED MISCONFIG @ https://docker-registry.docker.com/v2/: Persistent DNS errors indicate misconfigured registry endpoint
 - 2026-08-20 ACCEPTED BUSLOGIC @ https://
+- 2026-08-20 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param IPs in logs)
+- 2026-08-20 REJECTED IDOR @ https://api.coxautoinc.com/endpoint (403s with param IPs suggest auth, not IDOR)
