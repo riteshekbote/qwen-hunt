@@ -47,3 +47,11 @@
 - NEW https://docker-registry.docker.com
 - CHANGED https://*.docker.com
 - CHANGED https://docker-registry.docker.com/v2/
+
+## 2026-08-20 01:53:18 UTC
+- NEW docker-registry.docker.com (probe error confirmed misconfigured registry endpoint)
+- NEW https://docker.com/endpoint?param=127.0.1 (new surface item with 404 response)
+- CHANGED docker.com (200 response confirmed accessibility)
+- NEW https://docker-registry.docker.com/v2/ (now reachable via v2/ path)
+- NEW https://docker.com (now returns 200)
+- CHANGED https://docker-registry.docker.com (now returns error)

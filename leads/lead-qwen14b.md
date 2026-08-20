@@ -262,3 +262,10 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
 [RISK] 
 ## 2026-08-20 00:09:47 UTC (model qwen14b)
+## 2026-08-20 01:53:07 UTC (model qwen14b)
+[NEW] docker-registry.docker.com (probe error confirmed misconfigured registry endpoint)
+[NEW] https://docker.com/endpoint?param=127.0.1 (new surface item with 404 response)
+[CHANGED] docker.com (200 response confirmed accessibility)
+[HYP] SSRF in docker-registry.docker.com
+class: SSRF
+asset: docker-registry.docker
