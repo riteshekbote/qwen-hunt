@@ -1,0 +1,3 @@
+bdebe89d85c68999 Docker Registry SSRF
+6e33b6e97f9562aa Docker Registry DNS Misconfiguration
+ad801e8fde60e630 SSRF via CoxAutoInc API

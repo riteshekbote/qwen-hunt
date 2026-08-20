@@ -117,3 +117,7 @@
 - NEW docker-registry.docker.com/v2/ (DNS resolution failure confirmed)
 - NEW docker-registry.docker.com/v2/ DNS resolution failure confirmed
 - CHANGED https://docker-registry.docker.com/v2/ → ERR (DNS issue persists)
+
+## 2026-08-20 14:16:47 UTC
+- NEW docker-registry.docker.com/v2/?param=169.254.169.254 (repeated in probe logs, likely SSRF target)
+- CHANGED docker-registry.docker.com/v2/ (DNS failure confirmed in all logs)

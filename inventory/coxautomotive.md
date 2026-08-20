@@ -69,3 +69,6 @@
 ## 2026-08-20 13:19:13 UTC
 - CHANGED https://api.coxautoinc.com/endpoint (403 may be rate limiting/auth check)
 - CHANGED https://api.coxautoinc.com/endpoint?param=169.254.169.254 → 403 (rate limiting/auth check)
+
+## 2026-08-20 14:16:47 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=192.168.1.1 (403, new private IP param)

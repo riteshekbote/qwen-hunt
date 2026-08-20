@@ -625,3 +625,14 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 indicates dead repo
 [LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
 [RISK] 68
+## 2026-08-20 14:16:36 UTC (model qwen14b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254 (repeated in probe logs, likely SSRF target)
+[NEW] https://github.com/posit/.git/config (404, possible repo structure leak)
+[NEW] https://api.coxautoinc.com/endpoint?param=192.168.1.1 (403, new private IP param)
+[CHANGED] docker-registry.docker.com/v2/ (DNS failure confirmed in all logs)
+[CHANGED] https://github.com/posit/.github/workflows (404 confirmed in all logs)
+[HYP] Docker Registry SSRF  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 85  
+reasoning: DNS failure confirmed, param=16

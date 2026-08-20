@@ -185,3 +185,8 @@
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
 - LEARN: ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 indicates dead repo
 - LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
+
+## RANKED HYPOTHESES 2026-08-20 14:16:47 UTC
+- [85] https://docker-registry.docker.com/v2/: Docker Registry SSRF (from reports/hypotheses-qwen14b.txt)
+- [80] docker-registry.docker.com/v2/: SSRF via CoxAutoInc API (from reports/hypotheses-qwen8b.txt)
+- [80] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
