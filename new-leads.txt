@@ -5,6 +5,7 @@
 [HYP] CoxAuto SSRF Filter Bypass  
 [HYP] CoxAutoInc API Internal Network SSRF
 [HYP] CoxAutoInc Internal IP SSRF
+[HYP] CoxAutoInc Internal IP SSRF  
 [HYP] CoxAutoInc SSRF
 [HYP] CoxAutoInc SSRF Vulnerability  
 [HYP] CoxAutoInc SSRF via API
@@ -15,11 +16,10 @@
 [HYP] Docker Registry DNS Misconfiguration
 [HYP] Docker Registry Misconfiguration
 [HYP] Docker Registry Virtual Host Misconfiguration
+[HYP] Docker Registry Virtual Host Misconfiguration  
 [HYP] Docker Registry v2 Endpoint
 [HYP] Docker Wildcard DNS Misconfiguration
 [HYP] Docker Wildcard DNS Misconfiguration  
 [HYP] GitHub .git Config Exposure
+[HYP] GitHub Workflow Misconfig in Posit  
 [HYP] GitHub Workflow Misconfiguration in Posit  
-[HYP] GitHub Workflows Misconfig
-[HYP] GitHub Workflows Misconfiguration
-[HYP] GitHub Workflows Misconfiguration  
