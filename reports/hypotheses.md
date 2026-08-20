@@ -258,3 +258,6 @@
 - LEARN: IDOR @ https://api.coxautoinc.com/endpoint: proven dead (403)
 - LEARN: SSRF @ https://api.coxautoinc.com/endpoint: proven alive (403)
 - LEARN: MISCONFIG @ https://github.com/posit/.github/workflows: proven alive (404)
+
+## RANKED HYPOTHESES 2026-08-20 23:53:02 UTC
+- (no NEW hypotheses this cycle — all deduped)

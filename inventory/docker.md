@@ -176,3 +176,9 @@
 - NEW docker-registry.docker.com/v2/?param=172.16.0.1
 - NEW https://docker-registry.docker.com/v2/ (DNS resolution failure)
 - CHANGED https://docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure)
+
+## 2026-08-20 23:53:02 UTC
+- NEW docker-registry.docker.com/v2/?param=169.254.169.254
+- NEW docker-registry.docker.com/v2/?param=172.16.0.1
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not known
+- CHANGED https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not known
