@@ -935,3 +935,44 @@ testability: PASSIVE
 [HYP] IDOR in CoxAuto API
 [NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
 [RISK] 85
+## 2026-08-20 23:15:41 UTC (model qwen14b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] docker-registry.docker.com/v2/?param=172.16.0.1
+[NEW] api.coxautoinc.com/endpoint?param=admin
+[CHANGED] github.com/posit/.github/workflows (from 404 to 404, but with new query params)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 65
+reasoning: Repeated attempts to access docker-registry with private IPs (169.254.169.254, 172.16.0.1) show pattern of SSRF probing. All attempts fail with "Name or service not known" which may indicate misconfigured proxy or internal service exposure.
+evidence_needed: Successful proxy bypass or internal service access
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Potential access to internal services via SSRF (MEDIUM)
+testability: PASSIVE
+[HYP] Admin endpoint misconfig
+class: MISCONFIG
+asset: api.coxautoinc.com/endpoint
+confidence: 55
+reasoning: 403 response persists even with admin param. Could indicate misconfigured admin endpoint with loose access controls.
+evidence_needed: Successful admin access or response differentiation
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+impact: Potential admin access (HIGH)
+testability: PASSIVE
+[HYP] GitHub workflow misconfig
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 50
+reasoning: 404 response with workflow path suggests possible misconfigured GitHub actions workflow.
+evidence_needed: Workflow file visibility
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Potential workflow exposure (MEDIUM)
+testability: PASSIVE
+[PARKED] GitHub workflow misconfig: confidence (50) below threshold
+[FINAL]
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 65
+reasoning: Repeated attempts to access docker-registry with private IPs (169.254.169.254, 172.16.0.1) show pattern of SSRF probing. All attempts fail with "Name or service not known" which may indicate misconfigured proxy or internal service exposure.
+evidence_needed: Successful proxy bypass or internal service access
+verify_steps: GET https://

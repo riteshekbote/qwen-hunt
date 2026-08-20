@@ -112,3 +112,8 @@
 
 ## 2026-08-20 22:53:30 UTC
 - NEW api.coxautoinc.com/endpoint
+
+## 2026-08-20 23:15:51 UTC
+- NEW api.coxautoinc.com/endpoint?param=admin
+- NEW https://api.coxautoinc.com/endpoint (403)
+- CHANGED https://api.coxautoinc.com/endpoint?param=169.254.169.254 (403)
