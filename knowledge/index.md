@@ -38,3 +38,5 @@
 - 2026-08-20 ACCEPTED MISCONFIG @ docker-registry.docker.com/v2: DNS misconfiguration confirmed via repeated probe errors.
 - 2026-08-20 ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
 - 2026-08-20 REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 may indicate fix
+- 2026-08-20 ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 indicates dead repo
+- 2026-08-20 REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check

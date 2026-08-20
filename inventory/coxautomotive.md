@@ -59,3 +59,6 @@
 
 ## 2026-08-20 10:56:33 UTC
 - CHANGED coxautoinc.com endpoints consistently return 403 (no change in behavior)
+
+## 2026-08-20 11:52:58 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=169.254.169.254: 403 response (same as param=10.0.0.1)

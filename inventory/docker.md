@@ -104,3 +104,8 @@
 - CHANGED docker.com (200 OK in probe results, suggesting surface-level access)
 - NEW docker-registry.docker.com/v2/ DNS resolution failure (persistent since 2026-08-20 09:59:13 UTC)
 - CHANGED https://docker.com remains accessible (200) but endpoint probing shows 404s
+
+## 2026-08-20 11:52:58 UTC
+- NEW docker-registry.docker.com/v2/ (persistent DNS error confirmed)
+- NEW docker-registry.docker.com/v2/: DNS resolution failure confirmed (ERR [Errno -2] Name or service not known)
+- CHANGED https://docker-registry.docker.com/v2/: DNS misconfiguration confirmed (ERR [Errno -2] Name or service not known)
