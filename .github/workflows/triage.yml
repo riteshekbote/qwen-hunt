@@ -102,7 +102,7 @@ jobs:
                   f.write(f"{c} {u}\n")
           print(f"EVIDENCE GATE: kept {len(kept)} lead(s) with probe evidence, dropped {dropped} unproven")
           with open(os.environ.get('GITHUB_OUTPUT', 'gate.out'), 'a') as out:
-              out.write('has_evidence=true' if kept else 'has_evidence=false')
+              out.write('has_evidence=true\n' if kept else 'has_evidence=false\n')
           # if nothing survived the gate, skip the model (marker prevents downstream false VALIDs)
           if not kept:
               open('triage-output.txt', 'w').write('NO_EVIDENCE: no lead passed the probe-evidence gate. Nothing validated.\n')
@@ -219,9 +219,16 @@ jobs:
               txt = open('triage-output.txt', errors='ignore').read()
           except Exception:
               txt = ''
+          # only accept INVALID/HOLD lines that CITE an evidence URL — hallucinated
+          # rejection reasons must not pollute the knowledge base either
+          ev_urls = []
+          try:
+              ev_urls = [u for line in open('evidence.txt', errors='ignore') for u in re.findall(r'https?://[^\s]+', line)]
+          except Exception:
+              pass
           for m in re.finditer(r'(?im)^\s*(INVALID|HOLD|VALID)\b.*?[-:]\s*(.{10,220})', txt):
               verdict, why = m.group(1).upper(), m.group(2).strip()
-              if verdict in ('INVALID', 'HOLD'):
+              if verdict in ('INVALID', 'HOLD') and any(u in why for u in ev_urls):
                   line = f"- {stamp[:10]} REJECTED class @ lead: {why}"
                   if line not in ktext:
                       learnings.append(line)
