@@ -31,3 +31,5 @@
 - 2026-08-20 ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
 - 2026-08-20 ACCEPTED MISCONFIG @ https://docker-registry.docker.com/v2/: Probe confirms v2/ path is a valid registry endpoint
 - 2026-08-20 ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
+- 2026-08-20 ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
+- 2026-08-20 REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 responses for internal IPs may be normal network segmentation

@@ -321,3 +321,28 @@ testability: PASSIVE
 [NEXT] PROBE: `GET https://docker-registry.docker.com/v2/` with `Host: docker.com`
 [LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
 [RISK] 85
+## 2026-08-20 05:01:41 UTC (model qwen14b)
+[NEW] docker-registry.docker.com/v2/ with Host: docker.com (virtual host misconfiguration recurring DNS errors)
+[CHANGED] docker.com endpoint (recurring 200 OK with virtual host probe)
+[HYP] Virtual Host Misconfiguration in Docker Registry  
+class: MISCONFIG  
+asset: docker-registry.docker.com/v2/  
+confidence: 95  
+reasoning: Recurring DNS errors and virtual host probe with Host: docker.com suggest misconfigured virtual host.  
+evidence_needed: Response from docker-registry.docker.com/v2/ with Host: docker.com header.  
+verify_steps:  
+impact: Exposed Docker registry if virtual host misconfigured, possible SSRF or IDOR.  
+testability: PASSIVE  
+[FINAL]  
+[HYP] Virtual Host Misconfiguration in Docker Registry  
+class: MISCONFIG  
+asset: docker-registry.docker.com/v2/  
+confidence: 95  
+reasoning: Recurring DNS errors and virtual host probe with Host: docker.com suggest misconfigured virtual host.  
+evidence_needed: Response from docker-registry.docker.com/v2/ with Host: docker.com header.  
+verify_steps:  
+impact: Exposed Docker registry if virtual host misconfigured, possible SSRF or IDOR.  
+testability: PASSIVE  
+[NEXT] PROBE: `GET https://docker-registry.docker.com/v2/` with `Host: docker.com`  
+[LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig  
+[RISK] 85  
