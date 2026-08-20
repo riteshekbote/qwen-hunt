@@ -135,3 +135,6 @@
 
 - 1 lead(s) marked VALID at 2026-08-20 09:18:42 UTC
   - Verdict: VALID.
+
+- 1 lead(s) marked VALID at 2026-08-20 10:12:16 UTC
+  - First, check Q1: Is it in the program scope? Cox Automotive's domains include coxautoinc.com, autotrader.com, etc. The lead mentions Cox Automotive, so yes. Q2: Can an attacker reach it? If the SSRF i
