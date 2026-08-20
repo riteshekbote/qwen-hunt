@@ -86,3 +86,7 @@
 - CHANGED docker-registry.docker.com virtual host misconfig confirmed
 - NEW docker-registry.docker.com/v2/ DNS resolution failure (recurring)
 - CHANGED https://*.docker.com DNS errors (persistent)
+
+## 2026-08-20 08:03:36 UTC
+- NEW https://docker.com
+- CHANGED https://docker-registry.docker.com/v2/
