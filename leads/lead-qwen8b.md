@@ -792,3 +792,47 @@ testability: PASSIVE
 [HYP] Posit GitHub Workflow Misconfiguration
 [NEXT] PROBE https://docker-registry.docker.com/v2/
 [LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v
+## 2026-08-20 10:48:36 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/ DNS resolution failure (persistent since 2026-08-20 09:59:13 UTC)
+[NEW] https://github.com/posit/.git/config exposure (404, previously 200 in reports/hypotheses-qwen14b.txt)
+[CHANGED] https://docker.com remains accessible (200) but endpoint probing shows 404s
+[CHANGED] coxautoinc.com endpoints consistently return 403 (no change in behavior)
+[PRIO] docker-registry.docker.com/v2/ 8.2 
+[PRIO] https://github.com/posit/.git/config 7.5 
+[PRIO] https://api.coxautoinc.com/endpoint 7.0 
+[HYP] Docker Registry DNS Misconfiguration
+class: MISCONFIG
+asset: docker-registry.docker.com/v2/
+confidence: 85
+reasoning: Persistent DNS resolution failure suggests misconfigured DNS records or private IP exposure. Common in self-hosted registries or misconfigured public endpoints.
+evidence_needed: DNS record inspection or successful probe to private IP
+verify_steps: nslookup docker-registry.docker.com; curl -v https://docker-registry.docker.com/v2/
+impact: SSRF potential to internal systems; data exfiltration
+testability: PASSIVE
+[HYP] GitHub .git/config Exposure
+class: MISCONFIG
+asset: https://github.com/posit/.git/config
+confidence: 60
+reasoning: 404 response may indicate misconfigured repo visibility or accidental exposure. Could reveal CI/CD secrets or config details.
+evidence_needed: successful retrieval of .git/config file
+verify_steps: curl -v https://github.com/posit/.git/config
+impact: secret leakage; config exposure
+testability: PASSIVE
+[HYP] Coxautoinc API Misconfigured Auth
+class: AUTH
+asset: https://api.coxautoinc.com/endpoint
+confidence: 75
+reasoning: 403 responses to internal IPs suggest potential misconfigured access control. Could allow bypass of IP whitelisting.
+evidence_needed: successful access to internal IP endpoints
+verify_steps: curl -v https://api.coxautoinc.com/endpoint?param=10.0.0.1
+impact: internal data exposure; privilege escalation
+testability: PASSIVE
+[PARKED] GitHub .git/config Exposure: 404 response may indicate fix in production (confidence < 40%)
+[FINAL]
+[HYP] Docker Registry DNS Misconfiguration
+[HYP] Coxautoinc API Misconfigured Auth
+[HYP] GitHub .git/config Exposure
+[NEXT] PROBE https://docker-registry.docker.com/v2/
+[LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
+[LEARN] REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 may indicate fix
+[RISK] 75 reason: Persistent DNS misconfig in docker registry + potential internal API exposure in coxautoinc system

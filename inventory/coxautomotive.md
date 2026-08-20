@@ -56,3 +56,6 @@
 
 ## 2026-08-20 09:59:13 UTC
 - NEW api.coxautoinc.com/endpoint SSRF vulnerability (confirmed by 403 responses to internal IPs)
+
+## 2026-08-20 10:56:33 UTC
+- CHANGED coxautoinc.com endpoints consistently return 403 (no change in behavior)

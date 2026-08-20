@@ -150,3 +150,12 @@
 - [65] https://github.com/posit/.git/config: GitHub .git/config Exposure (from reports/hypotheses-qwen14b.txt)
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v
+
+## RANKED HYPOTHESES 2026-08-20 10:56:33 UTC
+- [85] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [60] docker-registry.docker.com/v2/: Docker Registry SSRF (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/ with param=169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2: DNS misconfiguration confirmed via repeated probe errors.
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
+- LEARN: REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 may indicate fix

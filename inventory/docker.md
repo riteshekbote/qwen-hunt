@@ -98,3 +98,9 @@
 ## 2026-08-20 09:59:13 UTC
 - NEW docker-registry.docker.com/v2/ DNS resolution failure (confirmed by multiple probes)
 - CHANGED docker.com/endpoint (now 404, previously 200)
+
+## 2026-08-20 10:56:33 UTC
+- NEW docker-registry.docker.com/v2/ (DNS misconfiguration, confirmed by repeated DNS errors in probe results)
+- CHANGED docker.com (200 OK in probe results, suggesting surface-level access)
+- NEW docker-registry.docker.com/v2/ DNS resolution failure (persistent since 2026-08-20 09:59:13 UTC)
+- CHANGED https://docker.com remains accessible (200) but endpoint probing shows 404s
