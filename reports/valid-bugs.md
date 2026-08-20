@@ -138,3 +138,8 @@
 
 - 1 lead(s) marked VALID at 2026-08-20 10:12:16 UTC
   - First, check Q1: Is it in the program scope? Cox Automotive's domains include coxautoinc.com, autotrader.com, etc. The lead mentions Cox Automotive, so yes. Q2: Can an attacker reach it? If the SSRF i
+
+- 3 lead(s) marked VALID at 2026-08-20 11:44:51 UTC
+  - Verdict: VALID. Steps: GET to the API endpoint with SSRF payload. Impact: internal network access. CVSS: maybe 9.1. Reporting channel: securitydisclosure@coxautoinc.com.
+  - Now Docker leads: [HYP] Docker Misconfigured Wildcard DNS. Check Q1: Docker's domains include docker.com, so yes. Q2: Public DNS? If the wildcard DNS is public, yes. Q3: Impact? Misconfigured DNS coul
+  - Verdict: VALID.
