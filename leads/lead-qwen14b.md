@@ -554,3 +554,40 @@ testability: AUTH_HELPED
 [HYP] Cox Endpoint 403 Lockout
 [NEXT] PROBE https://docker-registry.docker.com/v2/ with param=169.254.169.254
 [RISK] 85  
+## 2026-08-20 12:15:44 UTC (model qwen14b)
+[HYP] Docker Registry DNS Failure  
+class: MISCONFIG  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 60  
+reasoning: Repeated DNS resolution failures across 12 probes (all same error). Likely misconfigured internal DNS or missing cloud endpoint.  
+evidence_needed: DNS resolution logs for `docker-registry.docker.com`  
+verify_steps: PROBE https://docker-registry.docker.com/v2/  
+impact: Registry endpoint unreachable; potential internal network or cloud misconfig.  
+testability: PASSIVE
+[HYP] Posit GitHub Repo Dead  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 75  
+reasoning: 404 on 12 probes; likely dead repo or misconfigured path.  
+evidence_needed: GitHub repo metadata  
+verify_steps: PROBE https://github.com/posit/.github/workflows  
+impact: No active repo; minor business impact.  
+testability: PASSIVE
+[HYP] CoxAuto API Rate Limiting  
+class: SSRF  
+asset: https://api.coxautoinc.com/endpoint  
+confidence: 35  
+reasoning: 403 on 12 probes; likely rate limiting or auth failure.  
+evidence_needed: API rate limit headers  
+verify_steps: PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254  
+impact: Minor; rate limiting likely.  
+testability: PASSIVE
+[PARKED] CoxAuto API Rate Limiting: confidence < 40  
+[FINAL]  
+[HYP] Docker Registry DNS Failure  
+[HYP] Posit GitHub Repo Dead
+[NEXT] PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
+[LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed  
+[LEARN] ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 indicates dead repo  
+[LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
+[RISK] 65  

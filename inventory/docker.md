@@ -109,3 +109,6 @@
 - NEW docker-registry.docker.com/v2/ (persistent DNS error confirmed)
 - NEW docker-registry.docker.com/v2/: DNS resolution failure confirmed (ERR [Errno -2] Name or service not known)
 - CHANGED https://docker-registry.docker.com/v2/: DNS misconfiguration confirmed (ERR [Errno -2] Name or service not known)
+
+## 2026-08-20 12:15:53 UTC
+- NEW docker-registry.docker.com/v2/?param=169.254.169.254: DNS resolution failure confirmed
