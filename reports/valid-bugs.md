@@ -79,3 +79,10 @@
   - Verdict: VALID.
   - Verdict: VALID.
   - Verdict: VALID for first lead, others are HOLD.
+
+- 5 lead(s) marked VALID at 2026-08-20 00:43:12 UTC
+  - First, the lead is "HYP Cox Automotive SSRF Protection". Let's check the scope for coxautomotive. The domains include coxautoinc.com, autotrader.com, etc. So Q1: yes, in scope. Q2: Can an attacker rea
+  - - **Verdict:** VALID
+  - - **Verdict:** VALID
+  - - **Verdict:** VALID
+  - - **Verdict:** VALID
