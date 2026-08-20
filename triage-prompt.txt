@@ -137,6 +137,7 @@ LEADS:
 [HYP] Docker Misconfigured Wildcard DNS Records
 [HYP] Docker Misconfigured Wildcard DNS Records  
 [HYP] Docker Registry Misconfiguration
+[HYP] Docker Registry Virtual Host Misconfiguration
 [HYP] Docker Registry v2 Endpoint
 [HYP] Docker Wildcard DNS Misconfiguration
 [HYP] Docker Wildcard DNS Misconfiguration  
@@ -148,4 +149,3 @@ LEADS:
 [HYP] MISCONFIG in docker-registry.docker.com/v2/  
 [HYP] MISCONFIG in docker.com endpoint  
 [HYP] Posit GitHub Org Misconfiguration
-[HYP] Posit GitHub Org Misconfiguration  
