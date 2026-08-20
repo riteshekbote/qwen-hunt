@@ -105,3 +105,9 @@
   - Verdict: For the first Cox lead, maybe VALID. But need to check if the probe found a 200 response on an SSRF endpoint. The probe results for coxautomotive domains would have been probed. If the SSRF i
   - Now, for the Docker leads: the probe results for docker.com would have probed the domains. The leads about wildcard DNS misconfig would be in scope. So Q1: Yes. Q2: Can attacker reach? If the wildcard
   - **Verdict:** VALID
+
+- 4 lead(s) marked VALID at 2026-08-20 06:11:02 UTC
+  - Verdict: Maybe VALID, but need to check if the probe found the endpoints. The probe for coxautoinc.com is allowed, so maybe the SSRF is via an API endpoint. But the lead is a hypothesis, so maybe need
+  - **Verdict: VALID**
+  - **Verdict: VALID**
+  - **Verdict: VALID**

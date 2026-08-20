@@ -129,6 +129,7 @@ LEADS:
 [HYP] Cox Automotive SSRF via API Endpoints
 [HYP] Cox Automotive SSRF via API Endpoints  
 [HYP] CoxAuto SSRF Filter Bypass  
+[HYP] CoxAutoInc API Internal Network SSRF
 [HYP] CoxAutoInc SSRF
 [HYP] CoxAutoInc SSRF Vulnerability  
 [HYP] CoxAutoInc SSRF via API
@@ -148,4 +149,3 @@ LEADS:
 [HYP] GitHub Workflows Misconfiguration  
 [HYP] MISCONFIG in docker-registry.docker.com/v2/  
 [HYP] MISCONFIG in docker.com endpoint  
-[HYP] Posit GitHub Org Misconfiguration
