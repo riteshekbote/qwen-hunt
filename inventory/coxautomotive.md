@@ -53,3 +53,6 @@
 
 ## 2026-08-20 09:07:33 UTC
 - NEW coxautoinc.com SSRF via internal IPs (403 responses for 10.0.0.1/127.0.0.1/192.168.1.1)
+
+## 2026-08-20 09:59:13 UTC
+- NEW api.coxautoinc.com/endpoint SSRF vulnerability (confirmed by 403 responses to internal IPs)

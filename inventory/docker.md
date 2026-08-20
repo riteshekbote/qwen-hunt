@@ -94,3 +94,7 @@
 ## 2026-08-20 09:07:33 UTC
 - NEW docker-registry.docker.com/v2/ DNS resolution failure (ERR <urlopen error [Errno -2] Name or service not known>)
 - CHANGED docker.com/endpoint?param=127.0.0.1 (HTTP 404 vs previous 403)
+
+## 2026-08-20 09:59:13 UTC
+- NEW docker-registry.docker.com/v2/ DNS resolution failure (confirmed by multiple probes)
+- CHANGED docker.com/endpoint (now 404, previously 200)

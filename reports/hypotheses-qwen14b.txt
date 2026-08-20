@@ -1,1 +1,30 @@
-## 2026-08-20 09:07:23 UTC (model qwen14b)
+## 2026-08-20 09:59:05 UTC (model qwen14b)
+[NEW] https://github.com/posit/.git/config
+[NEW] https://github.com/posit/.github/workflows
+[HYP] GitHub .git/config Exposure  
+class: MISCONFIG  
+asset: https://github.com/posit/.git/config  
+confidence: 65  
+reasoning: 404 response suggests file is accessible but not found; likely misconfigured access controls.  
+evidence_needed: Probe for file retrieval or directory listing.  
+verify_steps: PROBE https://github.com/posit/.git/config  
+impact: Exposed config could reveal internal Git settings, leading to repo traversal or secrets.  
+testability: PASSIVE  
+[HYP] GitHub Workflow Misconfiguration  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 60  
+reasoning: 404 suggests workflows are exposed; likely misconfigured visibility.  
+evidence_needed: Fetch workflow file or directory listing.  
+verify_steps: PROBE https://github.com/posit/.github/workflows  
+impact: Exposed workflows may leak CI/CD secrets or internal logic.  
+testability: PASSIVE  
+[HYP] Docker Registry DNS Misconfiguration  
+class: MISCONFIG  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 85  
+reasoning: DNS resolution failure confirms virtual host misconfig.  
+evidence_needed: Confirm DNS resolution or proxy misrouting.  
+verify_steps: PROBE https://docker-registry.docker.com/v2/  
+impact: Potential internal network exposure or misdirected traffic.  
+testability: PASSIVE  

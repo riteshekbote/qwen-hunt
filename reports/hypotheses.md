@@ -144,3 +144,9 @@
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/ (verify DNS resolution)
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
 - LEARN: ACCEPTED SSRF @ api.coxautoinc.com/endpoint: 403 responses for internal IPs confirm SSRF
+
+## RANKED HYPOTHESES 2026-08-20 09:59:13 UTC
+- [95] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [65] https://github.com/posit/.git/config: GitHub .git/config Exposure (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v
