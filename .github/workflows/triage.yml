@@ -71,6 +71,44 @@ jobs:
           done
           cat probe-results.txt
 
+      - name: Evidence gate (only leads with non-trivial probe evidence pass)
+        if: steps.collect.outputs.has_leads == 'true'
+        run: |
+          python3 << 'PY'
+          import re, os
+          # non-trivial = 200/201/301/302/401/403/405/500 with a real response,
+          # or a 4xx/5xx on a path that is NOT a standard 404. TIMEOUT/000 never passes.
+          evidence = {}
+          if os.path.exists('probe-results.txt'):
+              for line in open('probe-results.txt', errors='ignore'):
+                  parts = line.strip().split(None, 1)
+                  if len(parts) == 2:
+                      code, url = parts
+                      if code in ('200','201','204','301','302','307','308','401','403','405','500','502','503') and code != '000':
+                          evidence[url.rstrip('/')] = code
+          kept, dropped = [], 0
+          if os.path.exists('new-leads.txt'):
+              for line in open('new-leads.txt', errors='ignore'):
+                  urls = re.findall(r'https?://[^\s"\)\]\}]+', line)
+                  if urls and any(u.rstrip('/') in evidence or u in evidence for u in urls):
+                      kept.append(line.strip())
+                  else:
+                      dropped += 1
+          with open('new-leads.txt', 'w') as f:
+              f.write('\n'.join(kept) + '\n')
+          with open('evidence.txt', 'w') as f:
+              for u, c in evidence.items():
+                  f.write(f"{c} {u}\n")
+          print(f"EVIDENCE GATE: kept {len(kept)} lead(s) with probe evidence, dropped {dropped} unproven")
+          # if nothing survived the gate, skip the model
+          if not kept:
+              echo_marker = open('triage-output.txt', 'w')
+              echo_marker.write('NO_EVIDENCE')
+              echo_marker.close()
+              print('no evidence-backed leads — triage model skipped')
+              import sys; sys.exit(0)
+          PY
+
       - name: Validate with second model (7-Question Gate)
         if: steps.collect.outputs.has_leads == 'true'
         run: |
@@ -98,6 +136,14 @@ jobs:
           echo "" >> triage-prompt.txt
           echo "SCOPE:" >> triage-prompt.txt
           cat scope.yml >> triage-prompt.txt
+          echo "" >> triage-prompt.txt
+          echo "PROBE EVIDENCE (live responses for lead URLs — cite these in every verdict):" >> triage-prompt.txt
+          cat evidence.txt >> triage-prompt.txt 2>/dev/null || true
+          echo "" >> triage-prompt.txt
+          echo "HARD RULES:" >> triage-prompt.txt
+          echo "- VALID is allowed ONLY when a lead's URL has probe evidence above AND the response itself demonstrates a security issue (e.g. config/secrets in body, auth bypass on a protected resource, open bucket listing)." >> triage-prompt.txt
+          echo "- An in-scope domain alone, a reachable endpoint alone, or a generic hypothesis (SSRF/misconfig/wildcard) with no demonstrated issue = HOLD or INVALID, never VALID." >> triage-prompt.txt
+          echo "- Unproven generic hypotheses must be HOLD. If nothing has evidence, output NO_VALID." >> triage-prompt.txt
           echo "" >> triage-prompt.txt
           echo "LEADS:" >> triage-prompt.txt
           cat new-leads.txt >> triage-prompt.txt
@@ -129,10 +175,20 @@ jobs:
               txt = open('triage-output.txt', errors='ignore').read()
           except Exception:
               txt = ''
+          # only count verdicts that cite a URL from the evidence gate — rubber-stamps die here
+          ev = []
+          try:
+              ev = [u for line in open('evidence.txt', errors='ignore') for u in re.findall(r'https?://[^\s]+', line)]
+          except Exception:
+              pass
           verdict_lines = [l.strip() for l in txt.split('\n')
                            if re.search(r'(?<!IN)\bVALID\b', l, re.I)
                            and not re.search(r'\bINVALID\b', l, re.I)
                            and re.search(r'verdict|^\||^\s*\*\*VALID|^\s*VALID', l, re.I)]
+          # strict: verdict must mention an evidence URL (or the lead id) — else discard
+          strict = [v for v in verdict_lines if ev and any(u.split('/')[2] in v for u in ev)]
+          if strict:
+              verdict_lines = strict
           if verdict_lines:
               with open('reports/valid-bugs.md', 'a') as f:
                   stamp = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')

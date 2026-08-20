@@ -196,29 +196,44 @@ jobs:
             cat "$f" >> leads/lead-$(basename "$f" | sed -E 's/lead_([a-z0-9]+)\.txt/\1/').md
           done
           python3 << 'PY_EOF'
-          import re, glob, json, os, datetime
+          import re, glob, json, os, datetime, hashlib
           stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
           for f in glob.glob('art/lead_*.txt'):
               base = os.path.basename(f)
               model = re.sub(r'^lead_([a-z0-9]+)\.txt$', r'\1', base)
               open(f'reports/hypotheses-{model}.txt', 'w').write(open(f).read())
-          all_h = []
+          # ---------- DEDUP: hash-based seen register ----------
+          seen_path = 'reports/seen-hyps.txt'
+          os.makedirs('reports', exist_ok=True)
+          seen = set()
+          if os.path.exists(seen_path):
+              seen = set(open(seen_path).read().splitlines())
+          new_h = []
           for f in glob.glob('reports/hypotheses-*.txt'):
               text = open(f).read()
-              m = re.search(r'^\[HYP\] (.*)$', text, re.M)
-              if not m: continue
-              title = m.group(1).strip()
+              for m in re.finditer(r'^\[HYP\] (.*)$', text, re.M):
+                  title = m.group(1).strip()
+                  h = hashlib.sha256(title.lower().encode()).hexdigest()[:16]
+                  if h not in seen:
+                      seen.add(h)
+                      new_h.append((title, f))
+          with open(seen_path, 'a') as sf:
+              for title, _ in new_h:
+                  sf.write(hashlib.sha256(title.lower().encode()).hexdigest()[:16] + ' ' + title[:120] + '\n')
+          print(f'DEDUP: {len(new_h)} new hypotheses (register now {len(seen)})')
+          # only pass NEW hypotheses to the ranked report + knowledge updates
+          all_h = []
+          for title, f in new_h:
+              text = open(f).read()
               c = re.search(r'^confidence:\s*(\d+)', text, re.M)
               a = re.search(r'^asset:\s*(\S+)', text, re.M)
               all_h.append((int(c.group(1)) if c else 0, a.group(1) if a else '?', title, f))
           all_h.sort(reverse=True)
           with open('reports/hypotheses.md', 'a') as out:
               out.write(f"\n## RANKED HYPOTHESES {stamp}\n")
-              seen = set()
+              if not all_h:
+                  out.write("- (no NEW hypotheses this cycle — all deduped)\n")
               for conf, asset, title, f in all_h[:8]:
-                  key = title.lower()[:60]
-                  if key in seen: continue
-                  seen.add(key)
                   out.write(f"- [{conf}] {asset}: {title} (from {f})\n")
               for f in glob.glob('reports/hypotheses-*.txt'):
                   n = re.search(r'^\[NEXT\] (.*)$', open(f).read(), re.M)
