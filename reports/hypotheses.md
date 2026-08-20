@@ -95,3 +95,7 @@
 - LEARN: ACCEPTED MISCONFIG @ https://docker-registry.docker.com/v2/: Probe confirms v2/ path is a valid registry endpoint
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: 403 with param=127.0.0.1 confirmed
 - LEARN: ACCEPTED MISCONFIG @ https://docker-registry.docker.com: Probe error confirms misconfigured registry endpoint
+
+## RANKED HYPOTHESES 2026-08-20 03:21:32 UTC
+- [85] https://docker-registry.docker.com/v2/: MISCONFIG in docker-registry.docker.com/v2/ (from reports/hypotheses-qwen14b.txt)
+- [85] https://docker-registry.docker.com/v2/: Docker Registry Misconfiguration (from reports/hypotheses-qwen8b.txt)

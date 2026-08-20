@@ -55,3 +55,13 @@
 - NEW https://docker-registry.docker.com/v2/ (now reachable via v2/ path)
 - NEW https://docker.com (now returns 200)
 - CHANGED https://docker-registry.docker.com (now returns error)
+
+## 2026-08-20 03:21:32 UTC
+- NEW https://docker.com/endpoint?param=127.0.0.1 -> HTTP 404
+- CHANGED https://docker-registry.docker.com/v2/ -> ERR (previously had probe confirmation)
+- CHANGED https://*.docker.com -> ERR (repeated errors)
+- NEW https://docker-registry.docker.com/v2/ (misconfigured registry endpoint)
+- NEW https://docker-registry.docker.com (misconfigured registry endpoint)
+- CHANGED https://docker-registry.docker.com/v2/ (probe error confirmed)
+- CHANGED https://docker-registry.docker.com (probe error confirmed)
+- CHANGED https://docker.com/endpoint?param=127.0.0.1 (404, likely misconfigured)
