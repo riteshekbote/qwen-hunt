@@ -123,29 +123,12 @@ targets:
 
 # passive-only boundary — host patterns the verifier may probe (union of all domains)
 probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantmigration|mailflowmonitoring|alumniforwarding|nureply|inboxissue|emsisoft|docker|posit|shinyapps|rstudio|coxautoinc|autotrader|kbb|manheim|dealertrack|dealer|vauto|vinsolutions|dhi.io"
+PROBE EVIDENCE (live responses for lead URLs — cite these in every verdict):
+
+HARD RULES:
+- VALID is allowed ONLY when a lead's URL has probe evidence above AND the response itself demonstrates a security issue (e.g. config/secrets in body, auth bypass on a protected resource, open bucket listing).
+- An in-scope domain alone, a reachable endpoint alone, or a generic hypothesis (SSRF/misconfig/wildcard) with no demonstrated issue = HOLD or INVALID, never VALID.
+- Unproven generic hypotheses must be HOLD. If nothing has evidence, output NO_VALID.
+
 LEADS:
-[HYP] Cox Automotive SSRF
-[HYP] Cox Automotive SSRF Protection
-[HYP] Cox Automotive SSRF via API Endpoints
-[HYP] Cox Automotive SSRF via API Endpoints  
-[HYP] Cox Endpoint 403 Lockout
-[HYP] Cox Endpoint 403 Lockout  
-[HYP] CoxAuto API Auth Bypass  
-[HYP] CoxAuto API Rate Limiting  
-[HYP] CoxAuto Inc SSRF via internal IP
-[HYP] CoxAuto SSRF Filter Bypass  
-[HYP] CoxAutoInc API Internal Network SSRF
-[HYP] CoxAutoInc API SSRF via internal IP param
-[HYP] CoxAutoInc Internal IP SSRF
-[HYP] CoxAutoInc Internal IP SSRF  
-[HYP] CoxAutoInc SSRF
-[HYP] CoxAutoInc SSRF Vulnerability  
-[HYP] CoxAutoInc SSRF via API
-[HYP] CoxAutoInc SSRF via Internal IPs
-[HYP] Coxautoinc API Misconfigured Auth
-[HYP] Coxautomotive SSRF Endpoint
-[HYP] Docker Misconfigured Wildcard DNS  
-[HYP] Docker Misconfigured Wildcard DNS Records
-[HYP] Docker Misconfigured Wildcard DNS Records  
-[HYP] Docker Registry DNS Failure  
-[HYP] Docker Registry DNS Misconfiguration
+
