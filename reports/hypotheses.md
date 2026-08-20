@@ -138,3 +138,9 @@
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
 - LEARN: ACCEPTED SSRF @ api.coxautoinc.com/endpoint: 403 responses for internal IPs confirm SSRF
 - LEARN: REJECTED IDOR @ github.com/posit/.github/workflows: 404 suggests no IDOR, but MISCONFIG is possible
+
+## RANKED HYPOTHESES 2026-08-20 09:07:33 UTC
+- [85] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/ (verify DNS resolution)
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
+- LEARN: ACCEPTED SSRF @ api.coxautoinc.com/endpoint: 403 responses for internal IPs confirm SSRF

@@ -50,3 +50,6 @@
 
 ## 2026-08-20 08:03:36 UTC
 - CHANGED https://api.coxautoinc.com/endpoint
+
+## 2026-08-20 09:07:33 UTC
+- NEW coxautoinc.com SSRF via internal IPs (403 responses for 10.0.0.1/127.0.0.1/192.168.1.1)

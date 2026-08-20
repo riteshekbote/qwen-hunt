@@ -448,3 +448,4 @@ evidence_needed: Check for other endpoints in the same repo.
 verify_steps: PROBE https://github.com/posit/.github/workflows
 impact: Possible exposure of workflow files.
 testability: PASSIVE
+## 2026-08-20 09:07:23 UTC (model qwen14b)
