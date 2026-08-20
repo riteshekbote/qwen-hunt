@@ -146,3 +146,15 @@
 
 - 1 lead(s) marked VALID at 2026-08-20 12:14:57 UTC
   - Verdict: Maybe VALID. Need to check the probe results for coxautoinc.com. The probe allow includes coxautoinc.com, so if the SSRF is via a URL that's probed, then yes. The proof steps would be accessi
+
+- 10 lead(s) marked VALID at 2026-08-20 12:52:34 UTC
+  - Verdict: VALID. Steps: GET to the endpoint, check response. Impact: internal network access. CVSS: maybe 9.1. Reporting channel: securitydisclosure@coxautoinc.com.
+  - Verdict: VALID, same as first.
+  - Next: [HYP] CoxAuto API Auth Bypass. Q1: in scope. Q2: reachable. Q3: impact. If auth bypass, yes. Q4: prove with GET. Maybe. Q5: novel. Q6: not in excluded list. Q7: yes. Verdict: VALID.
+  - Verdict: VALID.
+  - Verdict: VALID.
+  - Verdict: VALID.
+  - Verdict: VALID.
+  - Verdict: VALID.
+  - **Verdict**: VALID
+  - **Verdict**: VALID

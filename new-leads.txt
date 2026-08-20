@@ -2,9 +2,14 @@
 [HYP] Cox Automotive SSRF Protection
 [HYP] Cox Automotive SSRF via API Endpoints
 [HYP] Cox Automotive SSRF via API Endpoints  
+[HYP] Cox Endpoint 403 Lockout
+[HYP] Cox Endpoint 403 Lockout  
 [HYP] CoxAuto API Auth Bypass  
+[HYP] CoxAuto API Rate Limiting  
+[HYP] CoxAuto Inc SSRF via internal IP
 [HYP] CoxAuto SSRF Filter Bypass  
 [HYP] CoxAutoInc API Internal Network SSRF
+[HYP] CoxAutoInc API SSRF via internal IP param
 [HYP] CoxAutoInc Internal IP SSRF
 [HYP] CoxAutoInc Internal IP SSRF  
 [HYP] CoxAutoInc SSRF
@@ -16,10 +21,5 @@
 [HYP] Docker Misconfigured Wildcard DNS  
 [HYP] Docker Misconfigured Wildcard DNS Records
 [HYP] Docker Misconfigured Wildcard DNS Records  
+[HYP] Docker Registry DNS Failure  
 [HYP] Docker Registry DNS Misconfiguration
-[HYP] Docker Registry DNS Misconfiguration  
-[HYP] Docker Registry Misconfiguration
-[HYP] Docker Registry SSRF  
-[HYP] Docker Registry Virtual Host Misconfiguration
-[HYP] Docker Registry Virtual Host Misconfiguration  
-[HYP] Docker Registry v2 Endpoint
