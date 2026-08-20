@@ -185,10 +185,12 @@ jobs:
                            if re.search(r'(?<!IN)\bVALID\b', l, re.I)
                            and not re.search(r'\bINVALID\b', l, re.I)
                            and re.search(r'verdict|^\||^\s*\*\*VALID|^\s*VALID', l, re.I)]
-          # strict: verdict must mention an evidence URL (or the lead id) — else discard
-          strict = [v for v in verdict_lines if ev and any(u.split('/')[2] in v for u in ev)]
-          if strict:
-              verdict_lines = strict
+          # strict: verdict must cite an EXACT evidence URL — else discard
+          # (hostname-only matching is forbidden: a hallucinated duocircle.com
+          #  verdict must not pass because some OTHER url on duocircle.com was probed)
+          ev_host = {u for u in ev}
+          strict = [v for v in verdict_lines if any(u in v for u in ev_host)]
+          verdict_lines = strict  # fall-through is the bug: empty evidence => zero VALIDs
           if verdict_lines:
               with open('reports/valid-bugs.md', 'a') as f:
                   stamp = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
