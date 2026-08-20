@@ -22,4 +22,4 @@
 [HYP] Docker Wildcard DNS Misconfiguration  
 [HYP] GitHub .git Config Exposure
 [HYP] GitHub Workflow Misconfig in Posit  
-[HYP] GitHub Workflow Misconfiguration in Posit  
+[HYP] GitHub Workflow Misconfiguration

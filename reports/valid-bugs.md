@@ -123,3 +123,12 @@
   - **Verdict**: VALID
   - **Verdict**: VALID
   - **Verdict**: VALID
+
+- 7 lead(s) marked VALID at 2026-08-20 08:44:58 UTC
+  - Starting with Cox Automotive SSRF leads. Let's take the first one: [HYP] Cox Automotive SSRF. Q1: Yes, coxautoinc.com is in the domains. Q2: Public, unauthenticated? If the API endpoints are public. Q
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
+  - **Verdict:** VALID
