@@ -81,6 +81,10 @@ jobs:
             cat ctx-targets.md
             echo "=== KNOWLEDGE BASE ==="
             cat knowledge/index.md
+            echo "=== REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ==="
+            head -400 inventory/real-subdomains.txt 2>/dev/null || echo none
+            echo "=== LIVE HIGH-VALUE HOSTS (probed, with status) ==="
+            head -150 inventory/live-highvalue.txt 2>/dev/null || echo none
             echo "=== MY STATE ==="
             cat state_${MODEL_NAME}.json
             echo "=== MY LAST LEADS (tail) ==="
@@ -116,6 +120,12 @@ jobs:
           verify_steps: <passive-first concrete HTTP requests>
           impact: <what attacker gets + severity>
           testability: <PASSIVE|AUTH_HELPED|HUMAN_ONLY>
+
+          HARD RULE: asset MUST be a host from the REAL SUBDOMAIN INVENTORY or
+          LIVE HIGH-VALUE HOSTS sections above. Inventing a hostname that is not
+          in the inventory is a FAILURE — such hypotheses are auto-dropped and
+          count against you. If nothing in the inventory merits a hypothesis,
+          emit [HYP NONE] instead of inventing surface.
 
           HARD FORMAT RULE: one field per line. NEVER put confidence/class/asset inline
           inside the [HYP] title line. Every field MUST be on its own line as 'key: value'
@@ -208,11 +218,30 @@ jobs:
           seen = set()
           if os.path.exists(seen_path):
               seen = set(open(seen_path).read().splitlines())
+          # ---------- REALITY FILTER: asset must exist in real inventory ----------
+          real_hosts = set()
+          for f in ('inventory/real-subdomains.txt', 'inventory/live-highvalue.txt'):
+              if os.path.exists(f):
+                  for line in open(f, errors='ignore'):
+                      m = re.search(r'([a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+)', line)
+                      if m: real_hosts.add(m.group(1).lower())
+          def host_known(asset):
+              a = asset.lower().strip()
+              if not a: return False
+              if '://' in a: a = re.sub(r'^https?://', '', a).split('/')[0]
+              if ':' in a: a = a.split(':')[0]
+              return a in real_hosts or any(a.endswith('.' + h) for h in real_hosts if h.count('.') >= 1 and a.count('.') > h.count('.'))
           new_h = []
           for f in glob.glob('reports/hypotheses-*.txt'):
               text = open(f).read()
               for m in re.finditer(r'^\[HYP\] (.*)$', text, re.M):
                   title = m.group(1).strip()
+                  seg = text[m.end():m.end()+1500]
+                  am = re.search(r'^asset:\s*(\S+)', seg, re.M)
+                  asset = am.group(1) if am else ''
+                  if not host_known(asset):
+                      print(f'REALITY FILTER: dropped {title[:60]} (asset {asset[:40]} not in inventory)')
+                      continue
                   h = hashlib.sha256(title.lower().encode()).hexdigest()[:16]
                   if h not in seen:
                       seen.add(h)
