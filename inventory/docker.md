@@ -112,3 +112,8 @@
 
 ## 2026-08-20 12:15:53 UTC
 - NEW docker-registry.docker.com/v2/?param=169.254.169.254: DNS resolution failure confirmed
+
+## 2026-08-20 13:19:13 UTC
+- NEW docker-registry.docker.com/v2/ (DNS resolution failure confirmed)
+- NEW docker-registry.docker.com/v2/ DNS resolution failure confirmed
+- CHANGED https://docker-registry.docker.com/v2/ → ERR (DNS issue persists)

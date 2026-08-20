@@ -65,3 +65,7 @@
 
 ## 2026-08-20 12:15:53 UTC
 - CHANGED https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
+
+## 2026-08-20 13:19:13 UTC
+- CHANGED https://api.coxautoinc.com/endpoint (403 may be rate limiting/auth check)
+- CHANGED https://api.coxautoinc.com/endpoint?param=169.254.169.254 → 403 (rate limiting/auth check)

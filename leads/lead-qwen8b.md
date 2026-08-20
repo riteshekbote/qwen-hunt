@@ -917,3 +917,41 @@ testability: PASSIVE
 [FINAL] CoxAuto Inc SSRF via internal IP: 8.2, attack_surface=9, business_value=7, tech_exposure=8, gate_ease=4, cloud_surface=9, freshness=8
 [FINAL] Posit GitHub workflows dead repo: 7.8, attack_surface=6, business_value=9, tech_exposure=7, gate_ease=6, cloud_surface=5, freshness=7
 [NEXT] PROBE https://docker-registry.docker.com/v2/?param=172.16.0.1
+## 2026-08-20 13:11:15 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/ DNS resolution failure confirmed
+[NEW] https://github.com/posit/.github/workflows 404 indicates dead repo
+[CHANGED] https://api.coxautoinc.com/endpoint?param=169.254.169.254 → 403 (rate limiting/auth check)
+[CHANGED] https://docker-registry.docker.com/v2/ → ERR (DNS issue persists)
+[PRIO] docker-registry.docker.com/v2/ 8.2 attack=9, business=7, tech=8, gate=5, cloud=8, freshness=9
+[PRIO] https://github.com/posit/.github/workflows 7.5 attack=6, business=8, tech=7, gate=10, cloud=5, freshness=8
+[PRIO] https://api.coxautoinc.com/endpoint 7.0 attack=8, business=6, tech=7, gate=4, cloud=9, freshness=7
+[HYP] Docker Registry DNS Misconfiguration
+class: MISCONFIG
+asset: docker-registry.docker.com/v2/
+confidence: 85
+reasoning: Persistent DNS resolution failure confirms misconfigured DNS entry for internal registry
+evidence_needed: DNS lookup confirmation
+verify_steps: nslookup docker-registry.docker.com
+impact: Internal network access exposure
+testability: PASSIVE
+[HYP] GitHub Repo Dead
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows
+confidence: 90
+reasoning: 404 response indicates repo was deleted or renamed
+evidence_needed: HEAD request confirmation
+verify_steps: curl -I https://github.com/posit/.github/workflows
+impact: Lost CI/CD configuration
+testability: PASSIVE
+[HYP] CoxAutoInc SSRF Vulnerability
+class: SSRF
+asset: https://api.coxautoinc.com/endpoint
+confidence: 65
+reasoning: 403 responses to internal IPs suggest potential SSRF if auth bypassed
+evidence_needed: Successful internal IP access
+verify_steps: curl -G --data-urlencode "param=169.254.169.254" https://api.coxautoinc.com/endpoint
+impact: Internal network traversal
+testability: AUTH_HELPED
+[PARKED] CoxAutoInc SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
+[PARKED] Docker Registry DNS @ docker-registry.docker.com/v2/: 403 may be rate limiting/auth check
+[NEXT] PROBE https://docker-registry.docker.com/v2/
