@@ -1,25 +1,32 @@
-## 2026-08-20 05:01:41 UTC (model qwen14b)
-[NEW] docker-registry.docker.com/v2/ with Host: docker.com (virtual host misconfiguration recurring DNS errors)
-[CHANGED] docker.com endpoint (recurring 200 OK with virtual host probe)
-[HYP] Virtual Host Misconfiguration in Docker Registry  
-class: MISCONFIG  
-asset: docker-registry.docker.com/v2/  
-confidence: 95  
-reasoning: Recurring DNS errors and virtual host probe with Host: docker.com suggest misconfigured virtual host.  
-evidence_needed: Response from docker-registry.docker.com/v2/ with Host: docker.com header.  
-verify_steps:  
-impact: Exposed Docker registry if virtual host misconfigured, possible SSRF or IDOR.  
-testability: PASSIVE  
-[FINAL]  
-[HYP] Virtual Host Misconfiguration in Docker Registry  
-class: MISCONFIG  
-asset: docker-registry.docker.com/v2/  
-confidence: 95  
-reasoning: Recurring DNS errors and virtual host probe with Host: docker.com suggest misconfigured virtual host.  
-evidence_needed: Response from docker-registry.docker.com/v2/ with Host: docker.com header.  
-verify_steps:  
-impact: Exposed Docker registry if virtual host misconfigured, possible SSRF or IDOR.  
-testability: PASSIVE  
-[NEXT] PROBE: `GET https://docker-registry.docker.com/v2/` with `Host: docker.com`  
-[LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig  
-[RISK] 85  
+## 2026-08-20 05:54:45 UTC (model qwen14b)
+[NEW] docker-registry.docker.com/v2/ (recurring DNS errors suggest virtual host misconfig)
+[CHANGED] docker.com endpoint (stable 200 response)
+[CHANGED] coxautomotive endpoint (403 responses for internal IPs)
+[PRIO] docker-registry.docker.com/v2/ 78
+[PRIO] api.coxautoinc.com/endpoint 62
+[HYP] Virtual Host Misconfiguration
+class: MISCONFIG
+asset: docker-registry.docker.com/v2/
+confidence: 70
+reasoning: Recurring DNS errors with virtual host pattern, confirmed by LEARN tags
+evidence_needed: DNS records for docker-registry.docker.com
+verify_steps: GET https://docker-registry.docker.com/v2/ HEADER: Host: docker.com
+impact: Potential exposure of internal services through misconfigured virtual host
+testability: PASSIVE
+[HYP] SSRF Bypass Candidate
+class: SSRF
+asset: api.coxautoinc.com/endpoint
+confidence: 35
+reasoning: 403 for internal IPs but LEARN tags indicate REJECTED status
+evidence_needed: Network segmentation analysis
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=169.254.169.254
+impact: Limited due to network segmentation
+testability: AUTH_HELPED
+[PARKED] SSRF Bypass Candidate: Confidence below 40 and REJECTED by LEARN
+[FINAL] 
+[HYP] Virtual Host Misconfiguration
+[HYP] SSRF Bypass Candidate
+[NEXT] PROBE: https://docker-registry.docker.com/v2/ HEADER: Host: docker.com
+[LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
+[LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 responses for internal IPs may be normal network segmentation
+[RISK] 72

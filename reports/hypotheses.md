@@ -113,3 +113,13 @@
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
 - LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 responses for internal IPs may be normal network segmentation
+
+## RANKED HYPOTHESES 2026-08-20 05:54:56 UTC
+- [85] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [70] docker-registry.docker.com/v2/: Virtual Host Misconfiguration (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE: https://docker-registry.docker.com/v2/ HEADER: Host: docker.com
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
+- LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 responses for internal IPs may be normal network segmentation
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
+- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint:

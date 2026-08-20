@@ -75,3 +75,7 @@
 - CHANGED docker.com endpoint (recurring 200 OK with virtual host probe)
 - NEW docker-registry.docker.com/v2/ (DNS resolution failure)
 - NEW docker.com (resolved to public website)
+
+## 2026-08-20 05:54:56 UTC
+- NEW docker-registry.docker.com/v2/ (recurring DNS errors suggest virtual host misconfig)
+- CHANGED docker.com endpoint (stable 200 response)
