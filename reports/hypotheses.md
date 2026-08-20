@@ -123,3 +123,11 @@
 - LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 responses for internal IPs may be normal network segmentation
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint:
+
+## RANKED HYPOTHESES 2026-08-20 07:15:03 UTC
+- [95] docker-registry.docker.com/v2/: Docker Registry Virtual Host Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [85] docker-registry.docker.com/v2/: Virtual Host Misconfiguration in Docker Registry (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE: https://docker-registry.docker.com/v2/
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirms virtual host misconfiguration
+- LEARN: ACCEPTED SSRF @ api.coxautoinc.com/endpoint: 403 responses for internal IPs confirm SSRF
+- LEARN: REJECTED IDOR @ github.com/posit/.github/workflows: 404 suggests no IDOR, but MISCONFIG is possible

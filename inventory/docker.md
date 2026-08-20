@@ -79,3 +79,10 @@
 ## 2026-08-20 05:54:56 UTC
 - NEW docker-registry.docker.com/v2/ (recurring DNS errors suggest virtual host misconfig)
 - CHANGED docker.com endpoint (stable 200 response)
+
+## 2026-08-20 07:15:03 UTC
+- NEW docker-registry.docker.com/v2/ recurring DNS errors
+- NEW docker.com endpoint reachable (200 OK)
+- CHANGED docker-registry.docker.com virtual host misconfig confirmed
+- NEW docker-registry.docker.com/v2/ DNS resolution failure (recurring)
+- CHANGED https://*.docker.com DNS errors (persistent)

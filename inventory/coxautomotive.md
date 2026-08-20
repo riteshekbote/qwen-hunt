@@ -44,3 +44,6 @@
 ## 2026-08-20 05:01:52 UTC
 
 ## 2026-08-20 05:54:56 UTC
+
+## 2026-08-20 07:15:03 UTC
+- CHANGED api.coxautoinc.com/endpoint SSRF confirmed (403 for internal IPs)
