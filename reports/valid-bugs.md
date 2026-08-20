@@ -143,3 +143,6 @@
   - Verdict: VALID. Steps: GET to the API endpoint with SSRF payload. Impact: internal network access. CVSS: maybe 9.1. Reporting channel: securitydisclosure@coxautoinc.com.
   - Now Docker leads: [HYP] Docker Misconfigured Wildcard DNS. Check Q1: Docker's domains include docker.com, so yes. Q2: Public DNS? If the wildcard DNS is public, yes. Q3: Impact? Misconfigured DNS coul
   - Verdict: VALID.
+
+- 1 lead(s) marked VALID at 2026-08-20 12:14:57 UTC
+  - Verdict: Maybe VALID. Need to check the probe results for coxautoinc.com. The probe allow includes coxautoinc.com, so if the SSRF is via a URL that's probed, then yes. The proof steps would be accessi
