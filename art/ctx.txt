@@ -752,19 +752,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-reasoning: Persistent DNS resolution failures (Name or service not known) suggest misconfigured DNS or registry endpoint.
-evidence_needed: Successful DNS resolution or registry access
-verify_steps: nslookup docker-registry.docker.com
-impact: Potential exposure of container images
-testability: PASSIVE
-[HYP] GitHub repo deletion
-class: BUSLOGIC
-asset: https://github.com/posit/.github/workflows
-confidence: 65
-reasoning: 404 responses indicate the workflows repo may have been deleted or moved, impacting CI/CD pipelines.
-evidence_needed: Confirmation of repo deletion or migration
-verify_steps: GET https://github.com/posit/.github
-impact: Disruption of CI/CD processes
 testability: PASSIVE
 [PARKED] SSRF via internal IP parameter: confidence < 40
 [PARKED] Docker registry misconfiguration: no concrete verify_steps
@@ -812,10 +799,20 @@ confidence: 50
 reasoning: 404 suggests deleted or misconfigured workflows. .github/workflows is a common CI/CD config location.  
 evidence_needed: existing workflows or config files  
 verify_steps:  
+## 2026-08-20 20:49:09 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] docker-registry.docker.com/v2/?param=10.0.0.1
+[NEW] docker-registry.docker.com/v2/
+[NEW] api.coxautoinc.com/endpoint?param=169.254.169.254
+[NEW] api.coxautoinc.com/endpoint?param=172.16.0.1
+[NEW] api.coxautoinc.com/endpoint?param=127.0.0.1
+[NEW] api.coxautoinc.com/endpoint?param=192.168.1.1
+[CHANGED] github.com/posit/.github/workflows (HTTP 404)
+[CHANGED] github.com/posit/.github (HTTP 404)
+[CHANGED] github.com/posit/.git/config (HTTP 404)
+[PRIO] docker-registry.docker.com/v2/?param=169.254.169.254, 8.5, attack_surface:9, business_value:8, tech_exposure:7, gate_ease:6, cloud_surface:9, freshness:9
+[PRIO]
 === AGGREGATED HYPOTHESES (tail) ===
-- [75] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
-- [75] docker-registry.docker.com/v2/: CoxAutoInc API SSRF via Internal IP (from reports/hypotheses-qwen8b.txt)
-- NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=192.168.1.1
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
 
@@ -853,14 +850,10 @@ verify_steps:
 - NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254 HTTP/1.1
 - LEARN: ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param IPs in logs)
 - LEARN: REJECTED IDOR @ https://api.coxautoinc.com/endpoint (403s with param IPs suggest auth, not IDOR)
-=== LATEST ROBOT PROBE RESULTS ===
-https://github.com/posit/.github/workflows -> HTTP 404
-https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
-https://github.com/posit/.git/config -> HTTP 404
 
-## 2026-08-20 12:15:53 UTC
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://docker-registry.docker.com/v2/?param=10.0.0.1 -> ERR <urlopen error [Errno -2] Name or service not know
+## RANKED HYPOTHESES 2026-08-20 20:53:46 UTC
+- (no NEW hypotheses this cycle — all deduped)
+=== LATEST ROBOT PROBE RESULTS ===
 https://api.coxautoinc.com/endpoint?param=169.254.169.254 -> HTTP 403
 https://api.coxautoinc.com/endpoint?param=172.16.0.1 -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
@@ -914,3 +907,10 @@ https://api.coxautoinc.com/endpoint -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
 https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=127.0.0.1 -> HTTP 403
+
+## 2026-08-20 20:53:46 UTC
+https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
+https://docker-registry.docker.com/v2/?param=172.16.0.1 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint -> HTTP 403
+https://api.coxautoinc.com/endpoint?param=127.0.0.1 -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404

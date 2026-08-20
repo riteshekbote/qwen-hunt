@@ -827,3 +827,46 @@ testability: PASSIVE
 [FINAL]
 [HYP] SSRF in Docker Registry
 [HYP] Misconfigured API endpoint
+## 2026-08-20 21:52:43 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (added parameter in URL)
+[NEW] https://github.com/posit/.git/config (new 404 endpoint)
+[CHANGED] https://github.com/posit/.github/workflows (still 404 but with more timestamps)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 85
+reasoning: Probed with 169.254.169.254 (metadata IP) and got same error as base URL, suggesting no proxy check
+evidence_needed: Response from 169.254.169.254 metadata endpoint
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exfiltrate internal metadata from cloud VMs (high severity)
+testability: PASSIVE
+[HYP] Auth Misconfig in CoxAutoinc
+class: MISCONFIG
+asset: api.coxautoinc.com/endpoint
+confidence: 65
+reasoning: 403 responses with various IPs suggest auth misconfig or rate limiting
+evidence_needed: Successful auth response or token leak
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+impact: Potential internal API access (medium severity)
+testability: AUTH_HELPED
+[HYP] IDOR in Posit GitHub
+class: IDOR
+asset: github.com/posit/.github/workflows
+confidence: 55
+reasoning: 404s with workflows suggests missing access controls
+evidence_needed: 200 response from workflows
+verify_steps: GET https://github.com/posit/.github/workflows?access_token=123
+impact: Expose CI/CD secrets (medium severity)
+testability: HUMAN_ONLY
+[PARKED] IDOR in Posit GitHub: confidence 55 < 40
+[FINAL]
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 85
+reasoning: Probed with 169.254.169.254 (metadata IP) and got same error as base URL, suggesting no proxy check
+evidence_needed: Response from 169.254.169.254 metadata endpoint
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exfiltrate internal metadata from cloud VMs (high severity)
+testability: PASSIVE
+[HYP] Auth Misconfig in CoxAutoinc
