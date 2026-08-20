@@ -130,6 +130,7 @@ LEADS:
 [HYP] Cox Automotive SSRF via API Endpoints  
 [HYP] CoxAuto SSRF Filter Bypass  
 [HYP] CoxAutoInc API Internal Network SSRF
+[HYP] CoxAutoInc Internal IP SSRF
 [HYP] CoxAutoInc SSRF
 [HYP] CoxAutoInc SSRF Vulnerability  
 [HYP] CoxAutoInc SSRF via API
@@ -137,6 +138,7 @@ LEADS:
 [HYP] Docker Misconfigured Wildcard DNS  
 [HYP] Docker Misconfigured Wildcard DNS Records
 [HYP] Docker Misconfigured Wildcard DNS Records  
+[HYP] Docker Registry DNS Misconfiguration
 [HYP] Docker Registry Misconfiguration
 [HYP] Docker Registry Virtual Host Misconfiguration
 [HYP] Docker Registry v2 Endpoint
@@ -147,5 +149,3 @@ LEADS:
 [HYP] GitHub Workflows Misconfig
 [HYP] GitHub Workflows Misconfiguration
 [HYP] GitHub Workflows Misconfiguration  
-[HYP] MISCONFIG in docker-registry.docker.com/v2/  
-[HYP] MISCONFIG in docker.com endpoint  
