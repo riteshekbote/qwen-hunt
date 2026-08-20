@@ -167,3 +167,6 @@
 
 ## 2026-08-20 22:15:49 UTC
 - CHANGED https://docker-registry.docker.com/v2/ (ERR <urlopen error [Errno -2] Name or service not know) from previous errors
+
+## 2026-08-20 22:53:30 UTC
+- NEW docker-registry.docker.com/v2/

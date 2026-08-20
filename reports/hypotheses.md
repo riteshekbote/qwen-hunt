@@ -247,3 +247,7 @@
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE
 - LEARN: ACCEPTED
+
+## RANKED HYPOTHESES 2026-08-20 22:53:30 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254

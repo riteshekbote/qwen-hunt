@@ -898,3 +898,40 @@ testability: PASSIVE
 [FINAL]
 [NEXT] PROBE
 [LEARN] ACCEPTED
+## 2026-08-20 22:53:20 UTC (model qwen14b)
+[NEW] docker-registry.docker.com/v2/
+[NEW] api.coxautoinc.com/endpoint
+[CHANGED] github.com/posit/.github/workflows (from 404 to recurring 404)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 75
+reasoning: Repeated errors with param=169.254.169.254 (private IP) suggest proxy misconfig or SSRF vulnerability
+evidence_needed: Response with private IP resolution
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exfiltration of internal services via SSRF
+testability: PASSIVE
+[HYP] IDOR in CoxAuto API
+class: IDOR
+asset: api.coxautoinc.com/endpoint
+confidence: 65
+reasoning: 403s with param=192.168.x.x and 127.0.0.1 suggest pattern-based endpoint access
+evidence_needed: Response with internal IP resolution
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=192.168.1.1
+impact: Access to internal systems via IDOR
+testability: PASSIVE
+[HYP] Misconfig in Posit GitHub
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 55
+reasoning: Recurring 404s suggest missing .github/workflows files
+evidence_needed: File existence confirmation
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Exposed CI/CD pipeline
+testability: PASSIVE
+[PARKED] MISCONFIG in Posit GitHub: confidence 55 < 40
+[FINAL]
+[HYP] SSRF in Docker Registry
+[HYP] IDOR in CoxAuto API
+[NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+[RISK] 85

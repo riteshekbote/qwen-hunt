@@ -1,28 +1,37 @@
-## 2026-08-20 22:15:39 UTC (model qwen14b)
+## 2026-08-20 22:53:20 UTC (model qwen14b)
+[NEW] docker-registry.docker.com/v2/
+[NEW] api.coxautoinc.com/endpoint
+[CHANGED] github.com/posit/.github/workflows (from 404 to recurring 404)
+[HYP] SSRF in Docker Registry
 class: SSRF
 asset: docker-registry.docker.com/v2/
-confidence: 60
-reasoning: Repeated DNS errors when querying with param=169.254.169.254 (internal IP) suggest SSRF potential. The registry may be using the param as a URL without validation.
-evidence_needed: Confirm if param is parsed as URL in registry API.
-verify_steps: 
-impact: Access to internal services via SSRF.
+confidence: 75
+reasoning: Repeated errors with param=169.254.169.254 (private IP) suggest proxy misconfig or SSRF vulnerability
+evidence_needed: Response with private IP resolution
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exfiltration of internal services via SSRF
 testability: PASSIVE
-class: AUTH
+[HYP] IDOR in CoxAuto API
+class: IDOR
 asset: api.coxautoinc.com/endpoint
-confidence: 50
-reasoning: 403 responses for endpoint with no auth headers suggest missing authentication. Param values like 127.0.0.1 may be used for IP-based auth.
-evidence_needed: Check for auth headers in 403 responses.
-verify_steps: 
-impact: Potential access to endpoint if auth is weak.
-testability: AUTH_HELPED
+confidence: 65
+reasoning: 403s with param=192.168.x.x and 127.0.0.1 suggest pattern-based endpoint access
+evidence_needed: Response with internal IP resolution
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=192.168.1.1
+impact: Access to internal systems via IDOR
+testability: PASSIVE
+[HYP] Misconfig in Posit GitHub
 class: MISCONFIG
 asset: github.com/posit/.github/workflows
-confidence: 45
-reasoning: 404 responses for workflows suggest misconfigured GitHub Actions. Possible missing .github/workflows directory.
-evidence_needed: Confirm existence of .github/workflows directory.
-verify_steps: 
-impact: Exposure of workflows or secrets.
+confidence: 55
+reasoning: Recurring 404s suggest missing .github/workflows files
+evidence_needed: File existence confirmation
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Exposed CI/CD pipeline
 testability: PASSIVE
+[PARKED] MISCONFIG in Posit GitHub: confidence 55 < 40
 [FINAL]
-[NEXT] PROBE
-[LEARN] ACCEPTED
+[HYP] SSRF in Docker Registry
+[HYP] IDOR in CoxAuto API
+[NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+[RISK] 85
