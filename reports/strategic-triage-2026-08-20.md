@@ -19,13 +19,25 @@ Status: PASSIVE RECON ONLY (subfinder CT/passive sources + status-code probes). 
 - Version 4.0.9 is NOT in known-CVE ranges (host-header CVE-2025-47424 affects <3.196; SAML CVE-2025-29774/29775 needs SAML; CVE-2024-42056 needs authenticated attacker; CSRF CVE-2025-49017 needs app-editor permission).
 - Verdict: low/weakened value alone. Internal tooling exposed to internet + version disclosure = possible info-level report, but email-only program bar is higher. HOLD unless login flow shows more.
 
-### 2. Emsisoft — access.infra.emsisoft.com [MEDIUM]
+### 2. Emsisoft — access.infra.emsisoft.com [MEDIUM-LOW]
 - BeyondTrust Remote Support (Bomgar-style) appliance, community edition, publicly reachable, proxied to internet.
 - /web/config.js discloses: local auth enabled, OTP 2FA configured, edition=community, proxyCluster=access, canJoinSessions=true, no OIDC/SAML.
 - grafana-analytics.access.infra.emsisoft.com exists in CT logs — an internal infra hostname, reachable as a launch target.
 - /web/launch/<host> accepts ANY hostname (200 for localhost/169.254.169.254) but serves the same static SPA — NO SSRF/proxy demonstrated (content identical for bogus host).
 - CVE-2024-12356 (BeyondTrust RCE, actively exploited Dec 2024) — could NOT verify version from public surface (app.js obfuscated, /web/version is SPA).
 - Verdict: appliance exposed + internal hostnames leaked via CT + community edition. Medium-value lead: check version via authenticated login screen, check launch flow for auth bypass. Worth a human look.
+
+### 2b. Emsisoft — BeyondTrust appliance deep-dive [LOW]
+- /web/api/v1/currentuser, /web/api/v1/users, /web/1/api/v1/system/config, /web/1/auth/login all serve SPA fallback (token-gated API, no anonymous data).
+- /web/launch/<host> accepts ANY hostname (200 for localhost/127.0.0.1/10.0.0.1/169.254.169.254) but returns identical SPA content — NO SSRF/proxy behavior demonstrated.
+- Version fingerprint blocked: app.js (3.4MB) obfuscated, no version strings; /web/version is SPA. CVE-2024-12356 applicability UNVERIFIED (needs version).
+- Verdict downgrade: appliance + config.js disclosure + internal hostname in CT = info-level. Not reportable without version or access.
+
+### 5b. DuoCircle — sentry.ops + halonapi [LOW]
+- sentry.ops.duocircle.com: Sentry instance, /api/0/ returns {"version":"0","auth":null,"user":null}, orgs endpoint requires auth (401 "Authentication credentials were not provided"). Login page JS-rendered, no SSO providers, no DSN leak in HTML. Auth-gated.
+- halonapi.us.duocircle.com: Halon mail-gateway API host — root 200 (empty body), /api 302→http:// (HTTP downgrade redirect, benign), /rest /v1 /swagger /docs /health all 404. Nothing exposed.
+- release.duocircle.com / release.eu|us: "Quarantined Message Release" — customer-facing quarantine flows (potential auth surface, needs tenant context; email-only program, HOLD).
+- Verdict: LOW. HOLD.
 
 ### 3. Docker — api.staging.offload.docker.com / api.offload.docker.com / registry-stage.hub.docker.com [LOW]
 - Staging + production offload APIs, registry-stage: all 401 Bearer auth (Docker registry auth). No anonymous token flow. No exposed data.
