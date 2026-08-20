@@ -2,13 +2,16 @@
 [HYP] Cox Automotive SSRF via API Endpoints
 [HYP] Cox Automotive SSRF via API Endpoints  
 [HYP] CoxAuto SSRF Filter Bypass  
+[HYP] CoxAutoInc SSRF Vulnerability  
 [HYP] Coxautomotive SSRF Endpoint
 [HYP] Docker Misconfigured Wildcard DNS  
 [HYP] Docker Misconfigured Wildcard DNS Records
 [HYP] Docker Misconfigured Wildcard DNS Records  
 [HYP] Docker Wildcard DNS Misconfiguration
 [HYP] Docker Wildcard DNS Misconfiguration  
+[HYP] GitHub Workflow Misconfiguration in Posit  
 [HYP] GitHub Workflows Misconfiguration
+[HYP] GitHub Workflows Misconfiguration  
 [HYP] Posit GitHub Org Misconfiguration
 [HYP] Posit GitHub Org Misconfiguration  
 [HYP] Posit GitHub Org Misconfigurations
@@ -17,3 +20,5 @@
 [HYP] Posit GitHub Workflows Misconfiguration
 [HYP] Posit GitHub Workflows Misconfiguration  
 [HYP] SSRF Vulnerability in CoxAutoInc API
+[HYP] SSRF in CoxAutoinc Endpoint  
+[HYP] Wildcard DNS Misconfiguration in Docker  
