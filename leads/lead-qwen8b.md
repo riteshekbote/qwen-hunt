@@ -1224,3 +1224,18 @@ testability: PASSIVE
 [HYP] Cox API Auth Bypass  
 [HYP] GitHub Misconfig  
 [NEXT] PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254  
+## 2026-08-20 22:09:50 UTC (model qwen8b)
+[CHANGED] https://github.com/posit/.github/workflows (HTTP 404) from previous 404
+[CHANGED] https://docker-registry.docker.com/v2/ (ERR <urlopen error [Errno -2] Name or service not know) from previous errors
+class: MISCONFIG
+asset: https://docker-registry.docker.com/v2/
+confidence: 75
+reasoning: Name resolution failure suggests potential DNS misconfiguration or internal endpoint. Testing with internal IPs (169.254.169.254, 172.16.0.1, 192.168.1.1) consistently fails, indicating possible internal-only service.
+evidence_needed: Successful DNS resolution or internal network access
+verify_steps: nslookup docker-registry.docker.com; curl --interface 192.168.1.1 https://docker-registry.docker.com/v2/
+impact: Unauthorized access to internal Docker registry
+testability: PASSIVE
+class: IDOR
+asset: https://api.coxautoinc.com/endpoint
+confidence: 60
+reasoning: HTTP 403 for internal IPs (127.0.0.1, 192.168.1.1, 169.254.169.254) suggests potential misconfigured access control. Testing with admin parameter also returns 403.

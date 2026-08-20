@@ -242,3 +242,8 @@
 ## RANKED HYPOTHESES 2026-08-20 21:52:53 UTC
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
+
+## RANKED HYPOTHESES 2026-08-20 22:15:49 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE
+- LEARN: ACCEPTED

@@ -752,47 +752,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-testability: PASSIVE
-[PARKED] SSRF via internal IP parameter: confidence < 40
-[PARKED] Docker registry misconfiguration: no concrete verify_steps
-[PARKED] GitHub repo deletion: no concrete verify_steps
-[FINAL]
-[HYP] SSRF via internal IP parameter
-[HYP] Docker registry misconfiguration
-[HYP] GitHub repo deletion
-[NEXT] PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254
-[LEARN] REJECTED SSRF @ https://api.coxautoinc.com/endpoint?param=169.254.169.254: DNS resolution failure prevents verification
-[LEARN] ACCEPTED MISCONFIG @ https://docker-registry.docker.com/v2/: Persistent DNS errors indicate misconfigured registry endpoint
-[LEARN] ACCEPTED BUSLOGIC @ https://
-## 2026-08-20 19:47:04 UTC (model qwen8b)
-[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure)  
-[NEW] https://docker-registry.docker.com/v2/?param=10.0.0.1 (DNS resolution failure)  
-[NEW] https://github.com/posit/.github/workflows (404)  
-[NEW] https://github.com/posit/.git/config (404)  
-[CHANGED] https://docker-registry.docker.com/v2/ (persistent DNS error)  
-[CHANGED] https://api.coxautoinc.com/endpoint (persistent 403)  
-[PRIO] https://docker-registry.docker.com/v2/?param=169.254.169.254  
-[PRIO] https://api.coxautoinc.com/endpoint  
-[PRIO] https://github.com/posit/.github/workflows  
-[HYP] Internal IP SSRF via Docker Registry  
-class: SSRF  
-asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
-confidence: 70  
-reasoning: DNS resolution failure suggests misconfigured DNS or internal IP access. 169.254.169.254 is a reserved link-local IP, which may indicate internal network exposure.  
-evidence_needed: successful SSRF to internal hosts or DNS resolution success  
-verify_steps:  
-impact: access to internal systems or data via SSRF  
-testability: PASSIVE  
-[HYP] Cox API Auth Bypass  
-class: AUTH  
-asset: https://api.coxautoinc.com/endpoint  
-confidence: 60  
-reasoning: Persistent 403 suggests missing headers or invalid credentials. 192.168.1.1 and 169.254.169.254 are internal IPs, which may indicate misconfigured auth.  
-evidence_needed: successful auth bypass or 200 response  
-verify_steps:  
-impact: unauthorized access to internal systems  
-testability: AUTH_HELPED  
-[HYP] Posit GitHub Misconfiguration  
 class: MISCONFIG  
 asset: https://github.com/posit/.github/workflows  
 confidence: 50  
@@ -812,11 +771,48 @@ verify_steps:
 [CHANGED] github.com/posit/.git/config (HTTP 404)
 [PRIO] docker-registry.docker.com/v2/?param=169.254.169.254, 8.5, attack_surface:9, business_value:8, tech_exposure:7, gate_ease:6, cloud_surface:9, freshness:9
 [PRIO]
+## 2026-08-20 21:40:22 UTC (model qwen8b)
+[NEW] https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know  
+[CHANGED] https://github.com/posit/.github/workflows -> HTTP 404  
+[CHANGED] https://github.com/posit/.github -> HTTP 404  
+[PRIO] https://docker-registry.docker.com/v2/  
+[PRIO] https://api.coxautoinc.com/endpoint  
+[PRIO] https://github.com/posit/.github/workflows  
+[HYP] Docker Registry SSRF  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 60  
+reasoning: DNS resolution failure suggests potential misconfiguration. If the app uses this registry internally, it might expose internal services via SSRF.  
+evidence_needed: Confirm if the app uses this registry for internal services.  
+verify_steps:  
+impact: Expose internal Docker services via SSRF. Severity: HIGH  
+testability: PASSIVE  
+[HYP] Cox API Auth Bypass  
+class: AUTH  
+asset: https://api.coxautoinc.com/endpoint  
+confidence: 55  
+reasoning: 403 status might indicate misconfigured auth tokens or role-based access. Testing with internal IPs (127.0.0.1, 192.168.1.1) still returns 403, suggesting possible token leakage or misconfigured roles.  
+evidence_needed: Confirm if tokens are properly scoped.  
+verify_steps:  
+impact: Unauthorized access to internal APIs. Severity: HIGH  
+testability: AUTH_HELPED  
+[HYP] GitHub Misconfig  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 50  
+reasoning: 404 suggests missing workflows or misconfigured GitHub Actions. Could expose secrets or internal CI/CD pipelines.  
+evidence_needed: Check if workflows are publicly accessible.  
+verify_steps:  
+impact: Expose secrets or internal CI/CD. Severity: MEDIUM  
+testability: PASSIVE  
+[PARKED] GitHub Misconfig: Confidence < 40  
+[PARKED] Cox API Auth Bypass: No concrete verify_steps  
+[FINAL]  
+[HYP] Docker Registry SSRF  
+[HYP] Cox API Auth Bypass  
+[HYP] GitHub Misconfig  
+[NEXT] PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254  
 === AGGREGATED HYPOTHESES (tail) ===
-- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
-- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
-
-## RANKED HYPOTHESES 2026-08-20 15:59:20 UTC
 - [70] https://api.coxautoinc.com/endpoint: SSRF in docker-registry (from reports/hypotheses-qwen14b.txt)
 - [70] https://api.coxautoinc.com/endpoint: SSRF in coxautomotive endpoint (from reports/hypotheses-qwen14b.txt)
 
@@ -853,15 +849,11 @@ verify_steps:
 
 ## RANKED HYPOTHESES 2026-08-20 20:53:46 UTC
 - (no NEW hypotheses this cycle — all deduped)
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.coxautoinc.com/endpoint?param=169.254.169.254 -> HTTP 403
-https://api.coxautoinc.com/endpoint?param=172.16.0.1 -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
-https://github.com/posit/.github -> HTTP 404
-https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint -> HTTP 403
 
-## 2026-08-20 13:19:14 UTC
+## RANKED HYPOTHESES 2026-08-20 21:52:53 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
+=== LATEST ROBOT PROBE RESULTS ===
 https://github.com/posit/.github/workflows -> HTTP 404
 https://api.coxautoinc.com/endpoint -> HTTP 403
 https://docker-registry.docker.com/v2/` -> ERR <urlopen error [Errno -2] Name or service not know
@@ -914,3 +906,11 @@ https://docker-registry.docker.com/v2/?param=172.16.0.1 -> ERR <urlopen error [E
 https://api.coxautoinc.com/endpoint -> HTTP 403
 https://api.coxautoinc.com/endpoint?param=127.0.0.1 -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
+
+## 2026-08-20 21:52:54 UTC
+https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows?access_token=123 -> HTTP 404

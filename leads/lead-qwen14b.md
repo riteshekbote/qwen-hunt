@@ -870,3 +870,31 @@ verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
 impact: Exfiltrate internal metadata from cloud VMs (high severity)
 testability: PASSIVE
 [HYP] Auth Misconfig in CoxAutoinc
+## 2026-08-20 22:15:39 UTC (model qwen14b)
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 60
+reasoning: Repeated DNS errors when querying with param=169.254.169.254 (internal IP) suggest SSRF potential. The registry may be using the param as a URL without validation.
+evidence_needed: Confirm if param is parsed as URL in registry API.
+verify_steps: 
+impact: Access to internal services via SSRF.
+testability: PASSIVE
+class: AUTH
+asset: api.coxautoinc.com/endpoint
+confidence: 50
+reasoning: 403 responses for endpoint with no auth headers suggest missing authentication. Param values like 127.0.0.1 may be used for IP-based auth.
+evidence_needed: Check for auth headers in 403 responses.
+verify_steps: 
+impact: Potential access to endpoint if auth is weak.
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 45
+reasoning: 404 responses for workflows suggest misconfigured GitHub Actions. Possible missing .github/workflows directory.
+evidence_needed: Confirm existence of .github/workflows directory.
+verify_steps: 
+impact: Exposure of workflows or secrets.
+testability: PASSIVE
+[FINAL]
+[NEXT] PROBE
+[LEARN] ACCEPTED
