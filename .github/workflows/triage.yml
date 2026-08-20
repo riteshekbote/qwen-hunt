@@ -72,6 +72,7 @@ jobs:
           cat probe-results.txt
 
       - name: Evidence gate (only leads with non-trivial probe evidence pass)
+        id: gate
         if: steps.collect.outputs.has_leads == 'true'
         run: |
           python3 << 'PY'
@@ -100,17 +101,16 @@ jobs:
               for u, c in evidence.items():
                   f.write(f"{c} {u}\n")
           print(f"EVIDENCE GATE: kept {len(kept)} lead(s) with probe evidence, dropped {dropped} unproven")
-          # if nothing survived the gate, skip the model
+          with open(os.environ.get('GITHUB_OUTPUT', 'gate.out'), 'a') as out:
+              out.write('has_evidence=true' if kept else 'has_evidence=false')
+          # if nothing survived the gate, skip the model (marker prevents downstream false VALIDs)
           if not kept:
-              echo_marker = open('triage-output.txt', 'w')
-              echo_marker.write('NO_EVIDENCE')
-              echo_marker.close()
+              open('triage-output.txt', 'w').write('NO_EVIDENCE: no lead passed the probe-evidence gate. Nothing validated.\n')
               print('no evidence-backed leads — triage model skipped')
-              import sys; sys.exit(0)
           PY
 
       - name: Validate with second model (7-Question Gate)
-        if: steps.collect.outputs.has_leads == 'true'
+        if: steps.collect.outputs.has_leads == 'true' && steps.gate.outputs.has_evidence == 'true'
         run: |
           cat > triage-prompt.txt << 'PROMPT_START'
           You are a strict triager. A hunt bot produced the leads below for FIVE
@@ -161,7 +161,7 @@ jobs:
           echo "=== triage preview ==="; head -40 triage-output.txt
 
       - name: Update valid-bugs counter
-        if: steps.collect.outputs.has_leads == 'true'
+        if: steps.collect.outputs.has_leads == 'true' && steps.gate.outputs.has_evidence == 'true'
         run: |
           mkdir -p triage reports
           {
@@ -202,7 +202,7 @@ jobs:
           PY
 
       - name: Append learnings to knowledge base
-        if: steps.collect.outputs.has_leads == 'true'
+        if: steps.collect.outputs.has_leads == 'true' && steps.gate.outputs.has_evidence == 'true'
         run: |
           python3 << 'PY'
           import re, os, datetime
@@ -230,7 +230,7 @@ jobs:
           PY
 
       - name: Commit
-        if: steps.collect.outputs.has_leads == 'true'
+        if: steps.collect.outputs.has_leads == 'true' && steps.gate.outputs.has_evidence == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
