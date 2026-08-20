@@ -1,3 +1,8 @@
 bdebe89d85c68999 Docker Registry SSRF
 6e33b6e97f9562aa Docker Registry DNS Misconfiguration
 ad801e8fde60e630 SSRF via CoxAutoInc API
+861112bd4d9289ec Docker Registry SSRF via Internal IPs
+4eaa80bfa2b78315 CoxAutoInc API SSRF Filter Bypass
+6e33b6e97f9562aa Docker Registry DNS Misconfiguration
+9694df42c27b47e3 CoxAutoInc API SSRF via Internal IP
+4cc66f572debf241 Posit GitHub Workflow Misconfiguration

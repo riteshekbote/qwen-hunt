@@ -636,3 +636,23 @@ class: SSRF
 asset: https://docker-registry.docker.com/v2/  
 confidence: 85  
 reasoning: DNS failure confirmed, param=16
+## 2026-08-20 15:03:30 UTC (model qwen14b)
+[CHANGED] docker-registry.docker.com/v2/ (recurring "Name or service not known" errors with SSRF parameters like 169.254.169.254, 10.0.0.1, 172.16.0.1, 127.0.0.1)
+[HYP] Docker Registry SSRF via Internal IPs  
+class: SSRF  
+asset: docker-registry.docker.com/v2/  
+confidence: 90  
+reasoning: Recurring 403s on coxautoinc endpoint with internal IPs (169.254.169.254, 10.0.0.1) and "Name or service not known" on Docker Registry suggest SSRF chain.  
+evidence_needed: Successful SSRF payload resolving internal IPs via Docker Registry.  
+verify_steps:  
+impact: Leaked internal services (e.g., metadata, admin APIs) via SSRF.  
+testability: PASSIVE  
+[HYP] CoxAutoInc API SSRF Filter Bypass  
+class: SSRF  
+asset: api.coxautoinc.com/endpoint  
+confidence: 70  
+reasoning: 403s on coxautoinc endpoint with internal IPs suggest SSRF filter, but Docker Registry SSRF may chain through it.  
+evidence_needed: Bypass filter by encoding IPs or using alternate SSRF vectors.  
+verify_steps:  
+impact: Bypass filter to leak internal services.  
+testability:

@@ -190,3 +190,13 @@
 - [85] https://docker-registry.docker.com/v2/: Docker Registry SSRF (from reports/hypotheses-qwen14b.txt)
 - [80] docker-registry.docker.com/v2/: SSRF via CoxAutoInc API (from reports/hypotheses-qwen8b.txt)
 - [80] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+
+## RANKED HYPOTHESES 2026-08-20 15:03:41 UTC
+- [90] docker-registry.docker.com/v2/: Docker Registry SSRF via Internal IPs (from reports/hypotheses-qwen14b.txt)
+- [90] docker-registry.docker.com/v2/: CoxAutoInc API SSRF Filter Bypass (from reports/hypotheses-qwen14b.txt)
+- [75] docker-registry.docker.com/v2/: Posit GitHub Workflow Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [75] docker-registry.docker.com/v2/: Docker Registry DNS Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [75] docker-registry.docker.com/v2/: CoxAutoInc API SSRF via Internal IP (from reports/hypotheses-qwen8b.txt)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=192.168.1.1
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
+- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403

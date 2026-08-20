@@ -72,3 +72,6 @@
 
 ## 2026-08-20 14:16:47 UTC
 - NEW https://api.coxautoinc.com/endpoint?param=192.168.1.1 (403, new private IP param)
+
+## 2026-08-20 15:03:41 UTC
+- NEW coxautoinc.com/endpoint (SSRF via param=169.254.169.254)

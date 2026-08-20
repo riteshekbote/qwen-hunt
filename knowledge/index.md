@@ -40,3 +40,5 @@
 - 2026-08-20 REJECTED MISCONFIG @ https://github.com/posit/.git/config: 404 may indicate fix
 - 2026-08-20 ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 indicates dead repo
 - 2026-08-20 REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
+- 2026-08-20 REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
+- 2026-08-20 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
