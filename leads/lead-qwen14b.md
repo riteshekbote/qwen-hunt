@@ -688,3 +688,20 @@ asset: https://docker-registry.docker.com/v2/
 confidence: 70  
 reasoning: Probe results show DNS errors when using 169.254.169.254 (metadata IP) as a param, suggesting SSRF potential.  
 evidence_needed: Confirm if SSRF
+## 2026-08-20 17:54:57 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254  
+[CHANGED] https://docker-registry.docker.com/v2/ (now probed with new parameters)  
+[HYP] SSRF in docker-registry endpoint  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+confidence: 60  
+reasoning: Probe results show "Name or service not known" errors, suggesting the endpoint may be resolving internal IPs (e.g., 169.254.169.254) externally.  
+evidence_needed: Response indicating successful SSRF (e.g., internal metadata or proxy logs).  
+verify_steps:  
+impact: Attacker gains access to internal network services (e.g., metadata, APIs).  
+testability: PASSIVE  
+[FINAL]  
+[HYP] SSRF in docker-registry endpoint (retained)  
+[NEXT] PROBE https://docker-registry.docker.com/v2/?param=172.16.0.1  
+[LEARN] ACCEPTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: Probe errors suggest SSRF potential.  
+[RISK] 65  

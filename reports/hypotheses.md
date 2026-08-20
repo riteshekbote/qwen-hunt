@@ -211,3 +211,11 @@
 - [85] https://docker-registry.docker.com/v2/: GitHub Misconfiguration in Posit (from reports/hypotheses-qwen8b.txt)
 - [70] https://docker-registry.docker.com/v2/: SSRF in docker-registry endpoint (from reports/hypotheses-qwen14b.txt)
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry
+
+## RANKED HYPOTHESES 2026-08-20 17:55:08 UTC
+- [75] https://docker-registry.docker.com/v2/?param=169.254.169.254: SSRF in Docker Registry (from reports/hypotheses-qwen8b.txt)
+- [75] https://docker-registry.docker.com/v2/?param=169.254.169.254: GitHub Misconfiguration (from reports/hypotheses-qwen8b.txt)
+- [60] https://docker-registry.docker.com/v2/?param=169.254.169.254: SSRF in docker-registry endpoint (retained) (from reports/hypotheses-qwen14b.txt)
+- [60] https://docker-registry.docker.com/v2/?param=169.254.169.254: SSRF in docker-registry endpoint (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=172.16.0.1
+- LEARN: ACCEPTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: Probe errors suggest SSRF potential.

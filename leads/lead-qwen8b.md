@@ -1064,3 +1064,26 @@ testability: PASSIVE
 [PARKED] GitHub Misconfiguration in Posit: low confidence due to 404 response.  
 [PARKED] SSRF in Docker Registry: needs more evidence.  
 [NEXT] PROBE https://docker-registry
+## 2026-08-20 17:47:27 UTC (model qwen8b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (SSRF probe)
+[NEW] https://api.coxautoinc.com/endpoint?param=169.254.169.254 (SSRF probe)
+[NEW] https://github.com/posit/.git/config (misconfiguration probe)
+[CHANGED] https://docker-registry.docker.com/v2/ (increased SSRF testing frequency)
+[CHANGED] https://github.com/posit/.github/workflows (repeated 404 checks)
+[PRIO] https://docker-registry.docker.com/v2/?param=169.254.169.254: 9.2 (attack_surface:10, business_value:8, tech_exposure:9, gate_ease:5, cloud_surface:9, freshness:7)
+[PRIO] https://api.coxautoinc.com/endpoint?param=169.254.169.254: 8.5 (attack_surface:9, business_value:7, tech_exposure:8, gate_ease:6, cloud_surface:8, freshness:6)
+[PRIO] https://github.com/posit/.git/config: 7.8 (attack_surface:7, business_value:6, tech_exposure:8, gate_ease:4, cloud_surface:6, freshness:5)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254
+confidence: 75
+reasoning: Repeated probes to internal IP ranges (169.254.169.254) suggest potential SSRF vulnerability. Docker Registry's v2 endpoint is a common target for internal network traversal.
+evidence_needed: Successful SSRF to internal services (e.g., /etc/passwd)
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Internal network exposure + potential credential theft
+testability: PASSIVE
+[HYP] GitHub Misconfiguration
+class: MISCONFIG
+asset: https://github.com/posit/.git/config
+confidence: 60
+reasoning: GitHub's .git/config file is publicly accessible in some repos, but posit's repo returns 404. Could indicate misconfigured access controls or hidden files.

@@ -136,3 +136,9 @@
 ## 2026-08-20 17:00:52 UTC
 - NEW https://docker-registry.docker.com/v2/
 - NEW https://docker-registry.docker.com/v2/ (169.254.169.254 param test)
+
+## 2026-08-20 17:55:08 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+- CHANGED https://docker-registry.docker.com/v2/ (now probed with new parameters)
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (SSRF probe)
+- CHANGED https://docker-registry.docker.com/v2/ (increased SSRF testing frequency)

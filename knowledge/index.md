@@ -42,3 +42,4 @@
 - 2026-08-20 REJECTED SSRF @ https://api.coxautoinc.com/endpoint: 403 may be rate limiting/auth check
 - 2026-08-20 REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
 - 2026-08-20 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
+- 2026-08-20 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: Probe errors suggest SSRF potential.

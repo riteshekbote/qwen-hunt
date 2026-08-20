@@ -85,3 +85,6 @@
 ## 2026-08-20 17:00:52 UTC
 - NEW https://api.coxautoinc.com/endpoint
 - NEW https://api.coxautoinc.com/endpoint (SSRF param test)
+
+## 2026-08-20 17:55:08 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=169.254.169.254 (SSRF probe)
