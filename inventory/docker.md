@@ -154,3 +154,9 @@
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure)
 - NEW https://docker-registry.docker.com/v2/?param=10.0.0.1 (DNS resolution failure)
 - CHANGED https://docker-registry.docker.com/v2/ (persistent DNS error)
+
+## 2026-08-20 20:53:46 UTC
+- CHANGED https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated with same error)
+- NEW docker-registry.docker.com/v2/?param=169.254.169.254
+- NEW docker-registry.docker.com/v2/?param=10.0.0.1
+- NEW docker-registry.docker.com/v2/

@@ -1170,3 +1170,16 @@ confidence: 50
 reasoning: 404 suggests deleted or misconfigured workflows. .github/workflows is a common CI/CD config location.  
 evidence_needed: existing workflows or config files  
 verify_steps:  
+## 2026-08-20 20:49:09 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] docker-registry.docker.com/v2/?param=10.0.0.1
+[NEW] docker-registry.docker.com/v2/
+[NEW] api.coxautoinc.com/endpoint?param=169.254.169.254
+[NEW] api.coxautoinc.com/endpoint?param=172.16.0.1
+[NEW] api.coxautoinc.com/endpoint?param=127.0.0.1
+[NEW] api.coxautoinc.com/endpoint?param=192.168.1.1
+[CHANGED] github.com/posit/.github/workflows (HTTP 404)
+[CHANGED] github.com/posit/.github (HTTP 404)
+[CHANGED] github.com/posit/.git/config (HTTP 404)
+[PRIO] docker-registry.docker.com/v2/?param=169.254.169.254, 8.5, attack_surface:9, business_value:8, tech_exposure:7, gate_ease:6, cloud_surface:9, freshness:9
+[PRIO]

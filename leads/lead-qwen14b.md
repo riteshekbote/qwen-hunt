@@ -788,3 +788,42 @@ testability: HUMAN_ONLY
 [NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254 HTTP/1.1
 [LEARN] ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param IPs in logs)
 [LEARN] REJECTED IDOR @ https://api.coxautoinc.com/endpoint (403s with param IPs suggest auth, not IDOR)
+## 2026-08-20 20:53:34 UTC (model qwen14b)
+[NEW] https://github.com/posit/.github/workflows
+[NEW] https://github.com/posit/.github
+[CHANGED] https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated with same error)
+[CHANGED] https://api.coxautoinc.com/endpoint?param=169.254.169.254 (repeated with same 403)
+[PRIO] https://docker-registry.docker.com/v2/ 
+[PRIO] https://api.coxautoinc.com/endpoint 
+[PRIO] https://github.com/posit/.github/workflows 
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: https://docker-registry.docker.com/v2/
+confidence: 85
+reasoning: Repeated DNS errors when using private IP (169.254.169.254) as param, suggesting SSRF vulnerability.
+evidence_needed: Response from param=172.16.0.1 or 192.168.1.1
+verify_steps: GET https://docker-registry.docker.com/v2/?param=172.16.0.1
+impact: Exfiltration of internal services via SSRF
+testability: PASSIVE
+[HYP] Misconfigured API endpoint
+class: MISCONFIG
+asset: https://api.coxautoinc.com/endpoint
+confidence: 70
+reasoning: 403 responses with private IP params suggest misconfigured access controls.
+evidence_needed: Response with param=127.0.0.1
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=127.0.0.1
+impact: Potential access to internal services
+testability: PASSIVE
+[HYP] GitHub workflow misconfig
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows
+confidence: 60
+reasoning: 404 response suggests missing workflow files, possible misconfig.
+evidence_needed: File listing of .github/workflows
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Exposed secrets or CI/CD misconfig
+testability: PASSIVE
+[PARKED] [HYP] GitHub workflow misconfig: confidence 60 < 40 (after re-evaluation)
+[FINAL]
+[HYP] SSRF in Docker Registry
+[HYP] Misconfigured API endpoint

@@ -235,3 +235,6 @@
 - NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254 HTTP/1.1
 - LEARN: ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param IPs in logs)
 - LEARN: REJECTED IDOR @ https://api.coxautoinc.com/endpoint (403s with param IPs suggest auth, not IDOR)
+
+## RANKED HYPOTHESES 2026-08-20 20:53:46 UTC
+- (no NEW hypotheses this cycle — all deduped)
