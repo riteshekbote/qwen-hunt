@@ -132,3 +132,7 @@
 - NEW docker-registry.docker.com/v2/?param=10.0.0.1
 - NEW docker-registry.docker.com/v2/?param=172.16.0.1
 - NEW docker-registry.docker.com/v2/?param=127.0.0.1
+
+## 2026-08-20 17:00:52 UTC
+- NEW https://docker-registry.docker.com/v2/
+- NEW https://docker-registry.docker.com/v2/ (169.254.169.254 param test)

@@ -676,3 +676,15 @@ confidence: 45
 reasoning: DNS failure for SSRF probe (param=169.254.169.254) suggests SSRF potential.  
 evidence_needed: Confirm DNS resolution failure is SSRF-related.  
 verify_steps:  
+## 2026-08-20 17:00:39 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/  
+[NEW] https://api.coxautoinc.com/endpoint  
+asset: https://docker-registry.docker.com/v2/  
+asset: https://api.coxautoinc.com/endpoint  
+asset: https://github.com/posit/.github/workflows  
+[HYP] SSRF in docker-registry endpoint  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 70  
+reasoning: Probe results show DNS errors when using 169.254.169.254 (metadata IP) as a param, suggesting SSRF potential.  
+evidence_needed: Confirm if SSRF

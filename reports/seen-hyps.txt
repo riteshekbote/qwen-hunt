@@ -8,3 +8,7 @@ ad801e8fde60e630 SSRF via CoxAutoInc API
 4cc66f572debf241 Posit GitHub Workflow Misconfiguration
 475ea0ba6eca130d SSRF in coxautomotive endpoint
 190be22523438e69 SSRF in docker-registry
+843f1d880120701f SSRF in docker-registry endpoint
+173d4d64e2f2a50a SSRF in Docker Registry
+6a05ad880711f783 SSRF in Cox Automotive API
+ee862a0f90964073 GitHub Misconfiguration in Posit

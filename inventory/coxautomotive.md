@@ -81,3 +81,7 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=169.254.169.254
 - CHANGED https://api.coxautoinc.com/endpoint?param=10.0.0.1
 - CHANGED https://api.coxautoinc.com/endpoint?param=172.16.0.1
+
+## 2026-08-20 17:00:52 UTC
+- NEW https://api.coxautoinc.com/endpoint
+- NEW https://api.coxautoinc.com/endpoint (SSRF param test)

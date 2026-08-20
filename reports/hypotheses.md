@@ -204,3 +204,10 @@
 ## RANKED HYPOTHESES 2026-08-20 15:59:20 UTC
 - [70] https://api.coxautoinc.com/endpoint: SSRF in docker-registry (from reports/hypotheses-qwen14b.txt)
 - [70] https://api.coxautoinc.com/endpoint: SSRF in coxautomotive endpoint (from reports/hypotheses-qwen14b.txt)
+
+## RANKED HYPOTHESES 2026-08-20 17:00:52 UTC
+- [85] https://docker-registry.docker.com/v2/: SSRF in Docker Registry (from reports/hypotheses-qwen8b.txt)
+- [85] https://docker-registry.docker.com/v2/: SSRF in Cox Automotive API (from reports/hypotheses-qwen8b.txt)
+- [85] https://docker-registry.docker.com/v2/: GitHub Misconfiguration in Posit (from reports/hypotheses-qwen8b.txt)
+- [70] https://docker-registry.docker.com/v2/: SSRF in docker-registry endpoint (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry

@@ -192,16 +192,6 @@ probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantm
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-[HYP] Docker Registry DNS Misconfiguration
-class: MISCONFIG
-asset: docker-registry.docker.com/v2/
-confidence: 80
-reasoning: The endpoint consistently returns DNS resolution errors, indicating a possible misconfiguration or network issue. This could allow attackers to access internal services if the DNS is misconfigured.
-evidence_needed: Confirm that the DNS resolution is indeed the issue and that the registry is accessible via another method.
-verify_steps: Check DNS records, test connectivity, check if the registry is reachable via IP.
-impact: Potential exposure of internal Docker services, leading to data leaks or unauthorized access.
-testability: PASSIVE
-[HYP] SSRF via CoxAutoInc API
 class: SSRF
 asset: https://api.coxautoinc.com/endpoint
 confidence: 70
@@ -252,11 +242,17 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing  
 [LEARN] ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403  
 [RISK] 88 reason: High exposure from Docker registry SSRF potential and CoxAutoInc internal IP routing capabilities
+## 2026-08-20 15:53:01 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] docker-registry.docker.com/v2/?param=10.0.0.1
+[NEW] docker-registry.docker.com/v2/?param=172.16.0.1
+[NEW] docker-registry.docker.com/v2/?param=127.0.0.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=192.168.1.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=169.254.169.254
+[CHANGED] https://api.coxautoinc.com/endpoint?param=10.0.0.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=172.16.0.1
+[PRIO] https://api.c
 === AGGREGATED HYPOTHESES (tail) ===
-## RANKED HYPOTHESES 2026-08-20 11:52:58 UTC
-- [85] docker-registry.docker.com/v2/: Docker Registry SSRF via DNS misconfiguration (from reports/hypotheses-qwen8b.txt)
-- [85] docker-registry.docker.com/v2/: Docker Registry SSRF Revisited (from reports/hypotheses-qwen14b.txt)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/ with param=169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
 - LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
 - LEARN: ACCEPTED MISCONFIG @ https://github.com/posit/.github/workflows: 404 indicates dead repo
@@ -293,11 +289,11 @@ testability: PASSIVE
 - NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=192.168.1.1
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
+
+## RANKED HYPOTHESES 2026-08-20 15:59:20 UTC
+- [70] https://api.coxautoinc.com/endpoint: SSRF in docker-registry (from reports/hypotheses-qwen14b.txt)
+- [70] https://api.coxautoinc.com/endpoint: SSRF in coxautomotive endpoint (from reports/hypotheses-qwen14b.txt)
 === LATEST ROBOT PROBE RESULTS ===
-## 2026-08-20 07:15:03 UTC
-https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
-https://github.com/posit/.github/workflows -> HTTP 404
-https://api.coxautoinc.com/endpoint -> HTTP 403
 
 ## 2026-08-20 08:03:37 UTC
 https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
@@ -354,3 +350,7 @@ https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or 
 https://api.coxautoinc.com/endpoint -> HTTP 403
 https://api.coxautoinc.com/endpoint?param=192.168.1.1 -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
+
+## 2026-08-20 15:59:20 UTC
+https://api.coxautoinc.com/endpoint -> HTTP 403
+https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
