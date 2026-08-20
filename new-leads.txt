@@ -1,3 +1,4 @@
+[HYP] Cox Automotive SSRF
 [HYP] Cox Automotive SSRF Protection
 [HYP] Cox Automotive SSRF via API Endpoints
 [HYP] Cox Automotive SSRF via API Endpoints  
@@ -13,13 +14,12 @@
 [HYP] Docker Registry v2 Endpoint
 [HYP] Docker Wildcard DNS Misconfiguration
 [HYP] Docker Wildcard DNS Misconfiguration  
+[HYP] GitHub .git Config Exposure
 [HYP] GitHub Workflow Misconfiguration in Posit  
 [HYP] GitHub Workflows Misconfig
 [HYP] GitHub Workflows Misconfiguration
 [HYP] GitHub Workflows Misconfiguration  
+[HYP] MISCONFIG in docker-registry.docker.com/v2/  
+[HYP] MISCONFIG in docker.com endpoint  
 [HYP] Posit GitHub Org Misconfiguration
 [HYP] Posit GitHub Org Misconfiguration  
-[HYP] Posit GitHub Org Misconfigurations
-[HYP] Posit GitHub Repo Misconfiguration  
-[HYP] Posit GitHub Workflow Misconfig
-[HYP] Posit GitHub Workflow Misconfiguration
