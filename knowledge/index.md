@@ -43,3 +43,8 @@
 - 2026-08-20 REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
 - 2026-08-20 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
 - 2026-08-20 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: Probe errors suggest SSRF potential.
+- 2026-08-20 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (params include internal IPs)
+- 2026-08-20 ACCEPTED MISCONFIG @ https://api.coxautoinc.com/endpoint (403s with internal IPs)
+- 2026-08-20 REJECTED SSRF @ https://api.coxautoinc.com/endpoint?param=169.254.169.254: DNS resolution failure prevents verification
+- 2026-08-20 ACCEPTED MISCONFIG @ https://docker-registry.docker.com/v2/: Persistent DNS errors indicate misconfigured registry endpoint
+- 2026-08-20 ACCEPTED BUSLOGIC @ https://

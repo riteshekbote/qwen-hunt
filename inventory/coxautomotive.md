@@ -88,3 +88,9 @@
 
 ## 2026-08-20 17:55:08 UTC
 - NEW https://api.coxautoinc.com/endpoint?param=169.254.169.254 (SSRF probe)
+
+## 2026-08-20 19:07:39 UTC
+- NEW https://api.coxautoinc.com/endpoint
+- CHANGED https://api.coxautoinc.com/endpoint?param=10.0.0.1 (now 403)
+- NEW https://api.coxautoinc.com/endpoint?param=10.0.0.1
+- CHANGED https://api.coxautoinc.com/endpoint?param=192.168.1.1

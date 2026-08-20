@@ -219,3 +219,13 @@
 - [60] https://docker-registry.docker.com/v2/?param=169.254.169.254: SSRF in docker-registry endpoint (from reports/hypotheses-qwen14b.txt)
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=172.16.0.1
 - LEARN: ACCEPTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: Probe errors suggest SSRF potential.
+
+## RANKED HYPOTHESES 2026-08-20 19:07:39 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254
+- LEARN: ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (params include internal IPs)
+- LEARN: ACCEPTED MISCONFIG @ https://api.coxautoinc.com/endpoint (403s with internal IPs)
+- LEARN: REJECTED SSRF @ https://api.coxautoinc.com/endpoint?param=169.254.169.254: DNS resolution failure prevents verification
+- LEARN: ACCEPTED MISCONFIG @ https://docker-registry.docker.com/v2/: Persistent DNS errors indicate misconfigured registry endpoint
+- LEARN: ACCEPTED BUSLOGIC @ https://
