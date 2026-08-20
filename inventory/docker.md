@@ -125,3 +125,10 @@
 ## 2026-08-20 15:03:41 UTC
 - CHANGED docker-registry.docker.com/v2/ (recurring "Name or service not known" errors with SSRF parameters like 169.254.169.254, 10.0.0.1, 172.16.0.1, 127.0.0.1)
 - NEW docker-registry.docker.com/v2/ (DNS resolution failure)
+
+## 2026-08-20 15:59:20 UTC
+- CHANGED docker-registry.docker.com/v2/ DNS resolution failure persists
+- NEW docker-registry.docker.com/v2/?param=169.254.169.254
+- NEW docker-registry.docker.com/v2/?param=10.0.0.1
+- NEW docker-registry.docker.com/v2/?param=172.16.0.1
+- NEW docker-registry.docker.com/v2/?param=127.0.0.1

@@ -200,3 +200,7 @@
 - NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=192.168.1.1
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403
+
+## RANKED HYPOTHESES 2026-08-20 15:59:20 UTC
+- [70] https://api.coxautoinc.com/endpoint: SSRF in docker-registry (from reports/hypotheses-qwen14b.txt)
+- [70] https://api.coxautoinc.com/endpoint: SSRF in coxautomotive endpoint (from reports/hypotheses-qwen14b.txt)

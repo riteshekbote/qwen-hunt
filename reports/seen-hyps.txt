@@ -6,3 +6,5 @@ ad801e8fde60e630 SSRF via CoxAutoInc API
 6e33b6e97f9562aa Docker Registry DNS Misconfiguration
 9694df42c27b47e3 CoxAutoInc API SSRF via Internal IP
 4cc66f572debf241 Posit GitHub Workflow Misconfiguration
+475ea0ba6eca130d SSRF in coxautomotive endpoint
+190be22523438e69 SSRF in docker-registry

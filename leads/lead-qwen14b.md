@@ -656,3 +656,23 @@ evidence_needed: Bypass filter by encoding IPs or using alternate SSRF vectors.
 verify_steps:  
 impact: Bypass filter to leak internal services.  
 testability:
+## 2026-08-20 15:59:12 UTC (model qwen14b)
+[NEW] coxautomotive endpoint with param=192.168.1.1, 10.0.0.1, 172.16.0.1, 127.0.0.1  
+[CHANGED] docker-registry.docker.com/v2/ DNS resolution failure persists  
+[CHANGED] GitHub URLs (posit) continue returning HTTP 404  
+[HYP] SSRF in coxautomotive endpoint  
+class: SSRF  
+asset: https://api.coxautoinc.com/endpoint  
+confidence: 70  
+reasoning: 403 responses for internal IPs (169.254.169.254, 10.0.0.1) suggest SSRF is possible but server blocks it.  
+evidence_needed: Confirm server leaks metadata or internal IPs via SSRF.  
+verify_steps:  
+impact: Access to internal services (metadata, cloud VMs).  
+testability: PASSIVE  
+[HYP] SSRF in docker-registry  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 45  
+reasoning: DNS failure for SSRF probe (param=169.254.169.254) suggests SSRF potential.  
+evidence_needed: Confirm DNS resolution failure is SSRF-related.  
+verify_steps:  
