@@ -65,3 +65,7 @@
 - CHANGED https://docker-registry.docker.com/v2/ (probe error confirmed)
 - CHANGED https://docker-registry.docker.com (probe error confirmed)
 - CHANGED https://docker.com/endpoint?param=127.0.0.1 (404, likely misconfigured)
+
+## 2026-08-20 04:07:16 UTC
+- NEW https://docker-registry.docker.com/v2/ (recurring DNS errors suggest virtual host misconfig)
+- CHANGED https://docker.com (still returns 200, but probe logs show endpoint variations like /endpoint?param=127.0.0.1)

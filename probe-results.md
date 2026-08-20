@@ -100,3 +100,6 @@ https://github.com/posit/.git/config -> HTTP 404
 https://docker.com -> 200 len=345746 type=text/html; charset=UTF-8
 https://api.coxautoinc.com/endpoint?param=127.0.0.1 -> HTTP 403
 https://docker.com/endpoint?param=127.0.0.1 -> HTTP 404
+
+## 2026-08-20 04:07:17 UTC
+https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know

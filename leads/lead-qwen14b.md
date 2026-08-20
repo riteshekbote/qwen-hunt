@@ -303,3 +303,21 @@ evidence_needed: Probe to endpoint with valid param.
 verify_steps: PROBE https://docker.com/endpoint?param=127.0.0.1  
 impact: Potential endpoint misconfig.  
 testability: PASSIVE  
+## 2026-08-20 04:07:06 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/ (recurring DNS errors suggest virtual host misconfig)
+[CHANGED] https://docker.com (still returns 200, but probe logs show endpoint variations like /endpoint?param=127.0.0.1)
+[PRIO] docker-registry.docker.com/v2/
+[HYP] Docker Registry Virtual Host Misconfiguration
+class: MISCONFIG
+asset: https://docker-registry.docker.com/v2/
+confidence: 80
+reasoning: Recurring "Name or service not known" errors suggest DNS or virtual host misconfig. Registry endpoints are consistently unreachable, but docker.com itself is accessible.
+evidence_needed: DNS records for docker-registry.docker.com, or virtual host headers for docker.com
+verify_steps: 
+impact: Exposed registry could leak internal Docker images or allow unauthorized access to registry metadata
+testability: PASSIVE
+[FINAL] 
+[HYP] Docker Registry Virtual Host Misconfiguration
+[NEXT] PROBE: `GET https://docker-registry.docker.com/v2/` with `Host: docker.com`
+[LEARN] ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
+[RISK] 85

@@ -564,3 +564,4 @@ class: SSRF
 asset: https://api.coxautoinc.com/endpoint
 confidence: 75
 reasoning: 403 response with param=127.0.0.1 confirms internal IP resolution. This indicates potential SSRF vulnerability
+## 2026-08-20 04:03:48 UTC (model qwen8b)

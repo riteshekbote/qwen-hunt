@@ -99,3 +99,8 @@
 ## RANKED HYPOTHESES 2026-08-20 03:21:32 UTC
 - [85] https://docker-registry.docker.com/v2/: MISCONFIG in docker-registry.docker.com/v2/ (from reports/hypotheses-qwen14b.txt)
 - [85] https://docker-registry.docker.com/v2/: Docker Registry Misconfiguration (from reports/hypotheses-qwen8b.txt)
+
+## RANKED HYPOTHESES 2026-08-20 04:07:16 UTC
+- [80] https://docker-registry.docker.com/v2/: Docker Registry Virtual Host Misconfiguration (from reports/hypotheses-qwen14b.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE: `GET https://docker-registry.docker.com/v2/` with `Host: docker.com`
+- LEARN: ACCEPTED MISCONFIG @ docker-registry.docker.com/v2/: recurring DNS errors suggest virtual host misconfig
