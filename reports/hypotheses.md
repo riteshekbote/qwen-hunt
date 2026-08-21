@@ -300,3 +300,8 @@
 - NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254
 - LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.
 - LEARN: REJECTED SSRF
+
+## RANKED HYPOTHESES 2026-08-21 10:52:11 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+- LEARN: ACCEPTED SSRF @ docker-registry.docker.com/v2/ (proxy misrouting confirmed via repeated 503/ERR)

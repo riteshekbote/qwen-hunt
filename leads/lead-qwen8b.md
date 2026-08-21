@@ -1588,3 +1588,28 @@ testability: PASSIVE
 [PARKED] GitHub Workflows misconfiguration: no concrete verify_steps  
 [NEXT] PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254  
 [LEARN] REJECTED SSRF
+## 2026-08-21 10:48:06 UTC (model qwen8b)
+class: MISCONFIG
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254
+confidence: 85
+reasoning: DNS resolution failure suggests misconfigured DNS or unreachable registry. Param=169.254.169.254 is internal IP, indicating potential SSRF risk if endpoint accepts arbitrary IPs.
+evidence_needed: Confirm DNS resolution status and registry availability
+verify_steps: nslookup docker-registry.docker.com; curl -v https://docker-registry.docker.com/v2/
+impact: Potential SSRF or misconfigured internal service exposure
+testability: PASSIVE
+class: AUTH
+asset: https://api.coxautoinc.com/endpoint?param=admin
+confidence: 70
+reasoning: 403 responses for param=admin suggest missing or invalid token. Could indicate authentication bypass or token leakage.
+evidence_needed: Confirm token validity and endpoint access requirements
+verify_steps: curl -v --header "Authorization: Bearer <token>" https://api.coxautoinc.com/endpoint
+impact: Unauthorized access to admin endpoints
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows?access_token=123
+confidence: 65
+reasoning: 404 for workflows endpoint with access_token suggests misconfigured token or endpoint. Could indicate exposed credentials or misconfigured GitHub actions.
+evidence_needed: Verify token validity and endpoint existence
+verify_steps: curl -v --header "Authorization: Bearer 123" https://github.com/posit/.github/workflows
+impact: Potential credential exposure or misconfigured CI/CD
+testability: PASSIVE

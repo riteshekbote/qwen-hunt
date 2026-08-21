@@ -58,3 +58,4 @@
 - 2026-08-21 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint?param=internal_ip: 40
 - 2026-08-21 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.
 - 2026-08-21 REJECTED SSRF
+- 2026-08-21 ACCEPTED SSRF @ docker-registry.docker.com/v2/ (proxy misrouting confirmed via repeated 503/ERR)

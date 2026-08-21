@@ -227,3 +227,6 @@
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (ERR recurring, possible SSRF target)
 - NEW https://docker-registry.docker.com/v2/ -> DNS resolution failure
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 -> DNS resolution failure
+
+## 2026-08-21 10:52:11 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated SSRF probe with internal metadata IP)
