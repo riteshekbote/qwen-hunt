@@ -71,3 +71,41 @@ testability: AUTH_HELPED
 [LEARN] ACCEPTED AUTH @ auth.docker.com: dckr-sessid cookie set on unauthenticated requests, x-docker-app-version and x-trace-id leaked
 [LEARN] REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
 [RISK] 58
+## 2026-08-21 20:33:19 UTC (model mimo)
+[NEW] api.emsisoft.com/v1/workspaces/{guid} returns **404** (not 401) — endpoint may not exist or requires different auth pattern
+[NEW] api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 returns **404** — zeroed GUID matches error response, no info leak
+[CHANGED] docker-registry.docker.com/v2/ confirmed **NXDOMAIN** — DNS completely dead, not just unreachable
+[NEW] auth.docker.com returns **200** with 345KB HTML — potential client-side auth logic
+class: AUTH
+asset: api.emsisoft.com
+confidence: 48
+reasoning: The swagger spec reveals session state in example responses. The 404 on workspace endpoints (not 401) suggests either endpoints are deprecated OR session validation happens client-side before hitting the API. If session state is stored in a signed cookie, an attacker could forge valid sessions.
+evidence_needed: Inspect auth.docker.com HTML for JavaScript session management, test cookie manipulation
+verify_steps: 1. curl https://auth.docker.com/ | grep -i 'session\|cookie\|jwt\|token' 2. Decode dckr-sessid cookie and check if content is JSON with HMAC signature 3. Modify cookie value and test authenticated endpoints
+impact: Severity HIGH if cookie forgeable (full account takeover). Severity LOW if server-validated.
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: api.docker.com
+confidence: 55
+reasoning: The x-docker-app-version header (v187) is returned on every unauthenticated request. This reveals exact build information which could be used to identify version-specific vulnerabilities. Combined with the public swagger spec, an attacker could map API endpoints to version-specific exploits.
+evidence_needed: Verify version header is consistent across endpoints, check if version affects behavior
+verify_steps: 1. curl -I https://api.docker.com/ 2. Compare version across multiple endpoints 3. Check if different versions have different swagger specs
+impact: Severity LOW-MEDIUM (information disclosure enables targeted attacks)
+testability: PASSIVE
+class: AUTH
+asset: admin.dealertrack.com
+confidence: 45
+reasoning: Multiple dealertrack admin endpoints return different server headers (Apache, CA Access Gateway). The admin.pa1.dealertrack.com returns CA Access Gateway error which suggests enterprise auth gateway. However, admin.pa-east.unifipa.dealertrack.com shows raw Apache which may have different access controls.
+evidence_needed: Test admin panels with common bypass headers, check for exposed admin paths
+verify_steps: 1. curl -H "X-Forwarded-For: 127.0.0.1" https://admin.dealertrack.com/ 2. curl https://admin.dealertrack.com/admin/ 3. Check for exposed .git/config or .env files
+impact: Severity HIGH if admin access achieved (full platform control)
+testability: AUTH_HELPED
+[PARKED] Session cookie created via client-side JavaScript manipulation: confidence 48 < 50 threshold, insufficient evidence that session is client-validated
+[PARKED] Admin panel accessible via header manipulation: confidence 45 < 50 threshold, 403 pattern suggests robust WAF
+[FINAL]
+[NEXT] PROBE: curl https://auth.docker.com/ | grep -i 'session\|cookie\|jwt\|localStorage\|dckr' — decode JavaScript session logic
+[LEARN] ACCEPTED AUTH @ api.emsisoft.com: 404 on workspace GUIDs (not 401) indicates endpoints may not exist or require different auth pattern
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: Full OpenAPI spec reveals example session data structures
+[LEARN] REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead, confirmed dead
+[LEARN] ACCEPTED MISCONFIG @ auth.docker.com: Version header v187 and trace IDs leaked on unauthenticated requests
+[RISK] 62 — Moderate risk. Docker and Emsisoft have exposed API surfaces with information disclosure. Cox Automotive endpoints are locked down with 403 WAF responses. Auth.docker.com leaks operational metadata but no critical secrets. Overall attack surface limited by consistent auth enforcement.
