@@ -394,3 +394,14 @@
 - LEARN: REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
 - LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-21 21:31:05 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | jq '.paths | keys' — enumerate all API endpoints from public spec
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: Full OpenAPI spec with example GUIDs, emails, billing data publicly accessible
+- LEARN: ACCEPTED AUTH @ auth.docker.com: dckr-sessid cookie set on unauthenticated requests, x-docker-app-version and x-trace-id leaked
+- LEARN: REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
+- LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

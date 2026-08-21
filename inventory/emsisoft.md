@@ -124,3 +124,7 @@
 - NEW api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 returns **404** — zeroed GUID matches error response, no info leak
 
 ## 2026-08-21 20:55:03 UTC
+
+## 2026-08-21 21:31:05 UTC
+- NEW api.emsisoft.com/v2/ -> HTTP 404 (new probe confirms v2 path doesn't exist)
+- NEW apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 (testing endpoint returns identical spec to production)
