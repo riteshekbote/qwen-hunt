@@ -1338,3 +1338,37 @@ class: MISCONFIG
 asset: https://github.com/posit/.github/workflows  
 confidence: 65  
 reasoning: 404 error suggests missing GitHub Actions workflows,
+## 2026-08-21 01:54:52 UTC (model qwen8b)
+class: SSRF
+asset: api.coxautoinc.com/endpoint
+confidence: 80
+reasoning: Testing with parameters like internal IPs and admin might indicate SSRF if the backend is using these IPs. The 403 might be due to misconfigured auth, but SSRF could be possible.
+evidence_needed: Check if the backend is using the provided IP or if it's a misconfiguration.
+verify_steps: Send requests with different IPs and see if they're processed.
+impact: SSRF could allow access to internal services.
+testability: PASSIVE
+class: MISCONFIG
+asset: docker-registry.docker.com/v2/
+confidence: 70
+reasoning: DNS errors might indicate the service is down, but the parameterized endpoints might be misconfigured or using internal IPs.
+evidence_needed: Check if the service is reachable or if the DNS is the issue.
+verify_steps: Try resolving the domain and check if the endpoint is active.
+impact: Misconfigured registry could lead to data leaks.
+testability: PASSIVE
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 60
+reasoning: 404 might indicate the workflows are not properly set up or the path is wrong.
+evidence_needed: Check if the workflows exist in the repo.
+verify_steps: Access the GitHub repo and check the workflows section.
+impact: Misconfigured workflows could expose code or secrets.
+testability: PASSIVE
+[NEW] https://api.coxautoinc.com/endpoint?param=admin
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip
+[NEW] https://api.coxautoinc.com/endpoint?param=169.254.169.254
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] https://github.com/posit/.github/workflows?access_token=123
+[CHANGED] https://docker-registry.docker.com/v2/?param=172.16.0.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=192.168.1.1
+[CHANGED] https://api.coxautoinc.com/endpoint?param=10.0.0.1
+[PRIO] https://api.coxautoinc.com/endpoint?param=internal_ip: 8.5
