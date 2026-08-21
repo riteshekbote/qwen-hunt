@@ -235,3 +235,9 @@
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated SSRF probe with internal metadata IP)
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
 - CHANGED https://docker-registry.docker.com/v2/
+
+## 2026-08-21 12:06:38 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated 6x with ERR)
+- CHANGED https://docker-registry.docker.com/v2/ (ERR now appears 5x with 169.254.169.254 param)
+- NEW docker-registry.docker.com/v2/ (DNS resolution failure)
+- CHANGED docker-registry.docker.com/v2/?param=169.254.169.254 (persistent DNS error)

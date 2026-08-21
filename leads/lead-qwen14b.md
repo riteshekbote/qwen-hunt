@@ -1352,3 +1352,29 @@ testability: PASSIVE (if proxy misconfigured)
 [NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
 [LEARN] ACCEPTED SSRF @ docker-registry.docker.com/v2/ (proxy misrouting confirmed via repeated 503/ERR)
 [RISK] 85  
+## 2026-08-21 12:06:28 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated 6x with ERR)
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip (repeated 4x with HTTP 403)
+[CHANGED] https://github.com/posit/.github/workflows (404 now persists across 4 logs)
+[CHANGED] https://docker-registry.docker.com/v2/ (ERR now appears 5x with 169.254.169.254 param)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com
+confidence: 75
+reasoning: Param 169.254.169.254 (cloud metadata IP) appears in 6 consecutive ERR logs. SSRF likely if registry uses param as URL.
+evidence_needed: Check if 169.254.169.254 resolves within container network
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Access to internal cloud metadata (high severity)
+testability: PASSIVE
+[HYP] Missing Token in CoxAuto API
+class: AUTH
+asset: api.coxautoinc.com
+confidence: 60
+reasoning: 403 occurs with param=internal_ip and param=admin. Token likely missing in headers.
+evidence_needed: Check auth headers for token
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+impact: Token exposure (medium severity)
+testability: AUTH_HELPED
+[HYP] Misconfigured GitHub Workflows
+class: MISCONFIG
+asset: github.com/posit/.

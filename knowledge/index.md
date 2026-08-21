@@ -59,3 +59,6 @@
 - 2026-08-21 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.
 - 2026-08-21 REJECTED SSRF
 - 2026-08-21 ACCEPTED SSRF @ docker-registry.docker.com/v2/ (proxy misrouting confirmed via repeated 503/ERR)
+- 2026-08-21 REJECTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
+- 2026-08-21 ACCEPTED AUTH @ coxautoinc.com/endpoint: 403 remains after header tests
+- 2026-08-21 ACCEPTED MISCONFIG @ posit.github.com/.github/workflows

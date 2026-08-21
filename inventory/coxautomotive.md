@@ -172,3 +172,8 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin (403 persists with admin probe)
 - NEW https://api.coxautoinc.com/endpoint?param=internal_ip
 - CHANGED https://api.coxautoinc.com/endpoint
+
+## 2026-08-21 12:06:38 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=internal_ip (repeated 4x with HTTP 403)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=admin (403 remains)

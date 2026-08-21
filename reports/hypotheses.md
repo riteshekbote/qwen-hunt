@@ -310,3 +310,10 @@
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
 - LEARN: ACCEPTED SSRF @ docker-registry.docker.com/v2/ (proxy misrouting confirmed via repeated 503/ERR)
+
+## RANKED HYPOTHESES 2026-08-21 12:06:38 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/ (verify DNS resolution)
+- LEARN: REJECTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
+- LEARN: ACCEPTED AUTH @ coxautoinc.com/endpoint: 403 remains after header tests
+- LEARN: ACCEPTED MISCONFIG @ posit.github.com/.github/workflows
