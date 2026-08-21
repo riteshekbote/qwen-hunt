@@ -1,4 +1,4 @@
-name: Qwen Hunt - Triager (Validate Leads)
+name: MiMo Hunt - Triager (Validate Leads)
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  QWEN_14B: "hf.co/richardyoung/Qwen3-14B-abliterated-GGUF:Q4_K_M"
+  MODEL_ID: opencode/mimo-v2.5-free
 
 jobs:
   triage:
@@ -23,19 +23,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install Ollama + pull Qwen 14B
+      - name: Install OpenCode
         run: |
-          if ! command -v ollama >/dev/null 2>&1; then
-            curl -fsSL https://ollama.com/install.sh | sh
+          export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          if command -v opencode >/dev/null 2>&1; then
+            opencode --version
+            exit 0
           fi
-          nohup ollama serve > /tmp/ollama.log 2>&1 &
-          for i in $(seq 1 30); do
-            curl -s http://127.0.0.1:11434/api/version >/dev/null 2>&1 && break
-            sleep 2
-          done
-          ollama pull "$QWEN_14B" 2>&1 | tail -2
-          ollama list
-          echo "LOCAL_MODEL=$(ollama list | tail -n +2 | awk '{print $1}' | head -1)" >> $GITHUB_ENV
+          npm install -g opencode-ai 2>/dev/null || npm install -g --prefix "$HOME/.npm-global" opencode-ai 2>/dev/null || true
+          if ! command -v opencode >/dev/null 2>&1; then
+            for i in 1 2 3; do
+              curl -fsSL https://opencode.ai/install | bash && break
+              echo "opencode.ai installer attempt $i failed, retrying in 15s..."
+              sleep 15
+            done
+          fi
+          export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          opencode --version
 
       - name: Collect UNVALIDATED leads
         id: collect
@@ -147,17 +151,8 @@ jobs:
           echo "" >> triage-prompt.txt
           echo "LEADS:" >> triage-prompt.txt
           cat new-leads.txt >> triage-prompt.txt
-          python3 -c "import json,os; prompt=open('triage-prompt.txt').read(); req={'model': os.environ.get('LOCAL_MODEL', '$QWEN_14B'), 'prompt': prompt, 'stream': False, 'think': False, 'options': {'num_predict': 2048, 'temperature': 0.2}}; open('triage-req.json','w').write(json.dumps(req))"
-          timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
-            -d @triage-req.json > triage-raw.json || true
-          for a in 1 2 3 4 5 6; do
-            if python3 -c "import json; d=json.load(open('triage-raw.json')); exit(0 if d.get('response') else 1)" 2>/dev/null; then break; fi
-            echo "triage generate attempt $a failed: $(head -c 200 triage-raw.json)"
-            sleep 15
-            timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
-              -d @triage-req.json > triage-raw.json || true
-          done
-          python3 -c "import json; d=json.load(open('triage-raw.json')); print(d.get('response','[NO RESPONSE]'))" > triage-output.txt
+          export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          timeout -k 15 25m opencode run --model "$MODEL_ID" < triage-prompt.txt > triage-output.txt 2>&1 || true
           echo "=== triage preview ==="; head -40 triage-output.txt
 
       - name: Update valid-bugs counter

@@ -1,4 +1,4 @@
-name: Qwen Hunt - Analyst Pipeline
+name: MiMo Hunt - Analyst Pipeline
 
 on:
   schedule:
@@ -8,10 +8,6 @@ on:
 permissions:
   contents: write
   actions: write
-
-env:
-  QWEN_8B: "hf.co/richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M"
-  QWEN_14B: "hf.co/richardyoung/Qwen3-14B-abliterated-GGUF:Q4_K_M"
 
 jobs:
   analyst:
@@ -24,33 +20,33 @@ jobs:
       fail-fast: false
       matrix:
         model:
-          - { tag: "hf.co/richardyoung/Qwen3-14B-abliterated-GGUF:Q4_K_M", name: qwen14b }
-          - { tag: "hf.co/richardyoung/Qwen3-8B-Abliterated-GGUF:Q4_K_M", name: qwen8b }
+          - { id: opencode/mimo-v2.5-free, name: mimo }
 
     env:
-      MODEL_TAG: ${{ matrix.model.tag }}
+      MODEL_ID: ${{ matrix.model.id }}
       MODEL_NAME: ${{ matrix.model.name }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install Ollama + pull model (cached GGUF)
+      - name: Install OpenCode
         run: |
-          if ! command -v ollama >/dev/null 2>&1; then
-            curl -fsSL https://ollama.com/install.sh | sh
+          export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          if command -v opencode >/dev/null 2>&1; then
+            opencode --version
+            exit 0
           fi
-          nohup ollama serve > /tmp/ollama.log 2>&1 &
-          for i in $(seq 1 30); do
-            curl -s http://127.0.0.1:11434/api/version >/dev/null 2>&1 && break
-            sleep 2
-          done
-          ollama pull "$MODEL_TAG" 2>&1 | tail -2
-          ollama list
-          # HF-sourced models get a normalized local name — use what ollama list reports
-          LOCAL_MODEL=$(ollama list | tail -n +2 | awk '{print $1}' | head -1)
-          echo "LOCAL_MODEL=$LOCAL_MODEL" >> $GITHUB_ENV
-          echo "resolved local model: $LOCAL_MODEL"
+          npm install -g opencode-ai 2>/dev/null || npm install -g --prefix "$HOME/.npm-global" opencode-ai 2>/dev/null || true
+          if ! command -v opencode >/dev/null 2>&1; then
+            for i in 1 2 3; do
+              curl -fsSL https://opencode.ai/install | bash && break
+              echo "opencode.ai installer attempt $i failed, retrying in 15s..."
+              sleep 15
+            done
+          fi
+          export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          opencode --version
 
       - name: Prepare context (RAG + state + inventory + last cycle)
         run: |
@@ -95,7 +91,7 @@ jobs:
             tail -60 probe-results.md 2>/dev/null || echo none
           } > ctx.txt
 
-      - name: Analyst run (8-step methodology, Qwen abliterated)
+      - name: Analyst run (8-step methodology)
         run: |
           cat ctx.txt > analyst-prompt.txt
           cat >> analyst-prompt.txt << 'PROMPT_EOF'
@@ -141,26 +137,8 @@ jobs:
 
           RULES: facts vs hypotheses strictly separated; no endpoint-map-only output; no class on the REJECTED list; never mention secrets in full (hash them with sha256sum); all claims must trace to the context provided or your own read-only probes; scope boundary = PROBE_ALLOW only.
           PROMPT_EOF
-          python3 - << 'PYEOF'
-          import json, os
-          prompt = open('analyst-prompt.txt').read()
-          model = os.environ.get('LOCAL_MODEL', os.environ.get('MODEL_TAG', ''))
-          req = {'model': model, 'prompt': prompt, 'stream': False, 'think': False,
-                 'options': {'num_predict': 1536, 'temperature': 0.4}}
-          open('req.json','w').write(json.dumps(req))
-          print('using model:', model)
-          PYEOF
-          timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
-            -d @req.json > analyst-raw.json || true
-          # model may still be loading right after pull — retry with backoff
-          for a in 1 2 3 4 5 6; do
-            if python3 -c "import json; d=json.load(open('analyst-raw.json')); exit(0 if d.get('response') else 1)" 2>/dev/null; then break; fi
-            echo "generate attempt $a failed: $(cat analyst-raw.json | head -c 200)"
-            sleep 15
-            timeout -k 15 25m curl -s http://127.0.0.1:11434/api/generate \
-              -d @req.json > analyst-raw.json || true
-          done
-          python3 -c "import json; d=json.load(open('analyst-raw.json')); print(d.get('response','[NO RESPONSE]'))" > analyst-out.txt
+          export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          timeout -k 15 25m opencode run --model "$MODEL_ID" < analyst-prompt.txt > analyst-out.txt 2>&1 || true
           cp analyst-out.txt analyst-${MODEL_NAME}.out
           grep -E '^\[(NEW|CHANGED|PRIO|HYP|PARKED|FINAL|NEXT|LEARN|RISK)\]|^class:|^confidence:|^asset:|^impact:|^testability:|^verify_steps:|^reasoning:|^evidence_needed:' analyst-out.txt > lead.txt || true
           {
@@ -172,7 +150,7 @@ jobs:
       - name: Upload model artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: qwen-analyst-${{ matrix.model.name }}
+          name: analyst-${{ matrix.model.name }}
           path: |
             lead_${{ matrix.model.name }}.txt
             analyst-${{ matrix.model.name }}.out
