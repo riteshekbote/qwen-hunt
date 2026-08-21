@@ -133,3 +133,8 @@
 - NEW https://api.coxautoinc.com/endpoint?param=admin
 - NEW https://api.coxautoinc.com/endpoint?param=192.168.1.1
 - CHANGED https://api.coxautoinc.com/endpoint
+
+## 2026-08-21 04:30:11 UTC
+- NEW api.coxautoinc.com/endpoint?param=internal_ip
+- CHANGED api.coxautoinc.com/endpoint?param=admin
+- CHANGED api.coxautoinc.com/endpoint?param=10.0.0.1
