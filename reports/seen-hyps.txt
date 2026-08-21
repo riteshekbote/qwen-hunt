@@ -16,3 +16,4 @@ ee862a0f90964073 GitHub Misconfiguration in Posit
 12934d19820d8a9a SSRF in docker-registry endpoint (retained)
 173d4d64e2f2a50a SSRF in Docker Registry
 82c60032ef384a75 GitHub Misconfiguration
+1f3cbafbea04fe4e Session cookie set without Secure flag on unauthenticated requests

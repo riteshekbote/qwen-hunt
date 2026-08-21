@@ -362,3 +362,13 @@
 - LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead, not just unreachable
 - LEARN: ACCEPTED AUTH @ auth.docker.com: Leaks x-docker-app-version, trace IDs, and sets session cookies on unauthenticated requests
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-21 19:53:44 UTC
+- [72] api.emsisoft.com/swagger/v1.0/swagger.json: Session cookie set without Secure flag on unauthenticated requests (from reports/hypotheses-mimo.txt)
+- NEXT(hypotheses-mimo.txt): PROBE: GET https://api.emsisoft.com/v1/workspaces/ddaaa9b5-9985-4028-8ff7-f12255a168e9 — test if the example GUID from swagger spec returns data or 401
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: Full 365KB+ OpenAPI spec with example GUIDs, emails, billing data publicly accessible without a
+- LEARN: ACCEPTED AUTH @ auth.docker.com: dckr-sessid cookie set on unauthenticated requests, x-docker-app-version and x-trace-id leaked
+- LEARN: REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
