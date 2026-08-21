@@ -1061,3 +1061,26 @@ testability: PASSIVE
 [HYP] Token Param IDOR in Posit GitHub Workflows  
 [NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254  
 ## 2026-08-21 04:30:02 UTC (model qwen14b)
+## 2026-08-21 05:24:29 UTC (model qwen14b)
+[NEW] docker-registry.docker.com
+[CHANGED] coxautoinc.com/endpoint (403s with internal IPs as params)
+asset: docker-registry.docker.com
+[HYP] SSRF in docker-registry.docker.com
+class: SSRF
+asset: docker-registry.docker.com
+confidence: 70
+reasoning: Consistent DNS errors when param=169.254.169.254 (private IP) suggests SSRF vulnerability. Targeted internal IPs in params.
+evidence_needed: Response showing internal IP resolution
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exfiltration of internal network data (high severity)
+testability: AUTH_HELPED
+[PARKED] [HYP NONE] (other hypotheses for coxautoinc.com/endpoint dropped due to low confidence)
+[HYP] SSRF in docker-registry.docker.com
+class: SSRF
+asset: docker-registry.docker.com
+confidence: 70
+reasoning: Consistent DNS errors when param=169.254.169.254 (private IP) suggests SSRF vulnerability. Targeted internal IPs in params.
+evidence_needed: Response showing internal IP resolution
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exfiltration of internal network data (high severity)
+testability:

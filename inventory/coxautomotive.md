@@ -138,3 +138,6 @@
 - NEW api.coxautoinc.com/endpoint?param=internal_ip
 - CHANGED api.coxautoinc.com/endpoint?param=admin
 - CHANGED api.coxautoinc.com/endpoint?param=10.0.0.1
+
+## 2026-08-21 05:24:39 UTC
+- CHANGED coxautoinc.com/endpoint (403s with internal IPs as params)
