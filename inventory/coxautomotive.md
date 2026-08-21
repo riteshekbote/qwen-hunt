@@ -222,3 +222,11 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
+
+## 2026-08-21 20:55:03 UTC
+- NEW admin.dealertrack.com -> 200 with content (previously unprobed)
+- NEW admin.dealertrack.com/admin/ -> HTTP 403 (access-controlled path confirmed)
+- NEW admin.dealertrack.com serves Apache HTTP Server header (stack fingerprint)
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)

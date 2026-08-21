@@ -122,3 +122,5 @@
 ## 2026-08-21 20:33:29 UTC
 - NEW api.emsisoft.com/v1/workspaces/{guid} returns **404** (not 401) — endpoint may not exist or requires different auth pattern
 - NEW api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 returns **404** — zeroed GUID matches error response, no info leak
+
+## 2026-08-21 20:55:03 UTC
