@@ -1,54 +1,49 @@
-## 2026-08-21 08:08:02 UTC (model qwen14b)
-[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254
-[NEW] https://api.coxautoinc.com/endpoint?param=admin
-[NEW] https://github.com/posit/.github/workflows?access_token=123
-[CHANGED] https://docker-registry.docker.com/v2/ (now with recurring SSRF patterns)
-[CHANGED] https://api.coxautoinc.com/endpoint (now with 403s against admin param)
-[HYP] SSRF in Docker Registry
+## 2026-08-21 09:08:45 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (recurring SSRF probe)
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip (recurring 403 with internal IP)
+[CHANGED] https://github.com/posit/.github/workflows?access_token=123 (404 with token parameter)
+[HYP] SSRF in docker registry
 class: SSRF
 asset: docker-registry.docker.com
-confidence: 75
-reasoning: Repeated SSRF patterns with 169.254.169.254 (link-local IP) in query params
-evidence_needed: Response to SSRF payload reaching internal services
+confidence: 85
+reasoning: Recurring probe with 169.254.169.254 (link-local IP) in URL parameters, which is a common SSRF vector for cloud metadata leakage
+evidence_needed: Response from registry with cloud metadata in headers
 verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
-impact: Access to internal services (high severity)
+impact: Cloud metadata exposure (AZ, instance ID, etc) leading to lateral movement
 testability: PASSIVE
-[HYP] Admin Param Bypass
-class: AUTH
+[HYP] Misconfigured API endpoint
+class: MISCONFIG
 asset: api.coxautoinc.com
 confidence: 65
-reasoning: 403 responses against admin param suggest auth bypass potential
-evidence_needed: Successful admin access with param
+reasoning: 403 responses with internal_ip param, admin param, and 169.254.169.254 suggest auth misconfig or param-based access control issues
+evidence_needed: 200 response with internal data after auth bypass
 verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
-impact: Admin panel access (high severity)
-testability: PASSIVE
-[HYP] GH Token Leak
-class: OATH
-asset: github.com
-confidence: 60
-reasoning: 404 on workflows with access_token=123
-evidence_needed: Token validation in response
+impact: Internal network exposure via admin endpoint
+testability: AUTH_HELPED
+[HYP] GitHub workflows misconfig
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 55
+reasoning: 404 with access_token param suggests workflows endpoint might be misconfigured or protected with token auth
+evidence_needed: 200 response with workflow YAML files
 verify_steps: GET https://github.com/posit/.github/workflows?access_token=123
-impact: Token exposure (medium severity)
-testability: PASSIVE
-[FINAL] 
-[HYP] SSRF in Docker Registry
+impact: Exposed CI/CD secrets or workflows
+testability: AUTH_HELPED
+[PARKED] GitHub workflows misconfig: confidence 55 < 40
+[FINAL]
+[HYP] SSRF in docker registry
 class: SSRF
 asset: docker-registry.docker.com
-confidence: 75
-reasoning: 75
-evidence_needed: 75
-verify_steps: 75
-impact: 75
+confidence: 85
+reasoning: Recurring probe with 169.254.169.254 (link-local IP) in URL parameters, which is a common SSRF vector for cloud metadata leakage
+evidence_needed: Response from registry with cloud metadata in headers
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Cloud metadata exposure (AZ, instance ID, etc) leading to lateral movement
 testability: PASSIVE
-[HYP] Admin Param Bypass
-class: AUTH
+[HYP] Misconfigured API endpoint
+class: MISCONFIG
 asset: api.coxautoinc.com
 confidence: 65
-reasoning: 65
-evidence_needed: 65
-verify_steps: 65
-impact: 65
-testability: PASSIVE
-[NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
-[LEARN] ACCEPTED SSRF
+reasoning: 403 responses with internal_ip param, admin param, and 169.254.169.254 suggest auth misconfig or param-based access control issues
+evidence_needed: 200 response with internal data after auth bypass
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin

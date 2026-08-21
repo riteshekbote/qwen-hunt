@@ -219,3 +219,6 @@
 - CHANGED https://docker-registry.docker.com/v2/ (now with recurring SSRF patterns)
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
 - CHANGED https://docker-registry.docker.com/v2/
+
+## 2026-08-21 09:08:57 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (recurring SSRF probe)

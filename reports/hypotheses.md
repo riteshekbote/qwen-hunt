@@ -290,3 +290,6 @@
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
 - LEARN: ACCEPTED SSRF
+
+## RANKED HYPOTHESES 2026-08-21 09:08:57 UTC
+- (no NEW hypotheses this cycle — all deduped)

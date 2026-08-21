@@ -157,3 +157,6 @@
 - CHANGED https://api.coxautoinc.com/endpoint (now with 403s against admin param)
 - NEW https://api.coxautoinc.com/endpoint?param=internal_ip
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin
+
+## 2026-08-21 09:08:57 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=internal_ip (recurring 403 with internal IP)
