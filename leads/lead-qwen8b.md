@@ -1613,3 +1613,29 @@ evidence_needed: Verify token validity and endpoint existence
 verify_steps: curl -v --header "Authorization: Bearer 123" https://github.com/posit/.github/workflows
 impact: Potential credential exposure or misconfigured CI/CD
 testability: PASSIVE
+## 2026-08-21 11:42:51 UTC (model qwen8b)
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] https://github.com/posit/.github/workflows?access_token=123
+[CHANGED] https://api.coxautoinc.com/endpoint
+[CHANGED] https://docker-registry.docker.com/v2/
+[CHANGED] https://github.com/posit/.github/workflows
+[PRIO] https://api.coxautoinc.com/endpoint?param=internal_ip: 8.5 (attack_surface:9, business_value:8, tech_exposure:7, gate_ease:6, cloud_surface:8, freshness:7)
+[PRIO] https://docker-registry.docker.com/v2/?param=169.254.169.254: 7.8 (attack_surface:8, business_value:6, tech_exposure:7, gate_ease:5, cloud_surface:7, freshness:6)
+[PRIO] https://github.com/posit/.github/workflows?access_token=123: 7.2 (attack_surface:6, business_value:7, tech_exposure:8, gate_ease:5, cloud_surface:6, freshness:6)
+[HYP] SSRF via internal IP parameter
+class: SSRF
+asset: https://api.coxautoinc.com/endpoint?param=internal_ip
+confidence: 65
+reasoning: Multiple 403 responses for param=admin/internal_ip suggest parameter-based access control. The 169.254.169.254 IP is a common internal DNS server, indicating potential SSRF exposure.
+evidence_needed: Verify if internal IP resolves to internal service
+verify_steps: curl -v https://api.coxautoinc.com/endpoint?param=169.254.169.254
+impact: Potential access to internal services, severity: high
+testability: PASSIVE
+[HYP] Docker registry SSRF
+class: SSRF
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254
+confidence: 60
+reasoning: Persistent DNS resolution failure for 169.254.169.254 suggests network misconfiguration. The Docker registry endpoint is a high-value target.
+evidence_needed: Confirm if 169.254.169.254 is a valid DNS entry
+verify_steps: nslookup 169.

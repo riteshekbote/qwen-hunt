@@ -230,3 +230,8 @@
 
 ## 2026-08-21 10:52:11 UTC
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated SSRF probe with internal metadata IP)
+
+## 2026-08-21 11:43:12 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (repeated SSRF probe with internal metadata IP)
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+- CHANGED https://docker-registry.docker.com/v2/

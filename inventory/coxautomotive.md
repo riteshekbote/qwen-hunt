@@ -167,3 +167,8 @@
 
 ## 2026-08-21 10:52:11 UTC
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin (403 persists with admin probe)
+
+## 2026-08-21 11:43:12 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403 persists with admin probe)
+- NEW https://api.coxautoinc.com/endpoint?param=internal_ip
+- CHANGED https://api.coxautoinc.com/endpoint
