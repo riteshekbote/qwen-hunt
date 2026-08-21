@@ -143,3 +143,7 @@
 - NEW apitest.emsisoft.com/v1/tokens → 401 (auth enforced)
 - NEW apitest.emsisoft.com/v1/workflows → 401 (auth enforced)
 - CHANGED apitest.emsisoft.com AUTH hypothesis: previously confidence 48, now evidence CONFIRMS same auth as production — class dead
+
+## 2026-08-21 23:51:49 UTC
+- NEW emsisoft: api.emsisoft.com/v1/account — 401 (auth enforced, confirmed)
+- NEW emsisoft: api.emsisoft.com/v2/ — 404 (v2 endpoint not implemented)

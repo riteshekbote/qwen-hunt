@@ -17,3 +17,6 @@ ee862a0f90964073 GitHub Misconfiguration in Posit
 173d4d64e2f2a50a SSRF in Docker Registry
 82c60032ef384a75 GitHub Misconfiguration
 1f3cbafbea04fe4e Session cookie set without Secure flag on unauthenticated requests
+cdef171a95f8a7d7 Emsisoft API example tokens authenticate
+eb10f5f5a9507dc8 Posit secrets staging environment accessible
+df316b3d8b79f581 Emsisoft API workspace GUIDs return 404 not 401

@@ -456,3 +456,17 @@
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirm
 - LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-21 23:51:49 UTC
+- [48] api.emsisoft.com: Posit secrets staging environment accessible (from reports/hypotheses-mimo.txt)
+- [48] api.emsisoft.com: Emsisoft API workspace GUIDs return 404 not 401 (from reports/hypotheses-mimo.txt)
+- [48] api.emsisoft.com: Emsisoft API example tokens authenticate (from reports/hypotheses-mimo.txt)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10 — extract token-like strings from swagger spec to test 
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED AUTH @ apitest.emsisoft.com: /v1/account, /v1/tokens, /v1/workspaces all return 401 — identical auth enforcement as production. Testing environment aut
+- LEARN: REJECTED AUTH @ auth.docker.com session forgery (reconfirmed): Session IDs cryptographically random across 5+ sequential requests, HMAC-SHA256 signatures show n
+- LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirm
+- LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

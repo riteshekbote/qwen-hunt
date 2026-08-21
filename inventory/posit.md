@@ -132,3 +132,7 @@
 ## 2026-08-21 22:55:56 UTC
 
 ## 2026-08-21 23:32:00 UTC
+
+## 2026-08-21 23:51:49 UTC
+- NEW posit: api.secrets.posit.cloud — 404 on root, /health, /v1/secrets (confirmed non-existent)
+- NEW posit: api.secrets.staging.posit.cloud — untested (from CT inventory)
