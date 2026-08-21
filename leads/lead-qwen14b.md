@@ -1515,3 +1515,16 @@ class: SSRF
 asset: docker-registry.docker.com/v2/
 confidence: 60
 reasoning: Param=169.254.169.254 (metadata IP) used
+## 2026-08-21 17:54:11 UTC (model qwen14b)
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 60
+reasoning: Repeated use of 169.254.169.254 (private IP) as param in requests to Docker registry suggests SSRF potential. 403/ERR responses hint at internal network reachability.
+evidence_needed: Response containing internal service metadata (e.g. 169.254.169.254 in headers/body)
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Exposed internal services (medium severity)
+testability: PASSIVE
+class: AUTH
+asset: api.coxautoinc.com/endpoint
+confidence: 50
+reasoning: 403 responses with token=123 suggest broken auth flow. Token param hints at JWT/OAuth misconfig.
