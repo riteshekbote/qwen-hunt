@@ -1712,3 +1712,4 @@ impact: Potential access to workflow configurations.
 testability: PASSIVE  
 [PARKED] SSRF via internal IP parameter @ https://docker-registry.docker.com/v2/?param=169.254.169.254: confidence < 40  
 [PARKED] SSRF
+## 2026-08-21 14:04:25 UTC (model qwen8b)

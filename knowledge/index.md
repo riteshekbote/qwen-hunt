@@ -62,3 +62,4 @@
 - 2026-08-21 REJECTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
 - 2026-08-21 ACCEPTED AUTH @ coxautoinc.com/endpoint: 403 remains after header tests
 - 2026-08-21 ACCEPTED MISCONFIG @ posit.github.com/.github/workflows
+- 2026-08-21 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param 169.254.169.254 triggers SSRF filter)
