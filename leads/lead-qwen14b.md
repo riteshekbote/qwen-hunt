@@ -1275,3 +1275,40 @@ confidence: 65
 reasoning: 403 responses with internal_ip param, admin param, and 169.254.169.254 suggest auth misconfig or param-based access control issues
 evidence_needed: 200 response with internal data after auth bypass
 verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+## 2026-08-21 10:01:25 UTC (model qwen14b)
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip (repeated 403s with parameter variations)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (ERR recurring, possible SSRF target)
+[CHANGED] https://github.com/posit/.github/workflows (404 persists, possible GitHub Actions misconfig)
+[HYP] CoxAutoInc SSRF Bypass  
+class: SSRF  
+asset: https://api.coxautoinc.com/endpoint  
+confidence: 70  
+reasoning: 403s with param=internal_ip and 169.254.169.254 suggest param filtering; SSRF possible if filter bypassed.  
+evidence_needed: 200 OK on param=internal_ip after bypass.  
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=internal_ip (proxy via 169.254.169.254)  
+impact: Exfiltrate internal metadata or trigger internal SSRF.  
+testability: AUTH_HELPED (requires proxy setup)
+[HYP] Docker Registry SSRF  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/  
+confidence: 65  
+reasoning: ERR on param=169.254.169.254 suggests registry not resolving 169.254.x.x (metadata IPs).  
+evidence_needed: 200 OK on param=169.254.169.254 after SSRF bypass.  
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254 (proxy via 169.254.169.254)  
+impact: Exfiltrate internal metadata or trigger internal SSRF.  
+testability: AUTH_HELPED (requires proxy setup)
+[HYP] Posit GitHub Actions Misconfig  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows  
+confidence: 55  
+reasoning: 404 on workflows suggests GitHub Actions not properly secured.  
+evidence_needed: 200 OK on workflows with token.  
+verify_steps: GET https://github.com/posit/.github/workflows?access_token=123  
+impact: Expose CI/CD secrets or workflows.  
+testability: AUTH_HELPED (requires token)
+[PARKED] Posit GitHub Actions Misconfig: confidence < 40 (55 → 40 threshold)  
+[FINAL]  
+[HYP] CoxAutoInc SSRF Bypass  
+[HYP] Docker Registry SSRF  
+[NEXT] PROBE: GET https://api.coxautoinc.com/endpoint?param=internal_ip (proxy via 169.254.169.254)
+[LEARN] ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.  

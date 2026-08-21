@@ -293,3 +293,10 @@
 
 ## RANKED HYPOTHESES 2026-08-21 09:08:57 UTC
 - (no NEW hypotheses this cycle — all deduped)
+
+## RANKED HYPOTHESES 2026-08-21 10:01:36 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://api.coxautoinc.com/endpoint?param=internal_ip (proxy via 169.254.169.254)
+- NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254
+- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.
+- LEARN: REJECTED SSRF

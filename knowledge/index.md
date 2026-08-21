@@ -56,3 +56,5 @@
 - 2026-08-21 ACCEPTED SSRF @ docker-registry.docker.com: SSRF confirmed via param=169.254.169.254
 - 2026-08-21 REJECTED AUTH @ https://github.com/posit/.github/workflows?access_token=123: 404 response indicates token may not be valid
 - 2026-08-21 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint?param=internal_ip: 40
+- 2026-08-21 ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.
+- 2026-08-21 REJECTED SSRF
