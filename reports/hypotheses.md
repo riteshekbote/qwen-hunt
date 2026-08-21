@@ -444,3 +444,15 @@
 - LEARN: REJECTED AUTH @ auth.docker.com session forgery: Session IDs cryptographically random, HMAC-SHA256, no predictable pattern — session forgery dead without key le
 - LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: Redirect chain leaks CA Access Gateway REALMOID, SMAGENTNAME, TARGET parameters in URL
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-21 23:32:00 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://api.secrets.posit.cloud/ && curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" htt
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED AUTH @ apitest.emsisoft.com: /v1/account, /v1/tokens, /v1/workspaces all return 401 — identical auth enforcement as production. Testing environment aut
+- LEARN: REJECTED AUTH @ auth.docker.com session forgery (reconfirmed): Session IDs cryptographically random across 5+ sequential requests, HMAC-SHA256 signatures show n
+- LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirm
+- LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

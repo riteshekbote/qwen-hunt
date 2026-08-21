@@ -84,3 +84,8 @@
 - 2026-08-21 ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves nearly identical spec (422 byte difference), same 65 endpoints
 - 2026-08-21 REJECTED AUTH @ auth.docker.com session forgery: Session IDs cryptographically random, HMAC-SHA256, no predictable pattern — session forgery dead without key leakage
 - 2026-08-21 ACCEPTED MISCONFIG @ admin.dealertrack.com: Redirect chain leaks CA Access Gateway REALMOID, SMAGENTNAME, TARGET parameters in URL
+- 2026-08-21 REJECTED AUTH @ apitest.emsisoft.com: /v1/account, /v1/tokens, /v1/workspaces all return 401 — identical auth enforcement as production. Testing environment auth bypass class dead.
+- 2026-08-21 REJECTED AUTH @ auth.docker.com session forgery (reconfirmed): Session IDs cryptographically random across 5+ sequential requests, HMAC-SHA256 signatures show no predictable relationship. Forgery class dead without key leakage.
+- 2026-08-21 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
+- 2026-08-21 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirmed).
+- 2026-08-21 ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced.

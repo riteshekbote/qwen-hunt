@@ -345,3 +345,41 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ auth.docker.com session forgery: Session IDs cryptographically random, HMAC-SHA256, no predictable pattern — session forgery dead without key leakage
 [LEARN] ACCEPTED MISCONFIG @ admin.dealertrack.com: Redirect chain leaks CA Access Gateway REALMOID, SMAGENTNAME, TARGET parameters in URL
 [RISK] 52 — Moderate. Emsisoft API exposes complete attack surface with 353 example tokens. Testing environment publicly accessible. Docker auth session cookies are cryptographically secure. Cox Automotive admin panels WAF-protected. Main remaining attack surface is emsisoft API example data validation and testing environment auth bypass.
+## 2026-08-21 23:31:50 UTC (model mimo)
+[NEW] apitest.emsisoft.com/v1/account → 401 (auth enforced, same as production)
+[NEW] apitest.emsisoft.com/v1/tokens → 401 (auth enforced)
+[NEW] apitest.emsisoft.com/v1/workflows → 401 (auth enforced)
+[CHANGED] apitest.emsisoft.com AUTH hypothesis: previously confidence 48, now evidence CONFIRMS same auth as production — class dead
+class: MISCONFIG
+asset: api.secrets.posit.cloud
+confidence: 45
+reasoning: "secrets" in hostname strongly suggests a secrets/credential management API. Posit Connect platform manages application secrets for R/Python deployments. If the secrets endpoint mirrors other api.*.posit.cloud endpoints without auth, it could expose environment variables, database credentials, or API keys for hosted applications. The domain appears in CT logs and live inventory but has never been probed.
+evidence_needed: 1. Confirm api.secrets.posit.cloud resolves and responds. 2. Check if /status, /health, or root path returns data without auth. 3. Compare response patterns to api.posit.cloud or api.staging.posit.cloud.
+verify_steps: 1. curl -s -o /dev/null -w "%{http_code}" https://api.secrets.posit.cloud/ — check if host is live and returns data. 2. curl -s -o /dev/null -w "%{http_code}" https://api.secrets.posit.cloud/health — check for health endpoint. 3. curl -s -o /dev/null -w "%{http_code}" https://api.secrets.posit.cloud/v1/secrets — check for API path.
+impact: Severity HIGH if unauthenticated access to secrets management — full credential exposure for hosted applications. Severity LOW if auth-gated or non-existent.
+testability: AUTH_HELPED
+class: AUTH
+asset: api.emsisoft.com
+confidence: 42
+reasoning: The public swagger spec at /swagger/v1.0/swagger.json contains 4 example API tokens and 54 example GUIDs. If any example token is a valid test credential that was accidentally left in the spec, it would grant authenticated API access. The spec explicitly shows token format (e.g., UUID-style strings), suggesting they are real tokens used during documentation generation.
+evidence_needed: 1. Extract all token-like strings from the swagger spec. 2. Test 5 example tokens against /v1/tokens/{token} or as Authorization header. 3. Check if response differs between valid-token-format and random strings.
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]\{36\}"' | head -10 — extract GUIDs. 2. Pick 5 and test: curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account — check for 200 vs 401. 3. Compare response body between valid-looking and random tokens.
+impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all are fabricated examples (401 for all).
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: auth.docker.com
+confidence: 38
+reasoning: The auth.docker.com login page returns 200 with ~345KB HTML on any path. However, the x-docker-app-version header and trace IDs suggest a backend microservice. If the catch-all SPA serves different content for valid vs invalid SSO paths (e.g., /v2/auth vs /v1/auth), response size or header differences could enumerate internal API routes. Previous probe showed 200 len=345927 consistently, but untested paths may differ.
+evidence_needed: 1. Test 10 different auth paths (/v1/, /v2/, /oauth/, /saml/, /oidc/) for response size/status differences. 2. Compare response headers for different paths. 3. Check if any path returns non-HTML content type.
+verify_steps: 1. curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://auth.docker.com/v1/authorize — compare to base. 2. Repeat for /v2/, /oauth2/, /saml/, /oidc/. 3. Check for any 302/301 redirects that leak backend routing.
+impact: Severity LOW — route enumeration is informational only but may reveal admin/OIDC endpoints for targeted attacks.
+testability: PASSIVE
+[PARKED] auth.docker.com route enumeration: confidence 38 < 40 threshold, consistent 200 response sizes suggest SPA catch-all, no differential evidence.
+[FINAL] — re-ranked:
+[NEXT] PROBE: curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://api.secrets.posit.cloud/ && curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" https://api.secrets.posit.cloud/health && curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" https://api.secrets.posit.cloud/v1/secrets — confirm whether secrets endpoint is live and what it exposes
+[LEARN] REJECTED AUTH @ apitest.emsisoft.com: /v1/account, /v1/tokens, /v1/workspaces all return 401 — identical auth enforcement as production. Testing environment auth bypass class dead.
+[LEARN] REJECTED AUTH @ auth.docker.com session forgery (reconfirmed): Session IDs cryptographically random across 5+ sequential requests, HMAC-SHA256 signatures show no predictable relationship. Forgery class dead without key leakage.
+[LEARN] ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirmed).
+[LEARN] ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced.
+[RISK] 48 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Cox Automotive admin panels are WAF-protected with no bypass path. Docker registry is NXDOMAIN (DNS dead). Main remaining opportunity is untested posit cloud surface (api.secrets.posit.cloud) and deeper validation of emsisoft example token authenticity.

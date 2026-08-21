@@ -137,3 +137,9 @@
 ## 2026-08-21 22:31:51 UTC
 
 ## 2026-08-21 22:55:56 UTC
+
+## 2026-08-21 23:32:00 UTC
+- NEW apitest.emsisoft.com/v1/account → 401 (auth enforced, same as production)
+- NEW apitest.emsisoft.com/v1/tokens → 401 (auth enforced)
+- NEW apitest.emsisoft.com/v1/workflows → 401 (auth enforced)
+- CHANGED apitest.emsisoft.com AUTH hypothesis: previously confidence 48, now evidence CONFIRMS same auth as production — class dead
