@@ -65,3 +65,7 @@
 - 2026-08-21 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param 169.254.169.254 triggers SSRF filter)
 - 2026-08-21 REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: DNS error indicates no active service
 - 2026-08-21 ACCEPTED AUTH @ https://api.coxautoinc.com/endpoint?param=admin:
+- 2026-08-21 REJECTED MISCONFIG @ staging.posit.cloud/actuator/health: SPA catch-all serves same HTML on all paths — no backend actuator exposed
+- 2026-08-21 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: Full OpenAPI spec with example data publicly accessible
+- 2026-08-21 REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead, not just unreachable
+- 2026-08-21 ACCEPTED AUTH @ auth.docker.com: Leaks x-docker-app-version, trace IDs, and sets session cookies on unauthenticated requests

@@ -273,3 +273,13 @@
 - CHANGED https://docker-registry.docker.com/v2/ (ERR [Errno -2] recurring)
 - NEW docker-registry.docker.com/v2/ (DNS resolution failure)
 - CHANGED docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure persists)
+
+## 2026-08-21 19:32:16 UTC
+- CHANGED docker-registry.docker.com — NXDOMAIN confirmed (DNS彻底死亡, not just unreachable)
+- CHANGED auth.docker.com — reveals x-docker-app-version: v1287, x-trace-id, rate-limit headers, session cookies on every request
+- NEW api.hub.docker.com — empty response body (no error, no content — potential ghost endpoint)
+- CHANGED api.offload.docker.com — Cloudflare-fronted, empty response (no longer returning content)
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (recurring SSRF error)
+- CHANGED https://docker-registry.docker.com/v2/ (ERR [Errno -2] recurring)
+- NEW docker-registry.docker.com/v2/ (DNS resolution failure)
+- CHANGED docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure persists)
