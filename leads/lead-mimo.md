@@ -192,3 +192,87 @@ testability: AUTH_HELPED
 [LEARN] REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
 [LEARN] REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead
 [RISK] 62 — Moderate. Docker auth leaks operational metadata (version, trace IDs, session cookie). Emsisoft API spec exposes full surface with example data. Cox Automotive locked down by WAF (403). Auth.docker.com and api.emsisoft.com have the most accessible attack surface.
+## 2026-08-21 21:54:51 UTC (model mimo)
+[CHANGED] api.emsisoft.com/v2/ → HTTP 404 (confirms v2 path dead, spec is v1 only)
+[CHANGED] apitest.emsisoft.com/swagger/v1.0/swagger.json → 200 (testing endpoint returns identical spec to production)
+[CHANGED] admin.dealertrack.com/admin/ → HTTP 403 (was previously 200 on root)
+[PRIO] api.emsisoft.com — 6.15 (attack:7, business:6, tech:7, gate:6, cloud:5, fresh:5)
+[PRIO] auth.docker.com — 6.05 (attack:6, business:7, tech:7, gate:6, cloud:5, fresh:5)
+[PRIO] admin.dealertrack.com — 5.95 (attack:6, business:7, tech:6, gate:5, cloud:5, fresh:7)
+[PRIO] api.emsisoft.com — 6.15 (attack:7, business:6, tech:7, gate:6, cloud:5, fresh:5)
+[PRIO] auth.docker.com — 6.05 (attack:6, business:7, tech:7, gate:6, cloud:5, fresh:5)
+[PRIO] admin.dealertrack.com — 5.95 (attack:6, business:7, tech:6, gate:5, cloud:5, fresh:7)
+class: AUTH
+asset: auth.docker.com
+confidence: 52
+reasoning: dckr-sessid cookie is base64-encoded JSON set on unauthenticated requests. If server doesn't validate modified payloads, session can be forged. x-docker-app-version v187 leaked on every request.
+evidence_needed: Decode dckr-sessid payload, verify Set-Cookie flags (Secure, HttpOnly, SameSite), test if server accepts modified cookies
+verify_steps: 1. curl -v https://auth.docker.com/ 2>&1 | grep -i 'set-cookie\|x-docker-app-version'. 2. Base64-decode dckr-sessid value and inspect JSON fields. 3. Modify one byte in decoded payload, re-encode, send back as cookie to test validation.
+impact: Severity HIGH if cookie forgeable (full account takeover). Severity LOW if server validates with HMAC.
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 58
+reasoning: 365KB+ OpenAPI spec publicly accessible without auth. Contains example GUIDs, email addresses, and billing data structures. Workspace endpoints return 404 (not 401) suggesting different auth pattern.
+evidence_needed: Test additional GUID patterns from swagger against workspace endpoints, enumerate API versions (/v1/, /v2/), check if spec version is current
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | jq '.paths | keys'. 2. Test /v1/workspaces/ with GUIDs derived from spec patterns. 3. Check /v2/ or other API versions for unprotected endpoints.
+impact: Severity MEDIUM — Full API surface map enables targeted auth bypass. Example data may contain real PII or billing info.
+testability: AUTH_HELPED
+class: AUTH
+asset: admin.dealertrack.com
+confidence: 45
+reasoning: Multiple dealertrack admin endpoints return different server headers (Apache, CA Access Gateway). admin.pa1.dealertrack.com returns CA Access Gateway error suggesting enterprise auth gateway. admin.pa-east.unifipa.dealertrack.com shows raw Apache with different access controls.
+evidence_needed: Test admin panels with common bypass headers, check for exposed admin paths
+verify_steps: 1. curl -H "X-Forwarded-For: 127.0.0.1" https://admin.dealertrack.com/. 2. curl https://admin.dealertrack.com/admin/. 3. Check for exposed .git/config or .env files
+impact: Severity HIGH if admin access achieved (full platform control)
+testability: AUTH_HELPED
+[PARKED] Admin panel header bypass: confidence 45 < 50 threshold, 403 pattern suggests robust WAF
+[FINAL]
+[NEXT] PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | jq '.paths | keys' — enumerate all API endpoints from public spec
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: Full OpenAPI spec with example GUIDs, emails, billing data publicly accessible
+[LEARN] ACCEPTED AUTH @ auth.docker.com: dckr-sessid cookie set on unauthenticated requests, x-docker-app-version and x-trace-id leaked
+[LEARN] REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
+[LEARN] REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN —
+[NEW] dckr-sessid decoded: JSON payload `"5WeWr02vTHKF3FowoPqv2A"` (session ID) with HMAC signature suffix
+[NEW] x-docker-app-version: v1287 (increased from v187 — version actively changing)
+[NEW] emsisoft POST /v1/partner/workspaces → 401 (not 405 — auth enforced, empty body on failure)
+[NEW] emsisoft POST /v1/distributor/coupons → 401 (auth enforced)
+[NEW] emsisoft DELETE /v1/tokens/{token} → 401 (auth enforced)
+[CHANGED] apitest.emsisoft.com spec confirmed identical to production (65 paths, same GUIDs)
+[PRIO] auth.docker.com — 6.25 (attack:6, business:7, tech:8, gate:6, cloud:5, fresh:7)
+[PRIO] api.emsisoft.com — 6.15 (attack:7, business:6, tech:7, gate:6, cloud:5, fresh:5)
+[PRIO] apitest.emsisoft.com — 5.95 (attack:7, business:6, tech:7, gate:5, cloud:5, fresh:7)
+class: AUTH
+asset: auth.docker.com
+confidence: 55
+reasoning: dckr-sessid cookie is split into two parts: base64-encoded JSON session ID (`"5WeWr02vTHKF3FowoPqv2A"`) and an HMAC signature. Cookie is set on unauthenticated requests. If HMAC uses a weak/known key or the session ID is predictable (short alphanumeric string), session hijacking is possible. HttpOnly+Secure+SameSite=Lax flags prevent client-side theft but not server-side forgery.
+evidence_needed: 1. Generate multiple requests and check if session IDs follow a pattern (sequential, timestamp-based, or random). 2. Test if HMAC changes when session ID is modified. 3. Check if server accepts forged cookies with valid HMAC but different session ID.
+verify_steps: 1. Send 5 requests to auth.docker.com, extract dckr-sessid each time, decode the JSON part, compare session IDs for predictability. 2. Take one valid cookie, decode, modify the JSON payload by one byte, re-encode, recompute HMAC with common keys (empty string, "secret", etc.), send back. 3. Test if /v1/auth or similar endpoints accept the forged cookie.
+impact: Severity HIGH if session ID is predictable or HMAC is weak (full account takeover). Severity LOW if session IDs are cryptographically random and HMAC uses a strong key.
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 60
+reasoning: Full 65-endpoint OpenAPI spec publicly accessible without auth. Contains 54 example GUIDs (workspace, device, user IDs), 12 email addresses, and 4 potential API tokens. Spec reveals complete data model including workspace CRUD, device management, incident handling, protection groups, license management, and partner/distributor operations. All endpoints require ApiKey auth (401), but the spec itself is a misconfiguration that enables targeted brute-force or credential stuffing.
+evidence_needed: 1. Verify that the example GUIDs are not real workspace IDs (test against /v1/workspaces/{guid}). 2. Check if the example tokens are valid (test against /v1/tokens/{token}). 3. Confirm that apitest.emsisoft.com is a testing environment that should not be publicly accessible.
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | jq '.paths | keys | length' — confirm 65 endpoints. 2. Test 5 example GUIDs against /v1/workspaces/{guid} — check for 404 vs 401 (401 = GUID exists but no auth). 3. Test example tokens against /v1/tokens/{token} — check for 404 vs 401. 4. Compare apitest vs production swagger for differences (custom endpoints, test data).
+impact: Severity MEDIUM — Full API surface map enables targeted attacks. Example data may contain real PII or billing info. Testing endpoints (apitest) may have weaker controls.
+testability: AUTH_HELPED
+class: AUTH
+asset: apitest.emsisoft.com
+confidence: 48
+reasoning: apitest.emsisoft.com serves an identical swagger spec to production (65 paths, same GUIDs). Testing environments are typically less locked down than production. If apitest allows unauthenticated access to any endpoint, it could leak real customer data or allow unauthorized actions.
+evidence_needed: 1. Test all 65 endpoints on apitest without auth — compare 401/403/200 responses to production. 2. Check if apitest has different rate limiting or IP restrictions. 3. Verify that apitest swagger spec has any test-only endpoints not in production.
+verify_steps: 1. For each of the 5 major endpoint groups (/v1/account, /v1/workspaces, /v1/devices, /v1/tokens, /v1/partner), test on both api.emsisoft.com and apitest.emsisoft.com without auth. 2. Compare response codes and bodies. 3. Check for any endpoints that return 200 on apitest but 401 on api.
+impact: Severity HIGH if any endpoint is unprotected (full data access). Severity LOW if all endpoints enforce auth consistently.
+testability: AUTH_HELPED
+[PARKED] Admin panel header bypass (admin.dealertrack.com): confidence 45 < 50 threshold, 403 pattern suggests robust WAF
+[PARKED] emsisoft testing env (apitest): confidence 48 < 50 threshold — needs concrete evidence of weaker auth
+[FINAL]
+[NEXT] PROBE: Send 5 sequential requests to https://auth.docker.com/ and compare dckr-sessid JSON payloads for predictability pattern
+[LEARN] ACCEPTED AUTH @ auth.docker.com: dckr-sessid splits into JSON session ID + HMAC signature; HttpOnly+Secure+SameSite=Lax; x-docker-app-version v1287 leaked
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 54 GUIDs, 12 emails, 4 tokens publicly exposed
+[LEARN] ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves identical spec — potential for weaker controls
+[LEARN] REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
+[LEARN] REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead
+[RISK] 64 — Moderate-High. Docker auth leaks operational metadata (v1287, trace IDs, session cookies) with potential for session forgery. Emsisoft API exposes complete attack surface (65 endpoints, example GUIDs/emails/tokens). Testing environments publicly accessible. Cox Automotive locked down by WAF. Auth.docker.com and api.emsisoft.com have the most accessible and exploitable attack surface.

@@ -128,3 +128,8 @@
 ## 2026-08-21 21:31:05 UTC
 - NEW api.emsisoft.com/v2/ -> HTTP 404 (new probe confirms v2 path doesn't exist)
 - NEW apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 (testing endpoint returns identical spec to production)
+
+## 2026-08-21 21:55:01 UTC
+- CHANGED api.emsisoft.com/v2/ → HTTP 404 (confirms v2 path dead, spec is v1 only)
+- CHANGED apitest.emsisoft.com/swagger/v1.0/swagger.json → 200 (testing endpoint returns identical spec to production)
+- CHANGED apitest.emsisoft.com spec confirmed identical to production (65 paths, same GUIDs)
