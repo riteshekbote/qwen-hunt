@@ -133,3 +133,5 @@
 - CHANGED api.emsisoft.com/v2/ → HTTP 404 (confirms v2 path dead, spec is v1 only)
 - CHANGED apitest.emsisoft.com/swagger/v1.0/swagger.json → 200 (testing endpoint returns identical spec to production)
 - CHANGED apitest.emsisoft.com spec confirmed identical to production (65 paths, same GUIDs)
+
+## 2026-08-21 22:31:51 UTC
