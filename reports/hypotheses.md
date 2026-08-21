@@ -317,3 +317,6 @@
 - LEARN: REJECTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
 - LEARN: ACCEPTED AUTH @ coxautoinc.com/endpoint: 403 remains after header tests
 - LEARN: ACCEPTED MISCONFIG @ posit.github.com/.github/workflows
+
+## RANKED HYPOTHESES 2026-08-21 13:21:12 UTC
+- (no NEW hypotheses this cycle — all deduped)

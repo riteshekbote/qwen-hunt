@@ -1378,3 +1378,16 @@ testability: AUTH_HELPED
 [HYP] Misconfigured GitHub Workflows
 class: MISCONFIG
 asset: github.com/posit/.
+## 2026-08-21 13:20:55 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254  
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip  
+[NEW] https://github.com/posit/.github/workflows?access_token=123  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+asset: https://api.coxautoinc.com/endpoint?param=internal_ip  
+asset: https://github.com/posit/.github/workflows?access_token=123  
+[HYP] SSRF in Docker Registry  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+confidence: 75  
+reasoning: Param `169.254.169.254` is a link-local IP used in cloud metadata. Error `[Errno -2] Name or service not known` suggests SSRF proxy misconfiguration.  
+evidence_needed: Response from proxying to `169.254.169.254` (e.g., metadata endpoint

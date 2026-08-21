@@ -1682,3 +1682,33 @@ impact: Reduced CI/CD functionality; potential service disruption
 [LEARN] REJECTED MISCONFIG @ docker-registry.docker.com/v2/: DNS resolution failure confirmed
 [LEARN] ACCEPTED AUTH @ coxautoinc.com/endpoint: 403 remains after header tests
 [LEARN] ACCEPTED MISCONFIG @ posit.github.com/.github/workflows
+## 2026-08-21 13:10:51 UTC (model qwen8b)
+[HYP] SSRF via internal IP parameter  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+confidence: 85  
+reasoning: Internal IP parameter may allow SSRF to internal services. Docker registry endpoints are known to handle parameters, but DNS resolution errors suggest potential misconfigurations.  
+evidence_needed: Successful SSRF to internal service or response with internal metadata.  
+verify_steps: curl -v "https://docker-registry.docker.com/v2/?param=169.254.169.254"  
+impact: Access to internal services, potential data exfiltration.  
+testability: PASSIVE  
+[HYP] SSRF via internal IP parameter  
+class: SSRF  
+asset: https://api.coxautoinc.com/endpoint?param=169.254.169.254  
+confidence: 80  
+reasoning: Internal IP parameter may allow SSRF to internal services. 403 responses suggest authentication may be bypassed with internal IPs.  
+evidence_needed: Successful SSRF to internal service or response with internal metadata.  
+verify_steps: curl -v "https://api.coxautoinc.com/endpoint?param=169.254.169.254"  
+impact: Access to internal services, potential data exfiltration.  
+testability: PASSIVE  
+[HYP] Misconfigured GitHub workflows endpoint  
+class: MISCONFIG  
+asset: https://github.com/posit/.github/workflows?access_token=123  
+confidence: 70  
+reasoning: 404 response suggests the endpoint may be misconfigured or the access token is invalid. GitHub workflows endpoints often require specific tokens for certain actions.  
+evidence_needed: Valid token or correct endpoint path.  
+verify_steps: curl -v "https://github.com/posit/.github/workflows?access_token=123"  
+impact: Potential access to workflow configurations.  
+testability: PASSIVE  
+[PARKED] SSRF via internal IP parameter @ https://docker-registry.docker.com/v2/?param=169.254.169.254: confidence < 40  
+[PARKED] SSRF
