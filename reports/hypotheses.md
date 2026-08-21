@@ -433,3 +433,14 @@
 - LEARN: REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
 - LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-21 22:55:56 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s -o /dev/null -w "%{http_code}" https://apitest.emsisoft.com/v1/account — check if testing environment bypasses auth on /v1/account endpoint
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible
+- LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves nearly identical spec (422 byte difference), same 65 endpoints
+- LEARN: REJECTED AUTH @ auth.docker.com session forgery: Session IDs cryptographically random, HMAC-SHA256, no predictable pattern — session forgery dead without key le
+- LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: Redirect chain leaks CA Access Gateway REALMOID, SMAGENTNAME, TARGET parameters in URL
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
