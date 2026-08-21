@@ -141,3 +141,8 @@
 
 ## 2026-08-21 05:24:39 UTC
 - CHANGED coxautoinc.com/endpoint (403s with internal IPs as params)
+
+## 2026-08-21 06:19:32 UTC
+- NEW https://api.coxautoinc.com/endpoint (403s with param values)
+- NEW api.coxautoinc.com/endpoint?param=admin
+- CHANGED api.coxautoinc.com/endpoint?param=192.168.1.1

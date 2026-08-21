@@ -1440,3 +1440,39 @@ testability: AUTH_HELPED
 [CHANGED] api.coxautoinc.com/endpoint?param=10.0.0.1
 [PRIO] docker-registry.docker.com/v2/?param=169.254.169.254: 8.2
 ## 2026-08-21 05:18:48 UTC (model qwen8b)
+## 2026-08-21 06:08:31 UTC (model qwen8b)
+[HYP] Docker Registry SSRF
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 80
+reasoning: The endpoint is being accessed with various internal IPs, which might allow SSRF if the service doesn't validate the input.
+evidence_needed: Successful SSRF to an internal host.
+verify_steps: Check if the registry allows access to internal IPs like 169.254.169.254.
+impact: Access to internal systems, high severity.
+testability: PASSIVE
+[HYP] CoxAutoInc IDOR
+class: IDOR
+asset: api.coxautoinc.com/endpoint
+confidence: 70
+reasoning: The endpoint returns 403 when using different params, which might indicate that the param is used to access different resources without proper validation.
+evidence_needed: Access to different resources using the param.
+verify_steps: Test with various parameters like admin, internal IPs, etc.
+impact: Unauthorized access to data, medium severity.
+testability: AUTH_HELPED
+[HYP] Posit GitHub Misconfiguration
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 60
+reasoning: The endpoint returns 404, which might indicate a misconfigured repository or endpoint.
+evidence_needed: Access to the workflows file.
+verify_steps: Check if the access token is required or if the endpoint is correct.
+impact: Data exposure, medium severity.
+testability: PASSIVE
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] api.coxautoinc.com/endpoint?param=admin
+[NEW] github.com/posit/.github/workflows?access_token=123
+[CHANGED] docker-registry.docker.com/v2/?param=127.0.0.1
+[CHANGED] api.coxautoinc.com/endpoint?param=192.168.1.1
+[CHANGED] docker-registry.docker.com/v2/?param=169.254.169.254
+[PRIO] docker-registry.docker.com/v2/?param=169.254.169.254: 8.5
+[PRIO] api.coxautoinc.com/endpoint?param=admin: 7.8

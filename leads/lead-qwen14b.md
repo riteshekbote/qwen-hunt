@@ -1084,3 +1084,40 @@ evidence_needed: Response showing internal IP resolution
 verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
 impact: Exfiltration of internal network data (high severity)
 testability:
+## 2026-08-21 06:19:21 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/ (recurring DNS errors with param values)
+[NEW] https://api.coxautoinc.com/endpoint (403s with param values)
+[NEW] https://github.com/posit/.github/workflows (404s)
+[CHANGED] docker-registry.docker.com/v2/ (now consistently failing with [Errno -2])
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: https://docker-registry.docker.com/v2/
+confidence: 60
+reasoning: DNS errors with param values like 169.254.169.254 (metadata IP) suggest SSRF attempts
+evidence_needed: Response headers showing internal IPs
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Access to internal metadata services (medium severity)
+testability: PASSIVE
+[HYP] Auth bypass in CoxAuto API
+class: AUTH
+asset: https://api.coxautoinc.com/endpoint
+confidence: 50
+reasoning: 403s with param values like "admin" suggest auth misconfig
+evidence_needed: Presence of auth headers in response
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+impact: Potential access to internal API (high severity)
+testability: AUTH_HELPED
+[HYP] Misconfigured GitHub Actions
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows
+confidence: 40
+reasoning: 404s on workflows suggest misconfigured CI/CD
+evidence_needed: Workflow file visibility
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Exposed CI/CD secrets (medium severity)
+testability: PASSIVE
+[PARKED] [HYP] Misconfigured GitHub Actions: confidence 40 < 40
+[FINAL]
+[HYP] SSRF in Docker Registry
+[HYP] Auth bypass in CoxAuto API
+[NEXT]

@@ -202,3 +202,10 @@
 
 ## 2026-08-21 05:24:39 UTC
 - NEW docker-registry.docker.com
+
+## 2026-08-21 06:19:32 UTC
+- NEW https://docker-registry.docker.com/v2/ (recurring DNS errors with param values)
+- CHANGED docker-registry.docker.com/v2/ (now consistently failing with [Errno -2])
+- NEW docker-registry.docker.com/v2/?param=169.254.169.254
+- CHANGED docker-registry.docker.com/v2/?param=127.0.0.1
+- CHANGED docker-registry.docker.com/v2/?param=169.254.169.254
