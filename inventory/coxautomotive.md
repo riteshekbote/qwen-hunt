@@ -128,3 +128,8 @@
 - NEW https://api.coxautoinc.com/endpoint?param=169.254.169.254
 - CHANGED https://api.coxautoinc.com/endpoint?param=192.168.1.1
 - CHANGED https://api.coxautoinc.com/endpoint?param=10.0.0.1
+
+## 2026-08-21 03:29:03 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=admin
+- NEW https://api.coxautoinc.com/endpoint?param=192.168.1.1
+- CHANGED https://api.coxautoinc.com/endpoint

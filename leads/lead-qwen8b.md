@@ -1372,3 +1372,34 @@ testability: PASSIVE
 [CHANGED] https://api.coxautoinc.com/endpoint?param=192.168.1.1
 [CHANGED] https://api.coxautoinc.com/endpoint?param=10.0.0.1
 [PRIO] https://api.coxautoinc.com/endpoint?param=internal_ip: 8.5
+## 2026-08-21 03:20:32 UTC (model qwen8b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] https://api.coxautoinc.com/endpoint?param=192.168.1.1
+[NEW] https://github.com/posit/.github/workflows
+[CHANGED] https://docker-registry.docker.com/v2/
+[CHANGED] https://api.coxautoinc.com/endpoint
+[CHANGED] https://github.com/posit/.github/workflows?access_token=123
+[PRIO] https://docker-registry.docker.com/v2/ 8.5 attack:9, business:7, tech:9, gate:8, cloud:9, freshness:8
+[PRIO] https://api.coxautoinc.com/endpoint 8.0 attack:8, business:9, tech:7, gate:6, cloud:8, freshness:7
+[PRIO] https://github.com/posit/.github/workflows 7.5 attack:7, business:8, tech:8, gate:7, cloud:6, freshness:7
+[HYP] Docker Registry SSRF
+class: SSRF
+asset: https://docker-registry.docker.com/v2/
+confidence: 75
+reasoning: Repeated DNS resolution failures for internal IP ranges (169.254.169.254, 172.16.0.1) suggest potential SSRF misconfiguration. Docker registry endpoints often expose internal services via public endpoints.
+evidence_needed: Successful SSRF to internal services (e.g., /v2/?param=169.254.169.254)
+verify_steps:
+impact: Access to internal Docker services + potential container escape
+testability: PASSIVE
+[HYP] CoxAutoInc API Auth Bypass
+class: AUTH
+asset: https://api.coxautoinc.com/endpoint
+confidence: 65
+reasoning: 403 errors for internal IPs (192.168.1.1, 127.0.0.1) and "admin" parameter suggest misconfigured access control. May involve IDOR or token leakage.
+evidence_needed: Successful access to protected endpoints with invalid tokens
+verify_steps:
+impact: Data exfiltration from internal systems
+testability: PASSIVE
+[HYP] Posit GitHub Workflow Exposure
+class: MISCONFIG
+asset: https://github.com/posit/.github/workflows

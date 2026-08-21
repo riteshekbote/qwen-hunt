@@ -1018,3 +1018,45 @@ reasoning: Repeated attempts to access docker-registry with private IPs (169.254
 evidence_needed: Successful proxy bypass or internal service access
 verify_steps: GET https://
 ## 2026-08-21 02:03:59 UTC (model qwen14b)
+## 2026-08-21 03:28:51 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254  
+[NEW] https://docker-registry.docker.com/v2/?param=172.16.0.1  
+[NEW] https://docker-registry.docker.com/v2/?param=192.168.1.1  
+[NEW] https://docker-registry.docker.com/v2/?param=127.0.0.1  
+[NEW] https://github.com/posit/.github/workflows?access_token=123  
+[NEW] https://api.coxautoinc.com/endpoint?param=admin  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+asset: https://api.coxautoinc.com/endpoint?param=admin  
+asset: https://github.com/posit/.github/workflows?access_token=123  
+[HYP] SSRF in Docker Registry  
+class: SSRF  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+confidence: 85  
+reasoning: Param 169.254.169.254 is a known internal IP (metadata service). SSRF likely if the registry resolves it.  
+evidence_needed: Response headers or logs showing 169.254.169.254 reached.  
+verify_steps:  
+impact: Exfiltrate internal metadata, internal IPs, or internal services.  
+testability: PASSIVE  
+[HYP] Admin Param Misconfig in Cox API  
+class: MISCONFIG  
+asset: https://api.coxautoinc.com/endpoint?param=admin  
+confidence: 65  
+reasoning: Param "admin" suggests a misconfigured admin endpoint. 403 may indicate auth bypass.  
+evidence_needed: Response headers or body showing admin panel or auth token.  
+verify_steps:  
+impact: Expose admin panel, internal data, or auth tokens.  
+testability: PASSIVE  
+[HYP] Token Param IDOR in Posit GitHub Workflows  
+class: IDOR  
+asset: https://github.com/posit/.github/workflows?access_token=123  
+confidence: 70  
+reasoning: Token param suggests IDOR if workflows are versioned or user-specific. 404 may indicate missing access control.  
+evidence_needed: Response showing workflow files or secrets.  
+verify_steps:  
+impact: Expose workflow secrets, code, or internal data.  
+testability: PASSIVE  
+[PARKED] Admin Param Misconfig in Cox API: confidence (65) < 40 (threshold).  
+[FINAL]  
+[HYP] SSRF in Docker Registry  
+[HYP] Token Param IDOR in Posit GitHub Workflows  
+[NEXT] PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254  

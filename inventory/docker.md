@@ -186,3 +186,11 @@
 ## 2026-08-21 02:04:09 UTC
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
 - CHANGED https://docker-registry.docker.com/v2/?param=172.16.0.1
+
+## 2026-08-21 03:29:03 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+- NEW https://docker-registry.docker.com/v2/?param=172.16.0.1
+- NEW https://docker-registry.docker.com/v2/?param=192.168.1.1
+- NEW https://docker-registry.docker.com/v2/?param=127.0.0.1
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+- CHANGED https://docker-registry.docker.com/v2/
