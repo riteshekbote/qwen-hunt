@@ -765,45 +765,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-asset: https://api.coxautoinc.com/endpoint?param=169.254.169.254  
-confidence: 80  
-reasoning: Internal IP parameter may allow SSRF to internal services. 403 responses suggest authentication may be bypassed with internal IPs.  
-evidence_needed: Successful SSRF to internal service or response with internal metadata.  
-verify_steps: curl -v "https://api.coxautoinc.com/endpoint?param=169.254.169.254"  
-impact: Access to internal services, potential data exfiltration.  
-testability: PASSIVE  
-[HYP] Misconfigured GitHub workflows endpoint  
-class: MISCONFIG  
-asset: https://github.com/posit/.github/workflows?access_token=123  
-confidence: 70  
-reasoning: 404 response suggests the endpoint may be misconfigured or the access token is invalid. GitHub workflows endpoints often require specific tokens for certain actions.  
-evidence_needed: Valid token or correct endpoint path.  
-verify_steps: curl -v "https://github.com/posit/.github/workflows?access_token=123"  
-impact: Potential access to workflow configurations.  
-testability: PASSIVE  
-[PARKED] SSRF via internal IP parameter @ https://docker-registry.docker.com/v2/?param=169.254.169.254: confidence < 40  
-[PARKED] SSRF
-## 2026-08-21 14:04:25 UTC (model qwen8b)
-## 2026-08-21 14:54:08 UTC (model qwen8b)
-[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254
-[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip
-[NEW] https://github.com/posit/.github/workflows?access_token=123
-[CHANGED] https://docker-registry.docker.com/v2/
-[CHANGED] https://github.com/posit/.github/workflows
-[CHANGED] https://api.coxautoinc.com/endpoint
-[PRIO] https://docker-registry.docker.com/v2/?param=169.254.169.254: 8.5 (attack_surface:9, business_value:7, tech_exposure:8, gate_ease:6, cloud_surface:10, freshness:9)
-[PRIO] https://api.coxautoinc.com/endpoint?param=internal_ip: 8.0 (attack_surface:8, business_value:7, tech_exposure:7, gate_ease:5, cloud_surface:9, freshness:8)
-[PRIO] https://github.com/posit/.github/workflows?access_token=123: 7.5 (attack_surface:7, business_value:8, tech_exposure:6, gate_ease:5, cloud_surface:7, freshness:8)
-[HYP] Docker Registry SSRF
-class: SSRF
-asset: https://docker-registry.docker.com/v2/?param=169.254.169.254
-confidence: 75
-reasoning: 169.254.169.254 is a private IP used for internal DNS resolution. The parameterized query suggests potential SSRF vulnerability if the registry allows arbitrary IP resolution.
-evidence_needed: Successful DNS resolution to 169.254.169.254 or internal network access
-verify_steps: curl -v https://docker-registry.docker.com/v2/?param=169.254.169.254
-impact: Potential internal network access + data exfiltration (severity: HIGH)
-testability: PASSIVE
-[HYP] CoxAutoInc Internal IP Leak
 class: MISCONFIG
 asset: https://api.coxautoinc.com/endpoint?param=internal_ip
 confidence: 65
@@ -825,10 +786,46 @@ testability: PASSIVE
 [PARKED] CoxAutoInc Internal IP Leak: no concrete verify_steps
 [FINAL] Docker Registry SSRF: 75 (SSRF)
 [FINAL] GitHub Workflow Token
+## 2026-08-21 15:50:45 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] api.coxautoinc.com/endpoint?param=admin
+[NEW] github.com/posit/.github/workflows?access_token=123
+[CHANGED] docker-registry.docker.com/v2/
+[CHANGED] api.coxautoinc.com/endpoint
+[CHANGED] github.com/posit/.github/workflows
+[PRIO] docker-registry.docker.com/v2/?param=169.254.169.254: 8.5
+[PRIO] api.coxautoinc.com/endpoint?param=admin: 7.8
+[PRIO] github.com/posit/.github/workflows?access_token=123: 6.2
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/?param=169.254.169.254
+confidence: 75
+reasoning: DNS resolution failure suggests potential SSRF misconfiguration allowing internal IP access. The 169.254.169.254 is a private IP used in Docker for local DNS resolution.
+evidence_needed: Successful SSRF to internal endpoint
+verify_steps: GET https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+impact: Internal network exposure + potential credential theft
+testability: PASSIVE
+[HYP] IDOR in CoxAutoInc API
+class: IDOR
+asset: api.coxautoinc.com/endpoint?param=admin
+confidence: 65
+reasoning: 403 response for admin param suggests potential IDOR vulnerability. Could be misconfigured access control for admin endpoints.
+evidence_needed: Successful access to admin endpoint
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+impact: Admin access + data leakage
+testability: PASSIVE
+[HYP] Misconfigured GitHub Access Token
+class: MISCONFIG
+asset: github.com/posit/.github/workflows?access_token=123
+confidence: 60
+reasoning: 404 response suggests the access token might be required but not properly validated. Could be a misconfigured token or endpoint.
+evidence_needed: Successful access with valid token
+verify_steps: GET https://github.com/posit/.github/workflows?access_token=123
+impact: CI/CD config access
+testability: PASSIVE
+[PARKED] SSRF in Docker Registry: confidence < 40
+[PARKED] IDOR in CoxAutoInc API: class on REJECTED list (
 === AGGREGATED HYPOTHESES (tail) ===
-- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
-- LEARN: ACCEPTED SSRF
-
 ## RANKED HYPOTHESES 2026-08-21 09:08:57 UTC
 - (no NEW hypotheses this cycle — all deduped)
 
@@ -866,15 +863,10 @@ testability: PASSIVE
 
 ## RANKED HYPOTHESES 2026-08-21 15:07:48 UTC
 - (no NEW hypotheses this cycle — all deduped)
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
 
-## 2026-08-21 08:08:13 UTC
-https://api.coxautoinc.com/endpoint?param=internal_ip -> HTTP 403
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows?access_token=123 -> HTTP 404
+## RANKED HYPOTHESES 2026-08-21 15:58:45 UTC
+- (no NEW hypotheses this cycle — all deduped)
+=== LATEST ROBOT PROBE RESULTS ===
 
 ## 2026-08-21 09:08:57 UTC
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
@@ -925,5 +917,13 @@ https://github.com/posit/.github/workflows?access_token=123 -> HTTP 404
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=internal_ip -> HTTP 403
 https://github.com/posit/.github/workflows?access_token=123 -> HTTP 404
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+
+## 2026-08-21 15:58:46 UTC
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows?access_token=123 -> HTTP 404
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404

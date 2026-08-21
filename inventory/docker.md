@@ -255,3 +255,7 @@
 ## 2026-08-21 15:58:45 UTC
 - NEW docker-registry.docker.com/v2/?param=169.254.169.254
 - CHANGED docker-registry.docker.com/v2/
+
+## 2026-08-21 17:02:12 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+- CHANGED https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not known

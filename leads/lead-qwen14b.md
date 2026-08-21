@@ -1506,3 +1506,12 @@ reasoning: 50
 evidence_needed: Check if token param resolves 403.
 verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin&token=123
 impact: Admin access (critical
+## 2026-08-21 17:02:04 UTC (model qwen14b)
+[PRIO] docker-registry.docker.com/v2/ 7.3
+[PRIO] api.coxautoinc.com/endpoint 6.65
+[PRIO] github.com/posit/.github/workflows 5.5
+[HYP] SSRF via param=169.254.169.254
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 60
+reasoning: Param=169.254.169.254 (metadata IP) used

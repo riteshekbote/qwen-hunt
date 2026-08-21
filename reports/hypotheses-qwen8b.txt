@@ -1,39 +1,40 @@
-## 2026-08-21 15:50:45 UTC (model qwen8b)
-[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
-[NEW] api.coxautoinc.com/endpoint?param=admin
-[NEW] github.com/posit/.github/workflows?access_token=123
-[CHANGED] docker-registry.docker.com/v2/
-[CHANGED] api.coxautoinc.com/endpoint
-[CHANGED] github.com/posit/.github/workflows
-[PRIO] docker-registry.docker.com/v2/?param=169.254.169.254: 8.5
-[PRIO] api.coxautoinc.com/endpoint?param=admin: 7.8
-[PRIO] github.com/posit/.github/workflows?access_token=123: 6.2
-[HYP] SSRF in Docker Registry
+## 2026-08-21 16:51:35 UTC (model qwen8b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] https://api.coxautoinc.com/endpoint?param=admin
+[NEW] https://github.com/posit/.github/workflows?access_token=123
+[CHANGED] https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not known
+[CHANGED] https://api.coxautoinc.com/endpoint?param=internal_ip -> HTTP 403
+[CHANGED] https://github.com/posit/.github/workflows -> HTTP 404
+[HYP] Docker Registry SSRF via 169.254.169.254
 class: SSRF
-asset: docker-registry.docker.com/v2/?param=169.254.169.254
-confidence: 75
-reasoning: DNS resolution failure suggests potential SSRF misconfiguration allowing internal IP access. The 169.254.169.254 is a private IP used in Docker for local DNS resolution.
-evidence_needed: Successful SSRF to internal endpoint
-verify_steps: GET https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-impact: Internal network exposure + potential credential theft
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254
+confidence: 85
+reasoning: 169.254.169.254 is a reserved IP for internal metadata services. Docker registry might be misconfigured to allow SSRF to internal endpoints.
+evidence_needed: Successful SSRF to internal services
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Attacker could access internal metadata/services via Docker registry
 testability: PASSIVE
-[HYP] IDOR in CoxAutoInc API
-class: IDOR
-asset: api.coxautoinc.com/endpoint?param=admin
-confidence: 65
-reasoning: 403 response for admin param suggests potential IDOR vulnerability. Could be misconfigured access control for admin endpoints.
-evidence_needed: Successful access to admin endpoint
-verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
-impact: Admin access + data leakage
-testability: PASSIVE
-[HYP] Misconfigured GitHub Access Token
+[HYP] CoxAutoInc Admin Endpoint Misconfig
+class: AUTH
+asset: https://api.coxautoinc.com/endpoint?param=admin
+confidence: 70
+reasoning: 403 response suggests missing or invalid auth token. Admin endpoint might require specific headers or tokens.
+evidence_needed: Valid token or headers that bypass 403
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin with Authorization: Bearer <token>
+impact: Unauthorized access to admin functions
+testability: AUTH_HELPED
+[HYP] Posit GitHub Workflows Access Token Leak
 class: MISCONFIG
-asset: github.com/posit/.github/workflows?access_token=123
-confidence: 60
-reasoning: 404 response suggests the access token might be required but not properly validated. Could be a misconfigured token or endpoint.
-evidence_needed: Successful access with valid token
+asset: https://github.com/posit/.github/workflows?access_token=123
+confidence: 65
+reasoning: 404 suggests the access token might be required for accessing workflows, indicating potential token leakage or misconfigured access.
+evidence_needed: Valid token that resolves 404
 verify_steps: GET https://github.com/posit/.github/workflows?access_token=123
-impact: CI/CD config access
-testability: PASSIVE
-[PARKED] SSRF in Docker Registry: confidence < 40
-[PARKED] IDOR in CoxAutoInc API: class on REJECTED list (
+impact: Unauthorized access to CI/CD workflows
+testability: AUTH_HELPED
+[PARKED] Docker Registry SSRF via 169.254.169.254: confidence < 40
+[PARKED] CoxAutoInc Admin Endpoint Misconfig: class on knowledge REJECTED list
+[PARKED] Posit GitHub Workflows Access Token Leak: no concrete verify_steps
+[NEXT] PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: DNS error indicates no active service
+[LEARN] ACCEPTED AUTH @ https://api.coxautoinc.com/endpoint?param=admin: 

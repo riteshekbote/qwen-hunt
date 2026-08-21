@@ -191,3 +191,7 @@
 ## 2026-08-21 15:58:45 UTC
 - NEW api.coxautoinc.com/endpoint?param=admin
 - CHANGED api.coxautoinc.com/endpoint
+
+## 2026-08-21 17:02:12 UTC
+- NEW https://api.coxautoinc.com/endpoint?param=admin
+- CHANGED https://api.coxautoinc.com/endpoint?param=internal_ip -> HTTP 403

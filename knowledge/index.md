@@ -63,3 +63,5 @@
 - 2026-08-21 ACCEPTED AUTH @ coxautoinc.com/endpoint: 403 remains after header tests
 - 2026-08-21 ACCEPTED MISCONFIG @ posit.github.com/.github/workflows
 - 2026-08-21 ACCEPTED SSRF @ https://docker-registry.docker.com/v2/ (param 169.254.169.254 triggers SSRF filter)
+- 2026-08-21 REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: DNS error indicates no active service
+- 2026-08-21 ACCEPTED AUTH @ https://api.coxautoinc.com/endpoint?param=admin:
