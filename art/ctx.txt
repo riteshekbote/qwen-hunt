@@ -767,7 +767,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-[HYP] IDOR in CoxAutoInc API
 class: IDOR
 asset: api.coxautoinc.com/endpoint?param=admin
 confidence: 65
@@ -827,10 +826,8 @@ testability: AUTH_HELPED
 [NEXT] PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: DNS error indicates no active service
 [LEARN] ACCEPTED AUTH @ https://api.coxautoinc.com/endpoint?param=admin: 
+## 2026-08-21 17:46:07 UTC (model qwen8b)
 === AGGREGATED HYPOTHESES (tail) ===
-- NEXT(hypotheses-qwen8b.txt): PROBE https://api.coxautoinc.com/endpoint?param=169.254.169.254
-- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint: Param filtering may be bypassable.
-- LEARN: REJECTED SSRF
 
 ## RANKED HYPOTHESES 2026-08-21 10:52:11 UTC
 - (no NEW hypotheses this cycle — all deduped)
@@ -868,10 +865,10 @@ testability: AUTH_HELPED
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=169.254.169.254
 - LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: DNS error indicates no active service
 - LEARN: ACCEPTED AUTH @ https://api.coxautoinc.com/endpoint?param=admin:
-=== LATEST ROBOT PROBE RESULTS ===
 
-## 2026-08-21 10:01:37 UTC
-https://api.coxautoinc.com/endpoint -> HTTP 403
+## RANKED HYPOTHESES 2026-08-21 17:54:21 UTC
+- (no NEW hypotheses this cycle — all deduped)
+=== LATEST ROBOT PROBE RESULTS ===
 https://docker-registry.docker.com/v2/ -> ERR <urlopen error [Errno -2] Name or service not know
 https://github.com/posit/.github/workflows -> HTTP 404
 https://api.coxautoinc.com/endpoint?param=internal_ip -> HTTP 403
@@ -929,3 +926,6 @@ https://github.com/posit/.github/workflows -> HTTP 404
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows?access_token=123 -> HTTP 404
+
+## 2026-08-21 17:54:21 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
