@@ -247,3 +247,7 @@
 
 ## 2026-08-21 14:08:44 UTC
 - NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+
+## 2026-08-21 15:07:48 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254
+- CHANGED https://docker-registry.docker.com/v2/
