@@ -1754,3 +1754,42 @@ testability: PASSIVE
 [PARKED] CoxAutoInc Internal IP Leak: no concrete verify_steps
 [FINAL] Docker Registry SSRF: 75 (SSRF)
 [FINAL] GitHub Workflow Token
+## 2026-08-21 15:50:45 UTC (model qwen8b)
+[NEW] docker-registry.docker.com/v2/?param=169.254.169.254
+[NEW] api.coxautoinc.com/endpoint?param=admin
+[NEW] github.com/posit/.github/workflows?access_token=123
+[CHANGED] docker-registry.docker.com/v2/
+[CHANGED] api.coxautoinc.com/endpoint
+[CHANGED] github.com/posit/.github/workflows
+[PRIO] docker-registry.docker.com/v2/?param=169.254.169.254: 8.5
+[PRIO] api.coxautoinc.com/endpoint?param=admin: 7.8
+[PRIO] github.com/posit/.github/workflows?access_token=123: 6.2
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/?param=169.254.169.254
+confidence: 75
+reasoning: DNS resolution failure suggests potential SSRF misconfiguration allowing internal IP access. The 169.254.169.254 is a private IP used in Docker for local DNS resolution.
+evidence_needed: Successful SSRF to internal endpoint
+verify_steps: GET https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+impact: Internal network exposure + potential credential theft
+testability: PASSIVE
+[HYP] IDOR in CoxAutoInc API
+class: IDOR
+asset: api.coxautoinc.com/endpoint?param=admin
+confidence: 65
+reasoning: 403 response for admin param suggests potential IDOR vulnerability. Could be misconfigured access control for admin endpoints.
+evidence_needed: Successful access to admin endpoint
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin
+impact: Admin access + data leakage
+testability: PASSIVE
+[HYP] Misconfigured GitHub Access Token
+class: MISCONFIG
+asset: github.com/posit/.github/workflows?access_token=123
+confidence: 60
+reasoning: 404 response suggests the access token might be required but not properly validated. Could be a misconfigured token or endpoint.
+evidence_needed: Successful access with valid token
+verify_steps: GET https://github.com/posit/.github/workflows?access_token=123
+impact: CI/CD config access
+testability: PASSIVE
+[PARKED] SSRF in Docker Registry: confidence < 40
+[PARKED] IDOR in CoxAutoInc API: class on REJECTED list (

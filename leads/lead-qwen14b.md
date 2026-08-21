@@ -1460,3 +1460,49 @@ evidence_needed: Successful retrieval of workflow files.
 verify_steps: GET https://github.com/posit/.github/workflows
 impact: Possible exposure of internal CI/CD configurations.
 testability: PASSIVE
+## 2026-08-21 15:58:34 UTC (model qwen14b)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com
+confidence: 60
+reasoning: Repeated "Name or service not known" errors when probing with 169.254.169.254 (metadata IP) suggest potential SSRF vulnerability.
+evidence_needed: Check if internal metadata is accessible via SSRF.
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Leaked internal metadata (high severity)
+testability: PASSIVE
+[HYP] Admin auth bypass
+class: AUTH
+asset: api.coxautoinc.com/endpoint
+confidence: 50
+reasoning: 403 responses with admin param suggest potential auth bypass.
+evidence_needed: Check if token param resolves 403.
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin&token=123
+impact: Admin access (critical)
+testability: AUTH_HELPED
+[HYP] GitHub workflow misconfig
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 40
+reasoning: 404 responses suggest misconfigured workflow endpoint.
+evidence_needed: Check if workflow exists in repo.
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Minor exposure (low)
+testability: PASSIVE
+[FINAL]
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com
+confidence: 60
+reasoning: 60
+evidence_needed: Check if internal metadata is accessible via SSRF.
+verify_steps: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+impact: Leaked internal metadata (high severity)
+testability: PASSIVE
+[HYP] Admin auth bypass
+class: AUTH
+asset: api.coxautoinc.com/endpoint
+confidence: 50
+reasoning: 50
+evidence_needed: Check if token param resolves 403.
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin&token=123
+impact: Admin access (critical
