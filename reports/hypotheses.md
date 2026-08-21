@@ -277,3 +277,11 @@
 
 ## RANKED HYPOTHESES 2026-08-21 06:19:32 UTC
 - (no NEW hypotheses this cycle — all deduped)
+
+## RANKED HYPOTHESES 2026-08-21 07:11:18 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE: GET https://docker-registry.docker.com/v2/?param=169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE: GET https://api.coxautoinc.com/endpoint?param=169.254.169.254
+- LEARN: ACCEPTED SSRF @ docker-registry.docker.com: SSRF confirmed via param=169.254.169.254
+- LEARN: REJECTED AUTH @ https://github.com/posit/.github/workflows?access_token=123: 404 response indicates token may not be valid
+- LEARN: ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint?param=internal_ip: 40

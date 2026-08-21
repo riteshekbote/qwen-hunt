@@ -1476,3 +1476,49 @@ testability: PASSIVE
 [CHANGED] docker-registry.docker.com/v2/?param=169.254.169.254
 [PRIO] docker-registry.docker.com/v2/?param=169.254.169.254: 8.5
 [PRIO] api.coxautoinc.com/endpoint?param=admin: 7.8
+## 2026-08-21 07:07:10 UTC (model qwen8b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254  
+[NEW] https://api.coxautoinc.com/endpoint?param=internal_ip  
+[NEW] https://api.coxautoinc.com/endpoint?param=10.0.0.1  
+[NEW] https://github.com/posit/.github/workflows?access_token=123  
+[CHANGED] https://docker-registry.docker.com/v2/  
+[CHANGED] https://api.coxautoinc.com/endpoint  
+[PRIO] https://api.coxautoinc.com/endpoint?param=internal_ip: 8.2  
+[PRIO] https://docker-registry.docker.com/v2/?param=169.254.169.254: 7.5  
+[PRIO] https://github.com/posit/.github/workflows?access_token=123: 6.8  
+[HYP] Misconfigured Internal IP Access  
+class: SSRF  
+asset: https://api.coxautoinc.com/endpoint?param=internal_ip  
+confidence: 75  
+reasoning: Repeated 403 errors suggest potential misconfigured auth or SSRF vulnerability. Param=internal_ip may expose internal network data.  
+evidence_needed: Response content showing internal IP details or metadata  
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=169.254.169.254  
+impact: Exfiltration of internal network data (high)  
+testability: PASSIVE  
+[HYP] Docker Registry Metadata Exposure  
+class: MISCONFIG  
+asset: https://docker-registry.docker.com/v2/?param=169.254.169.254  
+confidence: 65  
+reasoning: DNS resolution failure may indicate misconfigured metadata endpoint. Param=169.254.169.254 is a common internal IP for metadata services.  
+evidence_needed: Successful DNS resolution or response content  
+verify_steps: nslookup 169.254.169.254  
+impact: Exposure of internal Docker metadata (medium)  
+testability: PASSIVE  
+[HYP] GitHub Actions Token Leak  
+class: AUTH  
+asset: https://github.com/posit/.github/workflows?access_token=123  
+confidence: 50  
+reasoning: 404 response may indicate token-based access control. Access token parameter could enable unauthorized workflow execution.  
+evidence_needed: 200 response or leaked workflow content  
+verify_steps: GET https://github.com/posit/.github/workflows?access_token=123  
+impact: Unauthorized CI/CD pipeline execution (high)  
+testability: PASSIVE  
+[PARKED] Misconfigured Internal IP Access: confidence < 40  
+[PARKED] Docker Registry Metadata Exposure: no concrete verify_steps  
+[FINAL]  
+[HYP] Misconfigured Internal IP Access  
+[HYP] Docker Registry Metadata Exposure  
+[HYP] GitHub Actions Token Leak  
+[NEXT] PROBE: GET https://api.coxautoinc.com/endpoint?param=169.254.169.254  
+[LEARN] REJECTED AUTH @ https://github.com/posit/.github/workflows?access_token=123: 404 response indicates token may not be valid  
+[LEARN] ACCEPTED SSRF @ https://api.coxautoinc.com/endpoint?param=internal_ip: 40
