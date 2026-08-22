@@ -509,3 +509,9 @@
 - LEARN: ACCEPTED MISCONFIG @ auth.docker.com: x-docker-app-version v1287, x-trace-id, dckr-sessid cookie with JSON+HMAC structure leaked on unauthenticated requests (re
 - LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params (reconfirmed).
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-22 05:33:16 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

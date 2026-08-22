@@ -2236,3 +2236,11 @@ testability: PASSIVE
 
 **STEP 7 — RISK SCORE**
 [RISK] 42 — Low-Moderate. Emsisoft API swagger misconfig is the richest confirmed finding (65 endpoints, full API surface map, example billing/contact data) but all tested example tokens are fabricated (401). Docker auth leaks version/build info but session crypto is sound (HMAC-SHA256). Dealertrack admin leaks SSO infrastructure IDs. No critical/auth-bypass findings remain active. Main remaining value is information disclosure for reconnaissance against Emsisoft customer base.
+===== ANALYST mimo 2026-08-22 05:33:16 UTC =====
+[91m[1mError: [0m{
+  "name": "UnknownError",
+  "data": {
+    "message": "Unexpected server error. Check server logs for details.",
+    "ref": "err_1060c446"
+  }
+}

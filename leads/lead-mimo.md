@@ -590,3 +590,4 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ auth.docker.com: x-docker-app-version v1287, x-trace-id, dckr-sessid cookie with JSON+HMAC structure leaked on unauthenticated requests (reconfirmed).
 [LEARN] ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params (reconfirmed).
 [RISK] 42 — Low-Moderate. Emsisoft API swagger misconfig is the richest confirmed finding (65 endpoints, full API surface map, example billing/contact data) but all tested example tokens are fabricated (401). Docker auth leaks version/build info but session crypto is sound (HMAC-SHA256). Dealertrack admin leaks SSO infrastructure IDs. No critical/auth-bypass findings remain active. Main remaining value is information disclosure for reconnaissance against Emsisoft customer base.
+## 2026-08-22 05:33:06 UTC (model mimo)
