@@ -488,3 +488,13 @@
 - LEARN: REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
 - LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-22 03:48:44 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | sort -u — extract all email addr
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED AUTH @ api.emsisoft.com: All 15 tested UUID tokens from swagger spec return 401 on /v1/account — example tokens are fabricated documentation, not real 
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 GUIDs, email addresses, and billing data structures publicly accessible (reco
+- LEARN: ACCEPTED MISCONFIG @ auth.docker.com: x-docker-app-version v1287, x-trace-id, dckr-sessid cookie with JSON+HMAC structure leaked on unauthenticated requests (re
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
