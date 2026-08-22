@@ -241,6 +241,9 @@ probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantm
 - 2026-08-22 REJECTED SSRF @ https://docker-registry.docker
 - 2026-08-22 REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
 - 2026-08-22 REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead
+- 2026-08-22 REJECTED AUTH @ api.emsisoft.com: All 15 tested UUID tokens from swagger spec return 401 on /v1/account — example tokens are fabricated documentation, not real credentials. AUTH class on emsisoft swagger tokens is dead.
+- 2026-08-22 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 GUIDs, email addresses, and billing data structures publicly accessible (reconfirmed with fresh probe).
+- 2026-08-22 ACCEPTED MISCONFIG @ auth.docker.com: x-docker-app-version v1287, x-trace-id, dckr-sessid cookie with JSON+HMAC structure leaked on unauthenticated requests (reconfirmed).
 === REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ===
 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud
@@ -796,41 +799,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-confidence: 48
-reasoning: Swagger spec contains 353 example tokens/GUIDs. UUID-style format suggests real test tokens from documentation generation.
-evidence_needed: 1. Extract token-like strings from swagger spec. 2. Test as Authorization header. 3. Compare response vs random strings.
-verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account
-impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all fabricated examples.
-testability: AUTH_HELPED
-class: MISCONFIG
-asset: api.emsisoft.com
-confidence: 42
-reasoning: /v1/workspaces/{guid} returns 404 for example GUIDs instead of 401. If 404 reveals endpoint existence while 401 requires auth, information leak exists.
-evidence_needed: 1. Test 3 more example GUIDs. 2. Compare response body between valid-looking and random GUIDs. 3. Check error message differences.
-verify_steps: 1. Extract 5 GUIDs from swagger spec. 2. curl -s https://api.emsisoft.com/v1/workspaces/<guid> for each. 3. Compare response sizes and errors.
-impact: Severity LOW — Information disclosure about endpoint existence, may help enumerate valid workspace IDs.
-testability: PASSIVE
-class: MISCONFIG
-asset: api.secrets.staging.posit.cloud
-confidence: 45
-reasoning: api.secrets.posit.cloud returned 404, but staging variant appears in CT inventory and has never been probed. Staging environments often have weaker controls.
-evidence_needed: 1. Confirm api.secrets.staging.posit.cloud resolves. 2. Test root path and /health endpoint. 3. Compare response patterns.
-verify_steps: 1. curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/. 2. curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/health.
-impact: Severity MEDIUM if staging secrets endpoint exposes test credentials or debug info. Severity LOW if non-existent.
-testability: PASSIVE
-[PARKED] Emsisoft API workspace GUIDs return 404 not 401: confidence 42 < 40 threshold
-[PARKED] Posit secrets staging environment accessible: 404 confirmed on both prod and staging — class dead
-[FINAL]
-[LEARN] REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
-[LEARN] REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
-[RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Main remaining opportunity is emsisoft example token validation.
-## 2026-08-22 03:00:23 UTC (model mimo)
-class: AUTH
-asset: api.emsisoft.com
-confidence: 48
-reasoning: Swagger spec contains 353 UUID-format tokens. Production endpoints return 401 (auth enforced) but example tokens in docs often reflect real test credentials from documentation generation. Confirmed 401 on /v1/account means valid token would authenticate.
-evidence_needed: 1. Extract 10 token-like strings from swagger spec. 2. Test 5 as Authorization header against /v1/account. 3. Compare response body between valid-format and random strings.
-verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account for each. 3. Compare response sizes and error messages.
 impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all fabricated examples (401 for all).
 testability: AUTH_HELPED
 class: MISCONFIG
@@ -856,17 +824,42 @@ testability: PASSIVE
 [LEARN] REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
 [LEARN] REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead
 [RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Main remaining opportunity is emsisoft example token validation.
+## 2026-08-22 03:48:33 UTC (model mimo)
+[PRIO] api.emsisoft.com/swagger/v1.0/swagger.json score=6.75 attack=8 business=7 tech=6 gate=9 cloud=2 fresh=5
+[PRIO] auth.docker.com score=5.45 attack=5 business=7 tech=6 gate=8 cloud=4 fresh=6
+[PRIO] admin.dealertrack.com score=5.25 attack=4 business=6 tech=5 gate=7 cloud=3 fresh=5
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 55
+reasoning: Swagger spec serves 65 endpoints with 353 example GUIDs, 12 emails, and 4 example tokens without auth. Example data includes billing structures (monthly-billing, invoice endpoints) and workspace assign-license flows. Real customer data structures exposed enable targeted phishing/social engineering.
+evidence_needed: 1. Extract email addresses and billing-related example values from swagger spec. 2. Verify examples match real data structures by comparing field names across endpoints. 3. Check if email examples are real corporate addresses.
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | python3 -c "import sys,json; d=json.load(sys.stdin); [print(k) for k in d['paths'] if 'bill' in k or 'invoice' in k or 'license' in k]". 2. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | sort -u.
+impact: Severity MEDIUM — Public API surface map with example billing data structures and contact emails enables targeted attacks against Emsisoft customers/partners.
+testability: PASSIVE
+class: MISCONFIG
+asset: auth.docker.com
+confidence: 50
+reasoning: Root path returns x-docker-app-version (v1287), x-trace-id, and sets dckr-sessid cookie with JSON+HMAC-SHA256 structure. Session cookie splits into base64 JSON payload and HMAC signature. Version header reveals internal build numbering. Previously confirmed ACCEPTED in knowledge base.
+evidence_needed: 1. Decode dckr-sessid cookie structure. 2. Confirm version header format across multiple requests. 3. Check if trace IDs are sequential (predictable).
+verify_steps: 1. curl -s -D - https://auth.docker.com/ 2>&1 | grep -E 'x-docker-app|x-trace|dckr-sessid'. 2. Decode cookie: echo "ImJsVkhmMHlqVDA2TGNpS0pSSm1RUHci" | base64 -d 2>/dev/null.
+impact: Severity LOW — Version/build information disclosure aids targeted exploitation. Session structure observation may reveal weaknesses if HMAC key is derivable.
+testability: PASSIVE
+class: MISCONFIG
+asset: admin.dealertrack.com
+confidence: 48
+reasoning: Redirect chain exposes REALMOID, SMAGENTNAME, and TARGET URL parameters from CA Access Gateway (formerly Broadcom/CA SSO). These are infrastructure identifiers used for SSO routing. Previously confirmed ACCEPTED in knowledge base.
+evidence_needed: 1. Capture full redirect chain with parameters. 2. Identify REALMOID format and whether it maps to specific environments. 3. Check if TARGET parameter accepts arbitrary redirect targets (open redirect).
+verify_steps: 1. curl -s -D - -L https://admin.dealertrack.com/ 2>&1 | grep -E 'REALMOID|SMAGENTNAME|TARGET'. 2. Check if TARGET param can be modified to redirect externally.
+impact: Severity LOW — SSO infrastructure disclosure may aid targeted attacks. Open redirect potential if TARGET is user-controllable.
+testability: PASSIVE
+[PARKED] Emsisoft API example tokens authenticate: confidence 48 → dropped. Tested 15 UUID tokens from swagger spec against /v1/account — all returned 401 with empty body. Tokens are fabricated documentation examples, not real credentials. AUTH class on this asset is dead.
+[FINAL]
+[NEXT] PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | sort -u — extract all email addresses from swagger spec to verify if they are real corporate addresses vs fabricated examples
+[LEARN] REJECTED AUTH @ api.emsisoft.com: All 15 tested UUID tokens from swagger spec return 401 on /v1/account — example tokens are fabricated documentation, not real credentials. AUTH class on emsisoft swagger tokens is dead.
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 GUIDs, email addresses, and billing data structures publicly accessible (reconfirmed with fresh probe).
+[LEARN] ACCEPTED MISCONFIG @ auth.docker.com: x-docker-app-version v1287, x-trace-id, dckr-sessid cookie with JSON+HMAC structure leaked on unauthenticated requests (reconfirmed).
+[RISK] 42 — Low-Moderate. Emsisoft API swagger misconfig is the richest confirmed finding (65 endpoints, full API surface map, example billing/contact data) but all tested example tokens are fabricated (401). Docker auth leaks version/build info but session crypto is sound (HMAC-SHA256). Dealertrack admin leaks SSO infrastructure IDs. No critical/auth-bypass findings remain active. Main remaining value is information disclosure for reconnaissance against Emsisoft customer base.
 === AGGREGATED HYPOTHESES (tail) ===
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- LEARN: REJECTED AUTH @ apitest.emsisoft.com: /v1/account, /v1/tokens, /v1/workspaces all return 401 — identical auth enforcement as production. Testing environment aut
-- LEARN: REJECTED AUTH @ auth.docker.com session forgery (reconfirmed): Session IDs cryptographically random across 5+ sequential requests, HMAC-SHA256 signatures show n
-- LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
-- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirm
-- LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-21 23:51:49 UTC
 - [48] api.emsisoft.com: Posit secrets staging environment accessible (from reports/hypotheses-mimo.txt)
 - [48] api.emsisoft.com: Emsisoft API workspace GUIDs return 404 not 401 (from reports/hypotheses-mimo.txt)
 - [48] api.emsisoft.com: Emsisoft API example tokens authenticate (from reports/hypotheses-mimo.txt)
@@ -897,17 +890,17 @@ testability: PASSIVE
 - LEARN: REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
 - LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
-## 2026-08-21 22:55:59 UTC
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
-https://apitest.emsisoft.com/v1/account -> HTTP 401
-https://apitest.emsisoft.com/v1/tokens -> HTTP 401
-https://apitest.emsisoft.com/v1/workspaces -> HTTP 401
-https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+## RANKED HYPOTHESES 2026-08-22 03:48:44 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | sort -u — extract all email addr
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED AUTH @ api.emsisoft.com: All 15 tested UUID tokens from swagger spec return 401 on /v1/account — example tokens are fabricated documentation, not real 
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 GUIDs, email addresses, and billing data structures publicly accessible (reco
+- LEARN: ACCEPTED MISCONFIG @ auth.docker.com: x-docker-app-version v1287, x-trace-id, dckr-sessid cookie with JSON+HMAC structure leaked on unauthenticated requests (re
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
@@ -956,5 +949,15 @@ https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application
 https://api.emsisoft.com/v1/account -> HTTP 401
 https://api.emsisoft.com/v1/workspaces/<guid -> HTTP 404
 https://auth.docker.com/ -> 200 len=345927 type=text/html; charset=UTF-8
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-08-22 03:48:47 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://auth.docker.com/ -> 200 len=345927 type=text/html; charset=UTF-8
+https://admin.dealertrack.com/ -> 200 len=16410 type=text/html; charset=UTF-8
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
