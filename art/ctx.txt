@@ -802,7 +802,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-[RISK] 42 — Low-Moderate. Emsisoft API swagger misconfig is the richest confirmed finding (65 endpoints, full API surface map, example billing/contact data) but all tested example tokens are fabricated (401). Docker auth leaks version/build info but session crypto is sound (HMAC-SHA256). Dealertrack admin leaks SSO infrastructure IDs. No critical/auth-bypass findings remain active. Main remaining value is information disclosure for reconnaissance against Emsisoft customer base.
 ## 2026-08-22 04:40:36 UTC (model mimo)
 [PRIO] emsisoft.com/swagger/v1.0/swagger.json score=6.75 attack=8 business=7 tech=6 gate=9 cloud=2 fresh=5
 [PRIO] auth.docker.com score=5.45 attack=5 business=7 tech=6 gate=8 cloud=4 fresh=6
@@ -862,13 +861,8 @@ testability: PASSIVE
 ## 2026-08-22 16:53:24 UTC (model mimo)
 ## 2026-08-22 17:26:42 UTC (model mimo)
 ## 2026-08-22 17:49:20 UTC (model mimo)
+## 2026-08-22 18:38:28 UTC (model mimo)
 === AGGREGATED HYPOTHESES (tail) ===
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-22 15:28:04 UTC
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
@@ -903,14 +897,13 @@ testability: PASSIVE
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
-https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
-## 2026-08-22 14:28:06 UTC
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+## RANKED HYPOTHESES 2026-08-22 18:38:38 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
@@ -959,6 +952,13 @@ https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlo
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
 ## 2026-08-22 17:49:31 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-08-22 18:38:39 UTC
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
