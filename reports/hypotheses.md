@@ -478,3 +478,13 @@
 - LEARN: REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
 - LEARN: REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-22 03:00:32 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-mimo.txt): PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10 — extract token-like strings from swagger spec to test 
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+- LEARN: REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
+- LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

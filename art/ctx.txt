@@ -236,6 +236,9 @@ probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantm
 - 2026-08-21 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
 - 2026-08-21 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirmed).
 - 2026-08-21 ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced.
+- 2026-08-22 REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+- 2026-08-22 REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
+- 2026-08-22 REJECTED SSRF @ https://docker-registry.docker
 === REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ===
 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud
@@ -791,37 +794,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-reasoning: The swagger spec contains 353 example tokens/GUIDs. If any example token is a valid test credential accidentally left in spec, it grants authenticated API access. Spec shows UUID-style token format, suggesting real tokens used during documentation generation.
-evidence_needed: 1. Extract token-like strings from swagger spec. 2. Test 5 example tokens as Authorization header. 3. Check response difference between valid-token-format and random strings.
-verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. Pick 5 and test: curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account. 3. Compare response body.
-impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all are fabricated examples (401 for all).
-testability: AUTH_HELPED
-[HYP] Posit secrets staging environment accessible
-class: MISCONFIG
-asset: api.secrets.staging.posit.cloud
-confidence: 45
-reasoning: api.secrets.posit.cloud returned 404, but staging variant appears in CT inventory and has never been probed. Staging environments often have weaker controls or debug endpoints enabled.
-evidence_needed: 1. Confirm api.secrets.staging.posit.cloud resolves. 2. Test root path and /health endpoint. 3. Compare response patterns to other staging.posit.cloud endpoints.
-verify_steps: 1. curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/. 2. curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/health. 3. Check for any /v1/, /v2/, /api/ paths.
-impact: Severity MEDIUM if staging secrets endpoint exposes test credentials or debug info. Severity LOW if non-existent or same as production (404).
-testability: PASSIVE
-[HYP] Emsisoft API workspace GUIDs return 404 not 401
-class: MISCONFIG
-asset: api.emsisoft.com
-confidence: 42
-reasoning: Previous probe showed /v1/workspaces/{guid} returns 404 for example GUIDs instead of 401. This suggests either endpoints don't exist or have different auth handling. If 404 reveals endpoint existence while 401 would require auth, it's an information leak.
-evidence_needed: 1. Test 3 more example GUIDs from spec against /v1/workspaces/{guid}. 2. Compare response body between valid-looking and random GUIDs. 3. Check if 404 response contains different error messages.
-verify_steps: 1. Extract 5 GUIDs from swagger spec. 2. curl -s https://api.emsisoft.com/v1/workspaces/<guid> for each. 3. Compare response sizes and error messages.
-impact: Severity LOW — Information disclosure about endpoint existence, may help enumerate valid workspace IDs.
-testability: PASSIVE
-[PARKED] Posit secrets production endpoint: 404 on all paths, class dead
-[PARKED] Docker registry SSRF: NXDOMAIN confirmed dead across 6 cycles
-[FINAL]
-[HYP] Emsisoft API example tokens authenticate
-class: AUTH
-asset: api.emsisoft.com
-confidence: 48
-reasoning: The swagger spec contains 353 example tokens/GUIDs. If any example token is a valid test credential accidentally left in spec, it grants authenticated API access. Spec shows UUID-style token format, suggesting real tokens used during documentation generation.
 evidence_needed: 1. Extract token-like strings from swagger spec. 2. Test 5 example tokens as Authorization header. 3. Check response difference between valid-token-format and random strings.
 verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. Pick 5 and test: curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account. 3. Compare response body.
 impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all are fabricated examples (401 for all).
@@ -851,15 +823,38 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirmed).
 [LEARN] ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced.
 [RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Cox Automotive admin panels are WAF-protected with no bypass path. Docker registry is NXDOMAIN (DNS dead). Main remaining opportunity is emsisoft example token validation and posit secrets staging environment probing.
+## 2026-08-22 01:37:25 UTC (model mimo)
+class: AUTH
+asset: api.emsisoft.com
+confidence: 48
+reasoning: Swagger spec contains 353 example tokens/GUIDs. UUID-style format suggests real test tokens from documentation generation.
+evidence_needed: 1. Extract token-like strings from swagger spec. 2. Test as Authorization header. 3. Compare response vs random strings.
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account
+impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all fabricated examples.
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 42
+reasoning: /v1/workspaces/{guid} returns 404 for example GUIDs instead of 401. If 404 reveals endpoint existence while 401 requires auth, information leak exists.
+evidence_needed: 1. Test 3 more example GUIDs. 2. Compare response body between valid-looking and random GUIDs. 3. Check error message differences.
+verify_steps: 1. Extract 5 GUIDs from swagger spec. 2. curl -s https://api.emsisoft.com/v1/workspaces/<guid> for each. 3. Compare response sizes and errors.
+impact: Severity LOW — Information disclosure about endpoint existence, may help enumerate valid workspace IDs.
+testability: PASSIVE
+class: MISCONFIG
+asset: api.secrets.staging.posit.cloud
+confidence: 45
+reasoning: api.secrets.posit.cloud returned 404, but staging variant appears in CT inventory and has never been probed. Staging environments often have weaker controls.
+evidence_needed: 1. Confirm api.secrets.staging.posit.cloud resolves. 2. Test root path and /health endpoint. 3. Compare response patterns.
+verify_steps: 1. curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/. 2. curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/health.
+impact: Severity MEDIUM if staging secrets endpoint exposes test credentials or debug info. Severity LOW if non-existent.
+testability: PASSIVE
+[PARKED] Emsisoft API workspace GUIDs return 404 not 401: confidence 42 < 40 threshold
+[PARKED] Posit secrets staging environment accessible: 404 confirmed on both prod and staging — class dead
+[FINAL]
+[LEARN] REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+[LEARN] REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
+[RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Main remaining opportunity is emsisoft example token validation.
 === AGGREGATED HYPOTHESES (tail) ===
-- LEARN: REJECTED SSRF @ api.coxautoinc.com/endpoint: 403 consistent across all param values — class dead
-- LEARN: REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN — DNS completely dead
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-21 22:55:56 UTC
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-mimo.txt): PROBE: curl -s -o /dev/null -w "%{http_code}" https://apitest.emsisoft.com/v1/account — check if testing environment bypasses auth on /v1/account endpoint
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible
 - LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves nearly identical spec (422 byte difference), same 65 endpoints
@@ -892,19 +887,15 @@ testability: PASSIVE
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirm
 - LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://admin.dealertrack.com/ -> 200 len=16411 type=text/html; charset=UTF-8
-https://admin.dealertrack.com/admin/ -> HTTP 403
-https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
-## 2026-08-21 21:55:03 UTC
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
-https://auth.docker.com/ -> 200 len=345927 type=text/html; charset=UTF-8
-https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://admin.dealertrack.com/ -> 200 len=16410 type=text/html; charset=UTF-8
+## RANKED HYPOTHESES 2026-08-22 01:37:35 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+- LEARN: REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://admin.dealertrack.com/admin/ -> HTTP 403
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
@@ -951,5 +942,17 @@ https://api.emsisoft.com/v1/account -> HTTP 401
 https://api.secrets.staging.posit.cloud/ -> HTTP 404
 https://api.secrets.staging.posit.cloud/health -> HTTP 404
 https://api.emsisoft.com/v1/workspaces/<guid -> HTTP 404
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-08-22 01:37:38 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/account -> HTTP 401
+https://api.emsisoft.com/v1/workspaces/<guid -> HTTP 404
+https://api.secrets.staging.posit.cloud/ -> HTTP 404
+https://api.secrets.staging.posit.cloud/health -> HTTP 404
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403

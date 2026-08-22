@@ -92,3 +92,5 @@
 - 2026-08-22 REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
 - 2026-08-22 REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
 - 2026-08-22 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-22 REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
+- 2026-08-22 REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead

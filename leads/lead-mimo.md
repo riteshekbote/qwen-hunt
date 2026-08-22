@@ -485,3 +485,35 @@ testability: PASSIVE
 [LEARN] REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
 [LEARN] REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
 [RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Main remaining opportunity is emsisoft example token validation.
+## 2026-08-22 03:00:23 UTC (model mimo)
+class: AUTH
+asset: api.emsisoft.com
+confidence: 48
+reasoning: Swagger spec contains 353 UUID-format tokens. Production endpoints return 401 (auth enforced) but example tokens in docs often reflect real test credentials from documentation generation. Confirmed 401 on /v1/account means valid token would authenticate.
+evidence_needed: 1. Extract 10 token-like strings from swagger spec. 2. Test 5 as Authorization header against /v1/account. 3. Compare response body between valid-format and random strings.
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account for each. 3. Compare response sizes and error messages.
+impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all fabricated examples (401 for all).
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 42
+reasoning: /v1/workspaces/{guid} returns 404 for example GUIDs from swagger spec. If 404 indicates endpoint existence while 401 indicates auth required, attacker can enumerate valid workspace IDs without credentials.
+evidence_needed: 1. Test 5 GUIDs from spec against /v1/workspaces/{guid}. 2. Compare response body between valid-looking and random GUIDs. 3. Check if error messages differ.
+verify_steps: 1. Extract GUIDs from swagger spec. 2. curl -s https://api.emsisoft.com/v1/workspaces/<guid> for each. 3. Compare response sizes and errors.
+impact: Severity LOW — Information disclosure about endpoint existence, may help enumerate valid workspace IDs.
+testability: PASSIVE
+class: MISCONFIG
+asset: auth.docker.com
+confidence: 45
+reasoning: Previous probes confirmed x-docker-app-version header and dckr-sessid cookie set on unauthenticated requests. Session ID contains JSON + HMAC-SHA256 split. Version header leaks internal build numbers.
+evidence_needed: 1. Capture full response headers from auth.docker.com root. 2. Document all leaked headers. 3. Check if session cookie format reveals session structure.
+verify_steps: 1. curl -s -D - https://auth.docker.com/ 2>&1 | head -50. 2. Document x-docker-app-version, dckr-sessid, x-trace-id values. 3. Check if session ID contains predictable components.
+impact: Severity LOW — Information disclosure about internal versioning and session management, may aid targeted attacks.
+testability: PASSIVE
+[PARKED] Emsisoft workspace GUIDs leak endpoint existence: confidence 42 < 40 threshold — close but below cutoff, and 404 may simply mean endpoint doesn't exist
+[FINAL]
+[NEXT] PROBE: curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10 — extract token-like strings from swagger spec to test authentication
+[LEARN] REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+[LEARN] REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on root and /health — staging environment confirmed dead
+[LEARN] REJECTED SSRF @ docker-registry.docker.com: NXDOMAIN confirmed across 5+ probe cycles — DNS completely dead
+[RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Main remaining opportunity is emsisoft example token validation.
