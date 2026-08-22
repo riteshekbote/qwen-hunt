@@ -89,3 +89,6 @@
 - 2026-08-21 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params — infrastructure disclosure confirmed.
 - 2026-08-21 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirmed).
 - 2026-08-21 ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced.
+- 2026-08-22 REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+- 2026-08-22 REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
+- 2026-08-22 REJECTED SSRF @ https://docker-registry.docker

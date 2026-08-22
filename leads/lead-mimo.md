@@ -454,3 +454,34 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirmed).
 [LEARN] ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced.
 [RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Cox Automotive admin panels are WAF-protected with no bypass path. Docker registry is NXDOMAIN (DNS dead). Main remaining opportunity is emsisoft example token validation and posit secrets staging environment probing.
+## 2026-08-22 01:37:25 UTC (model mimo)
+class: AUTH
+asset: api.emsisoft.com
+confidence: 48
+reasoning: Swagger spec contains 353 example tokens/GUIDs. UUID-style format suggests real test tokens from documentation generation.
+evidence_needed: 1. Extract token-like strings from swagger spec. 2. Test as Authorization header. 3. Compare response vs random strings.
+verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o '"[a-f0-9-]{36}"' | head -10. 2. curl -s -H "Authorization: ApiKey <token>" https://api.emsisoft.com/v1/account
+impact: Severity HIGH if any token authenticates — access to workspaces, devices, billing data. Severity LOW if all fabricated examples.
+testability: AUTH_HELPED
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 42
+reasoning: /v1/workspaces/{guid} returns 404 for example GUIDs instead of 401. If 404 reveals endpoint existence while 401 requires auth, information leak exists.
+evidence_needed: 1. Test 3 more example GUIDs. 2. Compare response body between valid-looking and random GUIDs. 3. Check error message differences.
+verify_steps: 1. Extract 5 GUIDs from swagger spec. 2. curl -s https://api.emsisoft.com/v1/workspaces/<guid> for each. 3. Compare response sizes and errors.
+impact: Severity LOW — Information disclosure about endpoint existence, may help enumerate valid workspace IDs.
+testability: PASSIVE
+class: MISCONFIG
+asset: api.secrets.staging.posit.cloud
+confidence: 45
+reasoning: api.secrets.posit.cloud returned 404, but staging variant appears in CT inventory and has never been probed. Staging environments often have weaker controls.
+evidence_needed: 1. Confirm api.secrets.staging.posit.cloud resolves. 2. Test root path and /health endpoint. 3. Compare response patterns.
+verify_steps: 1. curl -s -o /dev/null -w "%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/. 2. curl -s -o /dev/null -w "\n%{http_code}:%{size_download}" https://api.secrets.staging.posit.cloud/health.
+impact: Severity MEDIUM if staging secrets endpoint exposes test credentials or debug info. Severity LOW if non-existent.
+testability: PASSIVE
+[PARKED] Emsisoft API workspace GUIDs return 404 not 401: confidence 42 < 40 threshold
+[PARKED] Posit secrets staging environment accessible: 404 confirmed on both prod and staging — class dead
+[FINAL]
+[LEARN] REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+[LEARN] REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
+[RISK] 51 — Moderate. Emsisoft API swagger misconfig remains the richest publicly confirmed finding (65 endpoints, 353 example tokens, 12 emails). However, testing environment auth is confirmed equivalent to production (401 on all endpoints), reducing exploitation potential. Docker auth session security is cryptographically sound (HMAC-SHA256). Main remaining opportunity is emsisoft example token validation.

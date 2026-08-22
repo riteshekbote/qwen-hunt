@@ -147,3 +147,5 @@
 ## 2026-08-21 23:51:49 UTC
 - NEW emsisoft: api.emsisoft.com/v1/account — 401 (auth enforced, confirmed)
 - NEW emsisoft: api.emsisoft.com/v2/ — 404 (v2 endpoint not implemented)
+
+## 2026-08-22 01:37:35 UTC

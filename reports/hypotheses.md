@@ -470,3 +470,11 @@
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 example tokens/GUIDs, complete API surface map publicly accessible (reconfirm
 - LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com: Testing environment serves near-identical swagger spec — attack surface enumeration possible even if auth is enforced
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-22 01:37:35 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED MISCONFIG @ api.secrets.posit.cloud: 404 on all paths — class dead
+- LEARN: REJECTED MISCONFIG @ api.secrets.staging.posit.cloud: 404 on all paths — class dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
