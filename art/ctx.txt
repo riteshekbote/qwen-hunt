@@ -802,7 +802,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-verify_steps: 1. curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | sort -u. 2. For each email, check MX record validity. 3. Search LinkedIn for "{name}@emsisoft.com".
 impact: Severity MEDIUM — Public email disclosure combined with full API surface map and billing data structures enables targeted phishing against Emsisoft customers/partners.
 testability: PASSIVE
 class: MISCONFIG
@@ -862,13 +861,8 @@ testability: PASSIVE
 ## 2026-08-22 22:28:25 UTC (model mimo)
 ## 2026-08-22 22:50:39 UTC (model mimo)
 ## 2026-08-22 23:26:35 UTC (model mimo)
+## 2026-08-22 23:48:37 UTC (model mimo)
 === AGGREGATED HYPOTHESES (tail) ===
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-22 20:51:18 UTC
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
@@ -903,14 +897,13 @@ testability: PASSIVE
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
-https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
-## 2026-08-22 19:48:05 UTC
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+## RANKED HYPOTHESES 2026-08-22 23:48:48 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
@@ -959,6 +952,13 @@ https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlo
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
 ## 2026-08-22 23:26:45 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-08-22 23:48:49 UTC
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
