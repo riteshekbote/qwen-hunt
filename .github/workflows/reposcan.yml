@@ -174,6 +174,7 @@ jobs:
           mkdir -p reposcan-raw leads reports
           stamp=$(date -u +'%Y-%m-%d-%H-%M')
           cp reposcan-raw/grep-hits.md leads/reposcan-$stamp.md 2>/dev/null || true
+          grep -rlE 'AIza[A-Za-z0-9_-]{30,}' --include='*.md' --include='*.json' --include='*.txt' . | xargs -r sed -i -E 's/(AIza[A-Za-z0-9_-]{6})[A-Za-z0-9_-]{24,}/\1_REDACTED/g' || true
           git add -A || true
           if ! git diff --cached --quiet; then
             git commit -m "reposcan $stamp"
