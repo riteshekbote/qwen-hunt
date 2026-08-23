@@ -537,3 +537,8 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
+
+## 2026-08-23 15:49:39 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
