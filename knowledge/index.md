@@ -101,3 +101,4 @@
 - 2026-08-22 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints, 353 GUIDs, email addresses, and billing data structures publicly accessible (reconfirmed).
 - 2026-08-22 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params (reconfirmed).
 - 2026-08-23 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-24 REJECTED SSRF @ https://docker-registry.docker
