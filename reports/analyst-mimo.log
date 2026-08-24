@@ -2932,3 +2932,11 @@ testability: PASSIVE
     "ref": "err_77d9cc2d"
   }
 }
+===== ANALYST mimo 2026-08-24 20:37:46 UTC =====
+[91m[1mError: [0m{
+  "name": "UnknownError",
+  "data": {
+    "message": "Unexpected server error. Check server logs for details.",
+    "ref": "err_d0dffb36"
+  }
+}
