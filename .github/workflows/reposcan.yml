@@ -1,4 +1,4 @@
-name: MiMo Hunt - Public Repo Deep Scan
+name: Muse Spark Hunt - Public Repo Deep Scan
 
 on:
   schedule:
@@ -9,7 +9,8 @@ permissions:
   contents: write
 
 env:
-  MODEL_ID: opencode-go/ox-alpha-free
+  MODEL_ID: opencode/muse-spark-1.2-contributor-free
+  OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
 
 jobs:
   reposcan:
@@ -165,7 +166,7 @@ jobs:
           [SCAN] <count> summary. Never output secrets in full — hash values with sha256.
           PROMPT_EOF
           export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
-          timeout -k 15 25m opencode run --model "$MODEL_ID" < scan-prompt.txt > reposcan-raw/grep-hits.md 2>&1 || true
+          OPENCODE_REASONING=xhigh timeout -k 15 25m opencode run --model "$MODEL_ID" < scan-prompt.txt > reposcan-raw/grep-hits.md 2>&1 || true
 
       - name: Commit
         run: |

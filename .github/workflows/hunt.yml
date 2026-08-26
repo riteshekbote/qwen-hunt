@@ -1,4 +1,4 @@
-name: MiMo Hunt - Analyst Pipeline
+name: Muse Spark Hunt - Analyst Pipeline
 
 on:
   schedule:
@@ -20,10 +20,11 @@ jobs:
       fail-fast: false
       matrix:
         model:
-          - { id: opencode-go/ox-alpha-free, name: mimo }
+          - { id: opencode/muse-spark-1.2-contributor-free, name: muse-spark }
 
     env:
-      MODEL_ID: ${{ matrix.model.id }}
+      MODEL_ID: opencode/muse-spark-1.2-contributor-free
+  OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
       MODEL_NAME: ${{ matrix.model.name }}
 
     steps:
@@ -144,7 +145,7 @@ jobs:
           RULES: facts vs hypotheses strictly separated; no endpoint-map-only output; no class on the REJECTED list; never mention secrets in full (hash them with sha256sum); all claims must trace to the context provided or your own read-only probes; scope boundary = PROBE_ALLOW only.
           PROMPT_EOF
           export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
-          timeout -k 15 25m opencode run --model "$MODEL_ID" < analyst-prompt.txt > analyst-out.txt 2>&1 || true
+          OPENCODE_REASONING=xhigh timeout -k 15 25m opencode run --model "$MODEL_ID" < analyst-prompt.txt > analyst-out.txt 2>&1 || true
           cp analyst-out.txt analyst-${MODEL_NAME}.out
           grep -E '^\[(NEW|CHANGED|PRIO|HYP|PARKED|FINAL|NEXT|LEARN|RISK)\]|^class:|^confidence:|^asset:|^impact:|^testability:|^verify_steps:|^reasoning:|^evidence_needed:' analyst-out.txt > lead.txt || true
           {

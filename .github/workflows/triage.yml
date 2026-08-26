@@ -1,4 +1,4 @@
-name: MiMo Hunt - Triager (Validate Leads)
+name: Muse Spark Hunt - Triager (Validate Leads)
 
 on:
   schedule:
@@ -9,7 +9,8 @@ permissions:
   contents: write
 
 env:
-  MODEL_ID: opencode-go/ox-alpha-free
+  MODEL_ID: opencode/muse-spark-1.2-contributor-free
+  OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
 
 jobs:
   triage:
@@ -158,7 +159,7 @@ jobs:
           echo "LEADS:" >> triage-prompt.txt
           cat new-leads.txt >> triage-prompt.txt
           export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
-          timeout -k 15 25m opencode run --model "$MODEL_ID" < triage-prompt.txt > triage-output.txt 2>&1 || true
+          OPENCODE_REASONING=xhigh timeout -k 15 25m opencode run --model "$MODEL_ID" < triage-prompt.txt > triage-output.txt 2>&1 || true
           echo "=== triage preview ==="; head -40 triage-output.txt
 
       - name: Update valid-bugs counter
