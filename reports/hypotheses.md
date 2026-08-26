@@ -1347,3 +1347,13 @@
 - LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible without auth (Cloudflare, HSTS) — attac
 - LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak in redirect Location reconfirmed — infra disclosure alive
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-26 23:30:20 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content (headers Accept: application/json) no auth capture status/headers/body-hash; GET https://conne
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-26 reconfirmed - drop class
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 unauth text/html suggests API/content listing may not enforce auth - alive
+- LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi* 403 differential + sso.dealertrack 200 len0 xml suggests inconsistent auth + infra disclosure aliv
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

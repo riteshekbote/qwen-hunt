@@ -107,3 +107,6 @@
 - 2026-08-26 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN confirmed across 5+ cycles 2026-08-21 to 2026-08-26 — class dead, drop from queue
 - 2026-08-26 ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible without auth (Cloudflare, HSTS) — attack surface enumeration confirmed alive
 - 2026-08-26 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak in redirect Location reconfirmed — infra disclosure alive
+- 2026-08-26 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-26 reconfirmed - drop class
+- 2026-08-26 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 unauth text/html suggests API/content listing may not enforce auth - alive
+- 2026-08-26 ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi* 403 differential + sso.dealertrack 200 len0 xml suggests inconsistent auth + infra disclosure alive
