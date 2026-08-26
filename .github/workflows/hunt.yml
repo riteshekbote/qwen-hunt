@@ -24,7 +24,7 @@ jobs:
 
     env:
       MODEL_ID: opencode/muse-spark-1.2-contributor-free
-  OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
+      OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
       MODEL_NAME: ${{ matrix.model.name }}
 
     steps:

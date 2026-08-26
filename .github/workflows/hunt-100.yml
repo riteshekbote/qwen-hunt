@@ -24,7 +24,7 @@ jobs:
 
     env:
       MODEL_ID: opencode/muse-spark-1.2-contributor-free
-  OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
+      OPENCODE_REASONING: xhigh  # Zen xhigh — max reasoning per user request
       MODEL_NAME: ${{ matrix.model.name }}
 
     steps:
@@ -103,7 +103,7 @@ jobs:
           - Request-level reasoning only: exact METHOD path + params + headers + body, expected vs actual status codes. No prose filler, no restating context.
           - Breadth pass over the FULL inventory for anomalies (odd status codes, interesting param names like id/uid/email/user_id, versioned APIs /api/v1|v2|beta|internal, debug/test flags, swagger/openapi/json exposure), then depth on top-3 anomalies this cycle.
           - If a hypothesis needs live confirmation you cannot do passively, emit [NEXT] PROBE with the EXACT read-only request so the next cycle executes it immediately.
-          SCOPE (5 targets: duocircle, emsisoft, docker, posit, coxautomotive — all
+          SCOPE (105 targets: duocircle, emsisoft, docker, posit, coxautomotive — all
           email-only disclosure, no platform). Your job is NOT to invent
           vulnerabilities. Run these 8 steps and output ONLY the structured blocks.
           Tag every [HYP]/[PRIO]/[NEW] line with the target name, e.g. [HYP docker]
