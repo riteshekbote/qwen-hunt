@@ -214,7 +214,9 @@ jobs:
               if not a: return False
               if '://' in a: a = re.sub(r'^https?://', '', a).split('/')[0]
               if ':' in a: a = a.split(':')[0]
-              return a in real_hosts or any(a.endswith('.' + h) for h in real_hosts if h.count('.') >= 1 and a.count('.') > h.count('.'))
+              # STRICT: exact host must be in inventory — no parent-domain suffix match
+              # (prevents hallucinated docker-registry.docker.com passing because docker.com is in inventory)
+              return a in real_hosts
           new_h = []
           for f in glob.glob('reports/hypotheses-*.txt'):
               text = open(f).read()
