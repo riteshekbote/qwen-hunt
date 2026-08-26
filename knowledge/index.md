@@ -104,3 +104,6 @@
 - 2026-08-24 REJECTED SSRF @ https://docker-registry.docker
 - 2026-08-25 REJECTED SSRF @ https://docker-registry.docker
 - 2026-08-26 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-26 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN confirmed across 5+ cycles 2026-08-21 to 2026-08-26 — class dead, drop from queue
+- 2026-08-26 ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible without auth (Cloudflare, HSTS) — attack surface enumeration confirmed alive
+- 2026-08-26 ACCEPTED MISCONFIG @ admin.dealertrack.com: CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak in redirect Location reconfirmed — infra disclosure alive
