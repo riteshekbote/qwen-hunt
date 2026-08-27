@@ -270,6 +270,10 @@ probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantm
 - 2026-08-27 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging reconfirmed 05:03 systemic missing auth persists needs content-negotiation test
 - 2026-08-27 ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi 403 differential + sso 200 len0 xml + pa1 503 flip reconfirms infra disclosure + inconsistent auth alive
 - 2026-08-27 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed drop class
+- 2026-08-27 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 4 cycles 23:30-08:55 systemic SPA fallback still alive needs Accept negotiation test
+- 2026-08-27 ACCEPTED MISCONFIG @ share.connect.posit.cloud: predictable UUIDv7 share IDs show 200 vs 404 differential (019c9000 200 vs 0191a3bb 404) suggests per-object access variance — alive
+- 2026-08-27 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed — drop class
+- 2026-08-27 REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on example swagger tokens — example tokens are fabricated documentation, auth bypass dead
 === REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ===
 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud
@@ -827,17 +831,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY LAST LEADS (tail) ===
 none
 === AGGREGATED HYPOTHESES (tail) ===
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content (headers Accept: application/json) no auth capture status/headers/body-hash; GET https://conne
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-26 reconfirmed - drop class
-- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 unauth text/html suggests API/content listing may not enforce auth - alive
-- LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi* 403 differential + sso.dealertrack 200 len0 xml suggests inconsistent auth + infra disclosure aliv
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-27 00:02:21 UTC
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json no auth (capture status, content-type, x-cache, body length hash
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: ACCEPTED MISCONFIG @ connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html unauth mirrors staging reconfirms systemic missing auth — alive
@@ -867,21 +860,18 @@ none
 - LEARN: ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi 403 differential + sso 200 len0 xml + pa1 503 flip reconfirms infra disclosure + inconsistent auth 
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed drop class
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://api.unifi.dealertrack.com/health -> HTTP 403
-https://admin.dealertrack.com/ -> 200 len=16411 type=text/html; charset=UTF-8
-https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
-https://api.unifipp.dealertrack.com/ -> HTTP 403
 
-## 2026-08-26 23:30:28 UTC
-https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
-https://connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
-https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=12178 type=text/html
-https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ -> 200 len=4745 type=text/html; charset=UTF-8
-https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://apitest.emsisoft.com/v1/workspaces/{guid -> HTTP 404
-https://api.emsisoft.com/v1/workspaces/{guid -> HTTP 404
-https://apitest.emsisoft.com/v1/account -> HTTP 401
+## RANKED HYPOTHESES 2026-08-27 15:18:10 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest (no auth) capture stat
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 4 cycles 23:30-08:55 systemic SPA fallbac
+- LEARN: ACCEPTED MISCONFIG @ share.connect.posit.cloud: predictable UUIDv7 share IDs show 200 vs 404 differential (019c9000 200 vs 0191a3bb 404) suggests per-object acc
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed — drop class
+- LEARN: REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on example swagger tokens — example tokens are fabricated documentation, auth bypass dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://admin.dealertrack.com/ -> 200 len=16412 type=text/html; charset=UTF-8
 https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
 https://api.unifi.dealertrack.com/health -> HTTP 403
@@ -928,3 +918,17 @@ https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
 https://api.unifi.dealertrack.com/ -> HTTP 403
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+
+## 2026-08-27 15:18:16 UTC
+https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://staging.connect.posit.cloud/__api__/v1/content?limit=1 -> 200 len=2526 type=text/html
+https://admin.pa1.dealertrack.com/ -> HTTP 503
+https://admin.dealertrack.com/ -> 200 len=16412 type=text/html; charset=UTF-8
+https://api.unifi.dealertrack.com/ -> HTTP 403
+https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -> HTTP 404
+https://apitest.emsisoft.com/v1/workspaces -> HTTP 401
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know

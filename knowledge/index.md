@@ -127,3 +127,6 @@
 - 2026-08-27 ACCEPTED MISCONFIG @ share.connect.posit.cloud: predictable UUIDv7 share IDs show 200 vs 404 differential (019c9000 200 vs 0191a3bb 404) suggests per-object access variance — alive
 - 2026-08-27 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed — drop class
 - 2026-08-27 REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on example swagger tokens — example tokens are fabricated documentation, auth bypass dead
+- 2026-08-27 ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 differential on UUIDv7 share subdomains (019c9000/019c8e24 200 vs 0191a3bb 404) confirms per-object variance alive 2026-08-27 08:55
+- 2026-08-27 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html unauth mirrors staging across 4 cycles systemic SPA fallback alive needs content-negotiation test
+- 2026-08-27 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed class dead drop
