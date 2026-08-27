@@ -223,3 +223,36 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html unauth mirrors staging across 4 cycles systemic SPA fallback alive needs content-negotiation test
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed class dead drop
 [RISK] 68: multiple systemic unauth 200s (Connect API SPA fallback + Share 200/404 variance) plus full 65-endpoint Swagger public map on Emsisoft, plus Dealertrack 200 vs 403 differential and CA Gateway info leak — high chaining surface but no direct auth bypass proven yet
+## 2026-08-27 16:29:54 UTC (model muse-spark)
+class: MISCONFIG
+asset: staging.connect.posit.cloud/__api__/v1/content
+confidence: 78
+reasoning: Unauth GET returns 200 len2526 text/html identical on staging and prod across 4 cycles 23:30-15:32, same len for /content?limit=1, indicates SPA catch-all serving index.html not API JSON. Backend may still serve JSON when Accept: application/json forces content-negotiation, bypassing fallback.
+evidence_needed: JSON body/400/401 vs HTML on same path with content negotiation headers
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with Accept: application/json, X-Requested-With: XMLHttpRequest; GET https://connect.posit.cloud/__api__/v1/content same headers; capture status, content-type, x-cache, content-length, first 500 chars body; repeat with Accept: application/json vs text/html to detect differential
+impact: Unauthenticated listing of Posit Connect content IDs/titles/owners -> cross-workspace data leak, IDOR pivot; medium-high
+testability: PASSIVE
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 68
+reasoning: CT inventory hosts show 019c9000 len12178 200 and 019c8e24 len4745 200 vs 0191a3bb 404 across two independent probe cycles 08:55 and 15:32. UUIDv7 are time-ordered predictable; differential 200 vs 404 proves per-object ACL not uniform wildcard. Predictable IDs + no auth challenge observed.
+evidence_needed: Sequential near-by UUIDs from same time bucket returning 200 with app content vs 404, and body contains user app data not generic placeholder
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth capture body title; GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ compare; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ reconfirm 404; then probe 2 adjacent time-sorted IDs from inventory: 019c2310-d1f3-c202-b65d-2af52db09a6c and 019c241f-91f4-a63b-1097-ed53083ffbbc with same headers
+impact: Unauthenticated access to private Shiny/Quarto apps via share-link enumeration -> PII/code leak; high for Posit Cloud
+testability: PASSIVE
+class: IDOR
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 55
+reasoning: Full 65-endpoint OpenAPI spec publicly 200 without auth on both api.emsisoft.com and apitest.emsisoft.com reconfirmed 15:18; probe shows /v1/workspaces 401 but /v1/workspaces/00000000-0000-0000-0000-000000000000 404 differential (not 401) suggests object-level lookup occurs before auth or different auth pattern; swagger contains 353 GUID/email examples.
+evidence_needed: Known valid GUID from swagger or own account returning 200/403 vs 404 distinction when unauth, indicating traversable object IDs
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json parse /v1/workspaces/{id} and /v1/account example GUIDs; GET https://api.emsisoft.com/v1/workspaces no auth 401 baseline; GET https://api.emsisoft.com/v1/workspaces/{example-GUID-from-spec} unauth capture status (404 vs 401 vs 403); repeat on https://apitest.emsisoft.com/v1/workspaces/{same-id} to test env parity; never send credentials
+impact: Cross-tenant workspace enumeration, billing PII exposure via BOLA; high if GUIDs are sequential/predictable
+testability: PASSIVE
+[PARKED] Swagger-exposed schemas enable BOLA on workspace/account endpoints via GUID pivoting: confidence 55 passes threshold but overlaps REJECTED AUTH @ api.emsisoft.com example tokens are fabricated documentation (2026-08-22 REJECTED) - risk of conflating fabricated docs with real GUIDs, keep with lowered priority vs stronger staging/share leads
+[FINAL] 1) Posit Connect Cloud __api__/v1/content SPA fallback masks unauth API disclosure (78) 2) Share subdomain UUIDv7 per-object variance enables IDOR enumeration (68) 3) Swagger-exposed schemas enable BOLA on workspace/account endpoints (55 - parked pending GUID validity check)
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest, no auth; GET https://connect.posit.cloud/__api__/v1/content same headers; capture status, content-type, content-length, x-cache, first 500 chars body and compare to text/html baseline file_path:staging.connect.posit.cloud/__api__/v1/content
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed still dead file_path:PROBE RESULTS 15:32
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 4 cycles systemic SPA fallback alive file_path:PROBE RESULTS 15:18/15:32
+[LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 differential on UUIDv7 share subdomains reconfirmed 15:32 alive file_path:INVENTORY 019c9000/0191a3bb
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account: example swagger UUID tokens still 401 identical prod vs apitest fabricated docs dead remains file_path:PROBE RESULTS 15:18
+[RISK] 64 reason: Systemic 200 unauth on staging+prod __api__/v1/content with SPA fallback hides API behind content-negotiation (gate 10) + share UUIDv7 200/404 per-object variance suggests enumeratable private apps (posit business value high) + 65-endpoint swagger public on emsisoft Cloudflare without auth gives full attack surface map + dealerTrack CA Gateway REALMOID leak + 403/200 auth differentials; no SSRF/cloud-metadata surface currently alive (NXDOMAIN dead) but IDOR/MISCONFIG chain to PII remains high
