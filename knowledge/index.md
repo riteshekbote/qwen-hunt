@@ -120,3 +120,6 @@
 - 2026-08-27 REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on 23:30 — example swagger tokens are fabricated documentation, auth bypass class dead remains
 - 2026-08-27 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 — class dead drop
 - 2026-08-27 ACCEPTED MISCONFIG @ admin.pa1.dealertrack.com/sso.dealertrack.com: CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak + 200 vs api.unifi 403 differential reconfirmed — infra disclosure alive
+- 2026-08-27 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging reconfirmed 05:03 systemic missing auth persists needs content-negotiation test
+- 2026-08-27 ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi 403 differential + sso 200 len0 xml + pa1 503 flip reconfirms infra disclosure + inconsistent auth alive
+- 2026-08-27 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed drop class
