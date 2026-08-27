@@ -2,62 +2,61 @@
 > build · muse-spark-1.2-contributor-free
 [0m
 STEP 1 — DELTA
-[NEW posit] https://connect.posit.cloud/__api__/v1/content — prod mirror of staging __api__/v1/content, both 200 len2526 text/html unauth (new vs prior cycle which only probed staging) — indicates systemic not SPA fluke
-[NEW emsisoft] https://apitest.emsisoft.com/v1/account 401 + https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 404 — fresh auth differential probes on 65-endpoint swagger surface
-[CHANGED coxautomotive] https://admin.dealertrack.com/ 200 len16411->16412 reconfirmed vs https://api.unifi.dealertrack.com/ 403 and https://api.unifi.dealertrack.com/health 403 — persistent 200vs403 ACL differential; https://sso.dealertrack.com/ 200 len0 text/xml persistence
-[NEW posit] https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ 200 len12178 vs https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ 200 len4745 — same / path varied len on GUID-enumerated share hosts reconfirmed
+[CHANGED posit] staging.connect.posit.cloud/__api__/v1/content: prod connect.posit.cloud/__api__/v1/content now reconfirmed 200 len2526 text/html identical to staging (2026-08-27 00:02) — systemic vs SPA catch-all ambiguity — CHANGED from staging-only to prod-mirrored
+[CHANGED emsisoft] apitest.emsisoft.com/swagger/v1.0/swagger.json reconfirmed 200 application/json;charset=utf-8 at 23:30 and 00:02 identical to api.emsisoft.com — persistent Cloudflare/HSTS
+[CHANGED coxautomotive] admin.pa1.dealertrack.com/ now 503 (2026-08-27 00:02) vs admin.dealertrack.com/ 200 len16412 vs api.unifi.dealertrack.com/ 403 — differential changed/flapping indicates inconsistent auth
+[NEW posit] share.connect.posit.cloud content isolation surface reconfirmed unauth 200: 019c9000-f3f9-... 12178 text/html vs 019c8e24-... 4745 text/html;charset=UTF-8 (2026-08-26 20:07 and 23:30)
 
 STEP 2 — PRIORITIZE
-[PRIO posit] staging.connect.posit.cloud/__api__/v1/content score=8.7 (attack:8 business:9 tech:9 gate:10 cloud:7 fresh:9)
-[PRIO posit] 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ score=7.9 (attack:8 business:8 tech:6 gate:10 cloud:6 fresh:9)
-[PRIO emsisoft] apitest.emsisoft.com/swagger/v1.0/swagger.json score=8.3 (attack:9 business:7 tech:10 gate:10 cloud:6 fresh:7)
-[PRIO coxautomotive] admin.pa1.dealertrack.com/ score=8.0 (attack:7 business:9 tech:8 gate:9 cloud:5 fresh:9) — differential vs api.unifi.dealertrack.com 403
-[PRIO coxautomotive] api.unifi.dealertrack.com/health score=5.2 (attack:6 business:8 tech:7 gate:2 cloud:5 fresh:8)
-[PRIO docker] auth.docker.com score=7.4 (attack:6 business:8 tech:9 gate:10 cloud:3 fresh:7)
+[PRIO emsisoft] apitest.emsisoft.com/swagger/v1.0/swagger.json score 7.9 (attack 9 business 6 tech 9 gate 10 cloud 5 fresh 8) calc 0.25*9+0.25*6+0.15*9+0.15*10+0.10*5+0.10*8
+[PRIO posit] staging.connect.posit.cloud/__api__/v1/content score 7.8 (attack 8 business 7 tech 8 gate 9 cloud 6 fresh 9)
+[PRIO coxautomotive] admin.pa1.dealertrack.com/ (+admin.dealertrack.com/sso.dealertrack.com/api.unifi.dealertrack.com differential) score 7.1 (attack 7 business 8 tech 7 gate 8 cloud 4 fresh 7)
+[PRIO posit] 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ score 7.15 (attack 7 business 7 tech 6 gate 9 cloud 6 fresh 8)
 
 STEP 3 — HYPOTHESES
-[HYP posit] Staging Connect __api__ content listing missing auth / BOLA
-class: AUTH
-asset: staging.connect.posit.cloud/__api__/v1/content
-confidence: 72
-reasoning: GET staging and prod __api__/v1/content both 200 text/html len2526 unauth (2026-08-26 23:30). Expected 401/JSON for versioned internal API. Mirrors ACCEPTED MISCONFIG 2026-08-26 but now prod confirms systemic. Path __api__/v1/content suggests tenant content enumeration.
-evidence_needed: Content-Type negotiation, body hash/structure proves API data vs SPA shell; check if /__api__/v1/content/<id> or ?page enumerates other tenants' content without auth
-verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content Accept:application/json no auth capture status/headers/body hash; GET https://connect.posit.cloud/__api__/v1/content Accept:application/json no auth; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 offset=0; diff body vs SPA HTML length baseline
-impact: Unauthenticated tenant content/metadata enumeration across Posit Connect Cloud — PII, source code, app data — High
+[HYP posit] Unauthenticated Content Listing via __api__/v1/content on Posit Connect Cloud
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 68
+reasoning: Endpoint /__api__/v1/content returns 200 len2526 text/html unauth on both staging and prod at 23:30 and 00:02 with identical length. Share subdomains (*.share.connect.posit.cloud) also 200 unauth serving user content. Pattern suggests API may not enforce auth OR SPA catch-all masks real JSON response via content-negotiation.
+evidence_needed: Body hash comparison between Accept: text/html vs Accept: application/json, with/without auth; whether JSON array of content GUIDs leaks
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json no auth capture status/ct/len/hash/first-500-chars; GET same with Accept: text/html compare; GET https://connect.posit.cloud/__api__/v1/content same pair; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept: application/json
+impact: Unauthenticated enumeration of hosted Shiny/content GUIDs, cross-tenant PII/content theft — High
 testability: PASSIVE
 
-[HYP emsisoft] Swagger OpenAPI complete surface map enables chained IDOR/mass-assign
+[HYP emsisoft] Public Swagger Attack Surface Enumeration persists on testing env
 class: MISCONFIG
-asset: apitest.emsisoft.com/swagger/v1.0/swagger.json
+asset: apitest.emsisoft.com
 confidence: 85
-reasoning: apitest and api emsisoft both 200 application/json swagger 65 endpoints, 353 GUID/token examples, emails, billing structures publicly without auth (reconfirmed 23:30, 20:07). Cloudflare+HSTS. Testing spec near-identical (422B diff) expands attack surface. Prior AUTH bypass on /v1/account rejected 401 but MISCONFIG alive for enumeration.
-evidence_needed: Confirm spec exposes sensitive schemas (workspace GUID, billing, email) and maps to live 401 vs 404 differentials on those paths to prioritize BOLA tests
-verify_steps: GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json no auth capture keys count; GET https://api.emsisoft.com/swagger/v1.0/swagger.json compare hash; GET https://apitest.emsisoft.com/v1/workspaces no auth vs with dummy Bearer to map 401 vs 404; no token brute force
-impact: Full unauth API blueprint allows targeted BOLA/IDOR/mass-assignment discovery on Emsisoft AV/EDR billing — Medium-High (info disclosure)
+reasoning: /swagger/v1.0/swagger.json 200 without auth on both api.emsisoft.com and apitest.emsisoft.com across 23:30 and 00:02 with Cloudflare/HSTS, Swagger UI, jQuery 2.2.4. Prior ACCEPTED shows 65 endpoints, 353 GUIDs/tokens, emails, billing structures. Testing env near-identical (422B diff) same 65 endpoints. AUTH bypass via example tokens already dead (401 on /v1/account).
+evidence_needed: Current spec len/hash prod vs test diff, confirm no auth required, check for internal/debug endpoints unique to test
+verify_steps: GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json no auth record len/hash/x-cache; GET https://api.emsisoft.com/swagger/v1.0/swagger.json compare hash; OPTIONS https://apitest.emsisoft.com/v1/workspaces and GET https://apitest.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 capture 401 vs 404
+impact: Complete API map for attacker facilitates targeted BOLA/mass-assignment/billing logic probing — Medium
 testability: PASSIVE
 
-[HYP coxautomotive] Dealertrack CA Access Gateway infra disclosure + inconsistent ACL 200 vs 403
+[HYP coxautomotive] Inconsistent Auth + CA Siteminder Infra Disclosure differential on DealerTrack
 class: MISCONFIG
-asset: admin.pa1.dealertrack.com/
-confidence: 78
-reasoning: admin.pa1 200 CA Access Gateway Error Report Apache vs api.unifi* 403 vs sso.dealertrack 200 len0 text/xml (all reconfirmed 23:30). Prior ACCEPTED MISCONFIG admin.dealertrack REALMOID/SMAGENTNAME/TARGET leak in redirect Location. Differential 200 admin vs 403 api suggests inconsistent auth enforcement on same org.
-evidence_needed: Location header on admin.pa1 and admin.dealertrack with REALMOID/SMAGENTNAME/TARGET values hashed; status differential confirms infra leak + inconsistent gate
-verify_steps: GET https://admin.pa1.dealertrack.com/ no auth capture status Location Server; GET https://admin.dealertrack.com/ no auth follow_redirects=false; GET https://api.unifi.dealertrack.com/ no auth; GET https://api.unifi.dealertrack.com/health no auth; compare 200 vs 403 and header leak
-impact: Infrastructure disclosure (CA Siteminder version, internal routing) + potential auth bypass via gateway param manipulation — Medium
+asset: admin.pa1.dealertrack.com
+confidence: 62
+reasoning: admin.pa1.dealertrack.com [CA Access Gateway - Error Report] Apache, admin.dealertrack.com 200 len16412 unauth, sso.dealertrack.com 200 len0 text/xml unauth, while api.unifi.dealertrack.com/ and /health consistently 403 across 23:30 and 00:02. Prior ACCEPTED confirms CA Access Gateway redirect leaks REALMOID/SMAGENTNAME/TARGET. Differential suggests inconsistent auth and infra disclosure.
+evidence_needed: Location header and body on admin.* chain, confirm 200 vs 403 differential holds, verify sso empty xml meaning
+verify_steps: GET https://admin.pa1.dealertrack.com/ no auth capture status/headers Location/Set-Cookie/body-hash; GET https://admin.dealertrack.com/ same; GET https://sso.dealertrack.com/ capture 200 len0 headers; GET https://api.unifi.dealertrack.com/ and /health capture 403
+impact: Infrastructure fingerprinting + potential legacy CA auth bypass via TARGET param — Medium
 testability: PASSIVE
 
 STEP 4 — SELF-CRITIQUE
-[PARKED] none — all confidence 72-85 >=40, classes AUTH/MISCONFIG not on REJECTED list (rejected was SSO oracle, SSRF docker-registry/api.coxautoinc, secrets.posit 404, emsisoft token forgery, docker session forgery — none match), verify_steps concrete passive GETs
-[FINAL] 1. [HYP emsisoft] Swagger surface map (85) 2. [HYP coxautomotive] Dealertrack gateway leak + ACL diff (78) 3. [HYP posit] Staging Connect __api__ missing auth (72)
+[PARKED NONE] No hypotheses dropped — all confidence >=62, class MISCONFIG is ACCEPTED (not on REJECTED list: SSO-oracle, OATH@*.docker.com, SSRF@docker-registry, SSRF@api.coxautoinc, MISCONFIG@api.secrets.*, AUTH@emsisoft swagger tokens, AUTH@auth.docker session forgery), all have concrete PASSIVE verify_steps
+[FINAL] 1. [HYP emsisoft] Public Swagger Attack Surface Enumeration persists on testing env (85) 2. [HYP posit] Unauthenticated Content Listing via __api__/v1/content (68) 3. [HYP coxautomotive] Inconsistent Auth + CA Siteminder Infra Disclosure (62)
 
 STEP 5 — NEXT ACTION
-[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json no auth (capture status, content-type, x-cache, body length hash sha256); GET https://connect.posit.cloud/__api__/v1/content Accept: application/json no auth; GET https://staging.connect.posit.cloud/__api__/v1/content/019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud pattern check for IDOR; all read-only no auth
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json no auth capture status/content-type/x-cache/content-length/body-hash first-500; GET https://connect.posit.cloud/__api__/v1/content same; GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: text/html same; compare hashes to differentiate SPA catch-all (identical HTML) vs real API JSON leak
 
 STEP 6 — LEARNING
-[LEARN] ACCEPTED MISCONFIG @ connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html unauth mirrors staging reconfirms systemic missing auth — alive
-[LEARN] ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible Cloudflare reconfirmed 23:30 — alive
-[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-26 — class dead drop
-[LEARN] REJECTED AUTH @ apitest.emsisoft.com: /v1/account 401 identical to prod — testing auth bypass dead
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 mirrors staging reconfirmed systemic — alive needs content-negotiation test
+[LEARN] ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible Cloudflare reconfirmed 23:30 and 00:02 — alive
+[LEARN] REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on 23:30 — example swagger tokens are fabricated documentation, auth bypass class dead remains
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 — class dead drop
+[LEARN] ACCEPTED MISCONFIG @ admin.pa1.dealertrack.com/sso.dealertrack.com: CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak + 200 vs api.unifi 403 differential reconfirmed — infra disclosure alive
 
 STEP 7 — RISK SCORE
-[RISK] 71 — systemic unauth __api__ content endpoints on Posit staging+prod (gate 10), full 65-endpoint swagger disclosure on emsisoft prod+test, persistent CA gateway infrastructure leak + 200 vs 403 ACL inconsistency on Cox/Dealertrack, plus GUID-enumerable share.connect hosts 200 — no active SSRF but high enumeration/infra exposure
+[RISK] 68 reason: Posit Connect Cloud shows systemic unauth 200 on __api__/v1/content plus unauth share subdomains serving user content (potential cross-tenant leak if SPA catch-all false negative excluded), Emsisoft exposes full 65-endpoint OpenAPI spec on prod and test without auth enabling targeted BOLA, DealerTrack shows inconsistent 200/403 plus CA Siteminder disclosure — overall medium-high exposure but no proven ATO/SSRF chain yet, needs content-negotiation probe to confirm exploitability

@@ -1368,3 +1368,15 @@
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-26 — class dead drop
 - LEARN: REJECTED AUTH @ apitest.emsisoft.com: /v1/account 401 identical to prod — testing auth bypass dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-27 05:02:56 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json no auth capture status/content-type/x-cache/content-length/body-
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 mirrors staging reconfirmed systemic — alive needs content-negotiation tes
+- LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible Cloudflare reconfirmed 23:30 and 00:02 
+- LEARN: REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on 23:30 — example swagger tokens are fabricated documentation, auth bypass class dead re
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 — class dead drop
+- LEARN: ACCEPTED MISCONFIG @ admin.pa1.dealertrack.com/sso.dealertrack.com: CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak + 200 vs api.unifi 403 differential recon
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
