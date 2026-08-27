@@ -1,32 +1,32 @@
-## 2026-08-27 08:55:02 UTC (model muse-spark)
-class: MISCONFIG
-asset: staging.connect.posit.cloud
-confidence: 72
-reasoning: GET /__api__/v1/content unauth returns 200 len2526 text/html on both staging and prod consistently 2026-08-26 23:30 to 05:03, same len as prod; expected API should return 401 or JSON; staging.posit.cloud/actuator/health previously REJECTED as SPA catch-all — same risk SPA routing masking missing auth
-evidence_needed: response body JSON vs HTML under Accept:application/json, status 401 vs 200, content-type
-verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content Accept:application/json no cookie capture status/content-type/x-cache/body-hash; repeat GET https://connect.posit.cloud/__api__/v1/content Accept:application/json; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept:application/json compare
-impact: unauth enumeration of tenant content metadata (IDs/guids/titles) -> cross-tenant PII/code leak, BOLA prerequisite; severity medium-high if JSON leaks
-testability: PASSIVE
+## 2026-08-27 15:17:59 UTC (model muse-spark)
 class: IDOR
-asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
-confidence: 65
-reasoning: 30+ share.connect.posit.cloud GUID hosts from CT both return 200 unauth with divergent lengths (12178 vs 4745 2026-08-27); share.* pattern indicates per-publish tenant isolation; no Set-Cookie observed previously; inventory includes app.connect.posit.cloud GUID twins (0191a3bb...) suggests share vs app split
-evidence_needed: body hash differential, auth redirect vs 200, CORS/cookie, predictability of GUID, inter-tenant fetch
-verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ no auth capture status/x-cache/set-cookie/body-snippet hash; GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ same; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ vs /app. variant compare Host header
-impact: cross-tenant content access if GUID brute-forceable or leaked via content API (HYP1 chain) -> ATO/data exfiltration; severity high
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 62
+reasoning: Unauth GET 200 len2526 text/html on both staging and prod across 4 probe cycles 2026-08-26 23:30 to 2026-08-27 08:55; ?limit=1 still identical len2526 suggests SPA fallback masking API not auth enforcement; sibling share subdomains 019c9000 200 vs 0191a3bb 404 shows per-object ID variance.
+evidence_needed: Unauth response with Content-Type application/json and JSON body containing content GUIDs/titles/owners when Accept: application/json vs text/html
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json (no auth) capture status/content-type/len/hash; repeat GET https://connect.posit.cloud/__api__/v1/content same headers; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept: application/json; compare to baseline text/html
+impact: Cross-tenant enumeration of published content/apps, owner IDs, potential private app/share access — medium (high if private content leaked)
 testability: PASSIVE
 class: MISCONFIG
-asset: admin.dealertrack.com
+asset: https://admin.pa1.dealertrack.com/
 confidence: 68
-reasoning: admin.dealertrack.com 200 len16409-16412 text/html vs api.unifi*.dealertrack.com 403 consistent 05:03 + sso.dealertrack.com 200 len0 text/xml; 2026-08-21/26 LEARN confirmed CA Access Gateway REALMOID/SMAGENTNAME/TARGET leak in redirect Location + 503 flip on admin.pa1.dealertrack.com indicates inconsistent gateway enforcement
-evidence_needed: Location header REALMOID/SMAGENTNAME leak, 200 vs 403 differential, sso XML body
-verify_steps: GET https://admin.dealertrack.com/ no auth capture status/Location/Server/body hash; GET https://admin.pa1.dealertrack.com/ capture 503 vs 200; GET https://sso.dealertrack.com/ capture 200 len0 text/xml; GET https://api.unifi.dealertrack.com/ vs /health expect 403 compare headers
-impact: infra disclosure (CA SiteMinder config) + potential auth bypass via direct admin path bypassing api gateway; severity medium
+reasoning: https://admin.dealertrack.com/ 200 len16411 vs https://api.unifi.dealertrack.com/ 403 vs https://sso.dealertrack.com/ 200 len0 text/xml differential persistent 4 cycles; https://admin.pa1.dealertrack.com/ flip 503 vs 200 indicates inconsistent ACL/load-balancer; history leaks REALMOID/SMAGENTNAME/TARGET in redirect Location.
+evidence_needed: Location header leaking SMAGENTNAME/REALMOID/TARGET on unauth hit to admin.pa1/sso, plus 200 vs 403 differential on same logical path prefix
+verify_steps: GET https://admin.dealertrack.com/ follow_redirects=false capture Location and Set-Cookie; GET https://admin.pa1.dealertrack.com/ same; GET https://sso.dealertrack.com/ same; GET https://api.unifi.dealertrack.com/ and /health compare status; test TARGET param URL-encoding
+impact: Infra fingerprint, SiteMinder bypass via TARGET manipulation, potential admin access — medium
 testability: PASSIVE
-[PARKED] none: all 3 hypotheses confidence >=65, classes MISCONFIG/IDOR not on REJECTED list, verify_steps concrete passive
-[FINAL] 1: staging.connect.posit.cloud __api__ content listing missing auth (72) 2: admin.dealertrack.com CA gateway leak + auth differential (68) 3: share.connect.posit.cloud GUID tenant IDOR (65)
-[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json no auth capture status/content-type/x-cache/content-length/body-hash; GET https://connect.posit.cloud/__api__/v1/content with Accept: application/json no auth same; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept: application/json
-[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging reconfirmed 05:03 systemic missing auth persists needs content-negotiation test
-[LEARN] ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi 403 differential + sso 200 len0 xml + pa1 503 flip reconfirms infra disclosure + inconsistent auth alive
-[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed drop class
-[RISK] 74 systemic unauth 200 on versioned __api__ + 30+ GUID-isolated share hosts 200 unauth + CA Access Gateway param leak with 200/403/503 differential expands IDOR/BOLA and infra disclosure surface
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 75
+reasoning: Swagger 65 endpoints, 353 GUIDs/emails publicly accessible without auth reconfirmed both prod and apitest 2026-08-27 05:03 via Cloudflare HSTS; /v1/account 401 vs /v1/workspaces/{guid} 404 differential indicates object existence oracle; 15 example tokens from spec return 401 so not credential leak but enumeration aid.
+evidence_needed: Swagger JSON 200 with endpoint list + 401 vs 404 differential on guessing workspace GUIDs (fabricated vs spec example)
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth record len/hash endpoint count; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json compare; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 vs spec GUID capture 401/404; GET https://apitest.emsisoft.com/v1/workspaces same
+impact: Complete API surface map accelerates BOLA/IDOR, billing/account data structures exposed — low alone, high chaining value
+testability: PASSIVE
+[FINAL] Ranked survivors:
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest (no auth) capture status, content-type, content-length, x-cache, body-length hash; repeat GET https://connect.posit.cloud/__api__/v1/content same headers; plus GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept: application/json; compare all to baseline text/html 200 len2526
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 4 cycles 23:30-08:55 systemic SPA fallback still alive needs Accept negotiation test
+[LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: predictable UUIDv7 share IDs show 200 vs 404 differential (019c9000 200 vs 0191a3bb 404) suggests per-object access variance — alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed — drop class
+[LEARN] REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on example swagger tokens — example tokens are fabricated documentation, auth bypass dead
+[RISK] 62 reason: Unauth 200 on Connect Cloud content API systemic across staging/prod (SPA masking not disproven), persistent admin 200 vs api 403 differential + CA SiteMinder leak on Dealertrack, and public 65-endpoint Swagger on Emsisoft giving full attack surface — chained IDOR/BOLA risk remains PASSIVE-testable, no cloud-metadata SSRF alive

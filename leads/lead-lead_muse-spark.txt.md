@@ -160,3 +160,35 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ admin.dealertrack.com: 200 vs api.unifi 403 differential + sso 200 len0 xml + pa1 503 flip reconfirms infra disclosure + inconsistent auth alive
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed drop class
 [RISK] 74 systemic unauth 200 on versioned __api__ + 30+ GUID-isolated share hosts 200 unauth + CA Access Gateway param leak with 200/403/503 differential expands IDOR/BOLA and infra disclosure surface
+## 2026-08-27 15:17:59 UTC (model muse-spark)
+class: IDOR
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 62
+reasoning: Unauth GET 200 len2526 text/html on both staging and prod across 4 probe cycles 2026-08-26 23:30 to 2026-08-27 08:55; ?limit=1 still identical len2526 suggests SPA fallback masking API not auth enforcement; sibling share subdomains 019c9000 200 vs 0191a3bb 404 shows per-object ID variance.
+evidence_needed: Unauth response with Content-Type application/json and JSON body containing content GUIDs/titles/owners when Accept: application/json vs text/html
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json (no auth) capture status/content-type/len/hash; repeat GET https://connect.posit.cloud/__api__/v1/content same headers; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept: application/json; compare to baseline text/html
+impact: Cross-tenant enumeration of published content/apps, owner IDs, potential private app/share access — medium (high if private content leaked)
+testability: PASSIVE
+class: MISCONFIG
+asset: https://admin.pa1.dealertrack.com/
+confidence: 68
+reasoning: https://admin.dealertrack.com/ 200 len16411 vs https://api.unifi.dealertrack.com/ 403 vs https://sso.dealertrack.com/ 200 len0 text/xml differential persistent 4 cycles; https://admin.pa1.dealertrack.com/ flip 503 vs 200 indicates inconsistent ACL/load-balancer; history leaks REALMOID/SMAGENTNAME/TARGET in redirect Location.
+evidence_needed: Location header leaking SMAGENTNAME/REALMOID/TARGET on unauth hit to admin.pa1/sso, plus 200 vs 403 differential on same logical path prefix
+verify_steps: GET https://admin.dealertrack.com/ follow_redirects=false capture Location and Set-Cookie; GET https://admin.pa1.dealertrack.com/ same; GET https://sso.dealertrack.com/ same; GET https://api.unifi.dealertrack.com/ and /health compare status; test TARGET param URL-encoding
+impact: Infra fingerprint, SiteMinder bypass via TARGET manipulation, potential admin access — medium
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 75
+reasoning: Swagger 65 endpoints, 353 GUIDs/emails publicly accessible without auth reconfirmed both prod and apitest 2026-08-27 05:03 via Cloudflare HSTS; /v1/account 401 vs /v1/workspaces/{guid} 404 differential indicates object existence oracle; 15 example tokens from spec return 401 so not credential leak but enumeration aid.
+evidence_needed: Swagger JSON 200 with endpoint list + 401 vs 404 differential on guessing workspace GUIDs (fabricated vs spec example)
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth record len/hash endpoint count; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json compare; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 vs spec GUID capture 401/404; GET https://apitest.emsisoft.com/v1/workspaces same
+impact: Complete API surface map accelerates BOLA/IDOR, billing/account data structures exposed — low alone, high chaining value
+testability: PASSIVE
+[FINAL] Ranked survivors:
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest (no auth) capture status, content-type, content-length, x-cache, body-length hash; repeat GET https://connect.posit.cloud/__api__/v1/content same headers; plus GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 Accept: application/json; compare all to baseline text/html 200 len2526
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 4 cycles 23:30-08:55 systemic SPA fallback still alive needs Accept negotiation test
+[LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: predictable UUIDv7 share IDs show 200 vs 404 differential (019c9000 200 vs 0191a3bb 404) suggests per-object access variance — alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed — drop class
+[LEARN] REJECTED AUTH @ apitest.emsisoft.com/v1/account: 401 identical to prod on example swagger tokens — example tokens are fabricated documentation, auth bypass dead
+[RISK] 62 reason: Unauth 200 on Connect Cloud content API systemic across staging/prod (SPA masking not disproven), persistent admin 200 vs api 403 differential + CA SiteMinder leak on Dealertrack, and public 65-endpoint Swagger on Emsisoft giving full attack surface — chained IDOR/BOLA risk remains PASSIVE-testable, no cloud-metadata SSRF alive
