@@ -153,3 +153,6 @@
 - 2026-08-28 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example swagger GUIDs: 401 prod vs apitest vs apistage identical, fabricated documentation tokens remain dead for direct auth bypass (needs other endpoint)
 - 2026-08-28 ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 UUIDv7 differential extended to 4 hosts (019c9000/019c8e24/019c1fdf/019c2310 vs 0191a3bb) reconfirmed 12:07-12:46 per-object variance alive and enumerability increased
 - 2026-08-28 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 12:07 persists dead drop as per 2026-08-26 directive — keep dropped
+- 2026-08-28 ACCEPTED MISCONFIG @ share.connect.posit.cloud: 019c241f 404 at 22:34 extends differential to 5x200 vs 2x404 confirms enumerability alive and per-object variance persists
+- 2026-08-28 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html systemic SPA fallback alive across 6th cycle 22:34 needs content-negotiation test
+- 2026-08-28 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 22:34 persists dead drop per 2026-08-26 directive
