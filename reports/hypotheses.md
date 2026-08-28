@@ -1422,3 +1422,13 @@
 - LEARN: ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 differential on UUIDv7 share subdomains reconfirmed 15:32 alive file_path:INVENTORY 019c9000/0191a3bb
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account: example swagger UUID tokens still 401 identical prod vs apitest fabricated docs dead remains file_path:PROBE RESULT
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-28 00:33:29 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json, X-Requested-With: XMLHttpRequest no auth capture status/content
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints public no auth reconfirmed 16:30 alive
+- LEARN: ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 UUIDv7 differential reconfirmed 15:32+16:30 per-object variance alive
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed dead drop class
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
