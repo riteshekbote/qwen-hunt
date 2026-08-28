@@ -144,3 +144,8 @@
 - 2026-08-28 ACCEPTED MISCONFIG @ 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud / 019c2310-d1f3-c202-b65d-2af52db09a6c.share.connect.posit.cloud: 2 new 200s at 00:33 extend 200 vs 404 UUIDv7 differential — per-object variance and enumerability alive
 - 2026-08-28 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 5 cycles plus ?limit=1 200 — systemic SPA fallback alive, needs content-negotiation test
 - 2026-08-28 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 01:09 persists — class dead, drop from queue per 2026-08-26 directive
+- 2026-08-28 ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 UUIDv7 differential extended to 019c1fdf/019c2310 reconfirmed 00:33-12:07 per-object variance alive
+- 2026-08-28 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 5+ cycles plus ?limit=1 systemic SPA fallback alive needs content-negotiation test
+- 2026-08-28 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 12:07 persists dead drop as per 2026-08-26 directive
+- 2026-08-28 REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example tokens: 401 identical prod vs apitest fabricated docs dead remains
+- 2026-08-28 ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json (+apistage): 65 endpoints public no auth reconfirmed 16:30-12:07 alive

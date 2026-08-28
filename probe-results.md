@@ -1486,3 +1486,17 @@ https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=applica
 https://api.emsisoft.com/v1/workspaces -> HTTP 401
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
+
+## 2026-08-28 12:46:00 UTC
+https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=12178 type=text/html
+https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -> HTTP 404
+https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -> 200 len=? type=text/html; charset=utf-8
+https://019c2310-d1f3-c202-b65d-2af52db09a6c.share.connect.posit.cloud/ -> 200 len=64888 type=text/html
+https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://staging.connect.posit.cloud/__api__/v1/content?limit=1 -> 200 len=2526 type=text/html
+https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://apistage.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/workspaces -> HTTP 401
+https://apitest.emsisoft.com/v1/workspaces -> HTTP 401
+https://apitest.emsisoft.com/v1/workspaces/invalid-guid -> HTTP 404
