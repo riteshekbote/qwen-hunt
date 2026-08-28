@@ -1442,3 +1442,13 @@
 - LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 5th cycle 00:33 reconfirms systemic SPA f
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 00:33 persists dead drop as per 2026-08-26 directive
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-28 12:07:48 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest, no cookies/auth; GET 
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud / 019c2310-d1f3-c202-b65d-2af52db09a6c.share.connect.posit.cloud: 2 new 200s
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 5 cycles plus ?limit=1 200 — systemic SPA
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 01:09 persists — class dead, drop from queue per 2026-08-26 directi
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
