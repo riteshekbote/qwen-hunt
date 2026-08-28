@@ -288,3 +288,35 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 UUIDv7 differential reconfirmed 15:32+16:30 per-object variance alive
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-27 reconfirmed dead drop class
 [RISK] 71 reason: high gate_ease unauth disclosures (swagger full map + share IDOR differential + staging/prod content 200) systemic but auth enforced on tested emsisoft endpoints limits immediate exploit; chaining potential elevated
+## 2026-08-28 01:09:00 UTC (model muse-spark)
+class: MISCONFIG
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 68
+reasoning: 00:33:36 probe shows 019c9000 200 len12178, 019c8e24 200 len4745, 019c1fdf 200, 019c2310 200 len64888 vs 0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud 404 consistently across 15:32,16:30,00:33. 200 vs 404 differential with len variance indicates per-object existence check without auth, not uniform wildcard.
+evidence_needed: body diff of 200 hosts - does response contain user content, dataset names, or PII vs generic placeholder; check if 404 hosts are truly missing vs auth-gated
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth capture body title/h1 and GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ compare; repeat for 019c1fdf and 019c2310; no auth headers
+impact: unauth enumeration of share IDs exposes customer apps/dashboards, BOLA across tenants, medium-high
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 62
+reasoning: staging.connect.posit.cloud/__api__/v1/content and connect.posit.cloud/__api__/v1/content both return 200 len2526 text/html unauth at 15:18,15:32,16:30,00:33. Identical HTML on API path suggests CloudFront/S3 SPA catch-all serves index.html instead of enforcing auth. Real API may return JSON when Accept negotiates.
+evidence_needed: response with Accept: application/json vs text/html; status/content-type/len change proves API exists behind SPA
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest no auth; repeat against https://connect.posit.cloud/__api__/v1/content same headers; also GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 with same headers; capture status, content-type, len
+impact: unauth listing of content objects exposes tenant apps, IDs, potentially BOLA to read/modify, high
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 75
+reasoning: https://api.emsisoft.com/swagger/v1.0/swagger.json 200 application/json and https://apitest.emsisoft.com/swagger/v1.0/swagger.json 200 reconfirmed 15:18,15:32,16:30,00:33. History notes 65 endpoints, 353 GUIDs, 12 emails, billing structures public without auth. apitest mirrors prod (422 byte diff) indicating staging not stripped.
+evidence_needed: current spec endpoint count and presence of sensitive schemas (workspaces, tokens, billing) to confirm still 65 endpoints public
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth parse openapi paths count; diff against GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json; no auth needed
+impact: full API map enables targeted IDOR/BOLA, mass assignment, auth bypass hunting on money flows, medium (info disclosure -> chain)
+testability: PASSIVE
+[PARKED] none - all 3 confidence >=40, class not on REJECTED list (SSO-oracle, SSRF docker-registry, AUTH swagger-tokens bypass dead classes avoided), verify_steps are concrete passive unauth GETs within probe_allow
+[FINAL] 1. [HYP posit] Unauthenticated share subdomain per-object variance (68) - highest freshness + gate_ease + per-object PII risk; 2. [HYP emsisoft] Public Swagger spec (75) - highest tech_exposure and gate_ease but lower direct PII; 3. [HYP posit] SPA fallback masks missing auth (62) - needs header negotiation to confirm
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest (no cookies/auth) + GET https://connect.posit.cloud/__api__/v1/content same headers; capture status, content-type, len and first 500 bytes body; baseline compare to unauth text/html len2526. If 200 application/json with content array, then BOLA test next.
+[LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: 019c1fdf/019c2310 200 at 00:33:36 extend differential (2 new 200s vs 0191a3bb 404) confirms per-object variance alive and enumerability increases
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging across 5th cycle 00:33 reconfirms systemic SPA fallback alive needs Accept negotiation
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 00:33 persists dead drop as per 2026-08-26 directive
+[RISK] 68 - posit share enumeration + Connect content API SPA fallback both unauth and systemic, plus emsisoft 65-endpoint public spec gives high attack_surface/gate_ease; no confirmed PII dump yet but chain potential high, auth bypass on emsisoft tokens remains dead limiting immediate critical
