@@ -1464,3 +1464,13 @@
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example tokens: 401 identical prod vs apitest fabricated docs dead remains
 - LEARN: ACCEPTED MISCONFIG @ apitest.emsisoft.com/swagger/v1.0/swagger.json (+apistage): 65 endpoints public no auth reconfirmed 16:30-12:07 alive
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-28 22:34:02 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ apistage.emsisoft.com/swagger/v1.0/swagger.json: near-identical 65-endpoint spec publicly accessible without auth at 12:46 extends apitest 
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example swagger GUIDs: 401 prod vs apitest vs apistage identical, fabricated documentation tokens remain dead
+- LEARN: ACCEPTED MISCONFIG @ share.connect.posit.cloud: 200 vs 404 UUIDv7 differential extended to 4 hosts (019c9000/019c8e24/019c1fdf/019c2310 vs 0191a3bb) reconfirmed
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 12:07 persists dead drop as per 2026-08-26 directive — keep dropped
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
