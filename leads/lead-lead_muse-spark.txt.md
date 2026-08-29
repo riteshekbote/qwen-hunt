@@ -549,3 +549,36 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65-endpoint spec public unauth on prod/apitest/apistage reconfirmed 22:34-03:53 systemic exposure alive
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces|/v1/tokens via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — not bypassable via examples
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 22:34 persists dead drop per 2026-08-26 directive
+## 2026-08-29 11:03:13 UTC (model muse-spark)
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 78
+reasoning: LIVE probe 2026-08-29 10:57 shows prod/apitest/apistage swagger.json 200 unauth Cloudflare; 65 endpoints 353 GUIDs/tokens exposed; auth enforced (401) on /v1/account|workspaces but full surface map allows targeting untested verbs/mass-assignment/beta params
+evidence_needed: diff prod vs apistage spec for hidden beta endpoints; test unverified POST/PATCH params from spec with 401 vs 400 differential
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json (baseline) then GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json diff; passive JSON parse for POST /v1/workspaces, /v1/devices, /v1/tokens required fields; no auth intrusive POST yet
+impact: full API inventory for follow-on IDOR/BOLA/mass-assignment; low direct but high chain value; severity medium
+testability: PASSIVE
+class: MISCONFIG
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 72
+reasoning: 5x200 (019c9000 12178, 019c8e24 4745, 019c1fdf,019c2310 64888,01935672 etc) vs 2x404 (0191a3bb,019c241f) reconfirmed 22:34-10:57 on share.connect.posit.cloud; len variance 4745/12178/64888 indicates distinct objects not wildcard; predictable UUIDv7 share IDs unauth 200 suggests private apps/dashboards may be enumerable
+evidence_needed: body hash/title diff across 200s to confirm distinct content vs same SPA fallback; 404 vs 200 auth header differential
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ vs GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ vs GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ unauth; record status/len/content-type/title; passive only
+impact: cross-tenant private Shiny/Quarto app/data leakage if share IDs guessable/scrapable; severity high if PII
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 68
+reasoning: GET https://staging.connect.posit.cloud/__api__/v1/content and prod connect.posit.cloud 200 len2526 text/html unauth across 6 cycles; ?limit=1 same len suggests SPA catch-all not API auth; api.connect.posit.cloud/__api__ 404 differential suggests routing variance; needs Accept negotiation to bypass HTML fallback
+evidence_needed: json vs html differential with Accept: application/json
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json and X-Requested-With: XMLHttpRequest no cookies; repeat GET https://connect.posit.cloud/__api__/v1/content same headers; compare status/len/content-type vs text/html baseline; then GET https://api.connect.posit.cloud/__api__/v1/content same headers
+impact: unauth content listing/api disclosure if json bypass works; severity medium-high
+testability: PASSIVE
+[PARKED] NONE: all 3 hypotheses confidence >=40 and class not on REJECTED list (SSRF@docker-registry, SSO-oracle, OATH, AUTH swagger tokens) with concrete passive verify_steps
+[FINAL] 1. [HYP emsisoft] Public Swagger 65-endpoint spec (78) 2. [HYP posit] Share subdomain UUIDv7 variance (72) 3. [HYP posit] Connect __api__/v1/content SPA fallback (68)
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest (no auth/cookies); then GET https://connect.posit.cloud/__api__/v1/content same headers; then GET https://api.connect.posit.cloud/__api__/v1/content same headers; record status, content-type, len, body snippet
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 10:57 persists dead per 2026-08-26 directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces|/v1/tokens via swagger example GUIDs: 401 identical prod/apitest/apistage dead remains
+[LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance reconfirmed 10:57 alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 mirrors staging 6+ cycles SPA fallback alive
+[RISK] 62 reason: systemic misconfig exposure persists (3-env public swagger + 5x200 share differential + SPA content fallback) but no validated auth bypass or cloud metadata SSRF; chain potential medium, immediate exploit low without Accept-negotiation/probable object enumeration confirmation
