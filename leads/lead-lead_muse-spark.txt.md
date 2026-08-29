@@ -714,3 +714,4 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 18:49 — class dead per 2026-08-26 directive drop
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains
 [RISK] 68 reason: 3 alive MISCONFIG/IDOR primitives with high gate_ease (unauth 200s on share subdomains + SPA fallback vs api 404 differential + 3-env 65-endpoint swagger public) give systemic multi-tenant exposure on posit cloud and full attack surface map on emsisoft; no SSRF/OATH alive, but enumerability + content-negotiation gap keep overall program exposure medium-high
+## 2026-08-29 21:34:47 UTC (model muse-spark)
