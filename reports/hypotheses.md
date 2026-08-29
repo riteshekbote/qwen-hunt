@@ -1590,3 +1590,15 @@
 - LEARN: ACCEPTED MISCONFIG @ 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/12178->14332 reco
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints public unauth 3-env (prod/apitest/apistage) reconfirmed 18:49 — systemic exposure 
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-29 23:35:32 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with headers Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Languag
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/12178->14332 reconfirmed 21:43 — per-object variance a
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 mirrors staging 7 cycles vs api.connect 404 differential persists — SPA fa
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 21:43 — systemic exposure alive
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 21:43 persists per 2026-08-26 directive — class dead drop
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

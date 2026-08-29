@@ -748,3 +748,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/12178->14332 reconfirmed 18:49 — per-object variance alive
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints public unauth 3-env (prod/apitest/apistage) reconfirmed 18:49 — systemic exposure alive
 [RISK] 66 — Posit Connect surface shows systemic per-object share variance + SPA-masked __api__ content endpoint (both unauth 200) on CloudFront/S3 SPA stack, plus Emsisoft 3-env public swagger with 65 endpoints mapping; chained IDOR->content enumeration is HIGH-VALUE. Docker/cox automotive SSRF/auth vectors remain dead/NXDOMAIN/403, so risk not critical but medium-high due to enumerability without auth gate.
+## 2026-08-29 23:35:24 UTC (model muse-spark)
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 72
+reasoning: 5x200 vs 2x404 UUIDv7 differential reconfirmed 21:43 (019c9000/019c8e24/019c1fdf/019c2310/019c... vs 0191a3bb/019c241f). Len variance 4745 vs 12178 vs 14332 proves per-object content difference unauth. No auth, no 401/403. CloudFront+S3 stack serves user-published apps.
+evidence_needed: HTML body hash diff between 200 vs 404 hosts contains app data; Accept: application/json still 200 vs 404; sequential UUID predictability
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth no cookies record len/type; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ same; GET both with Accept: application/json, X-Requested-With: XMLHttpRequest; GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ compare; hash bodies
+impact: Unauthenticated access to private Posit Connect Cloud shared apps/data, PII/session leakage, cross-tenant enumeration. High if private shares reachable. Severity: Medium-High
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud/__api__/v1/content
+confidence: 68
+reasoning: prod 200 len2526 text/html mirrors staging across 7 cycles 00:33-21:43 indicates SPA fallback not API. api.connect.posit.cloud/__api__/v1/content returns 404 differential proves control host not SPA. ?limit=1 still 200 len2526 proves no filtering, suggests backend API returns HTML instead of JSON with 401 when Accept:text/html.
+evidence_needed: Content negotiation differential: Accept: application/json should return 401/json or JSON listing if auth missing vs HTML fallback
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest; GET https://connect.posit.cloud/__api__/v1/content same headers; GET https://api.connect.posit.cloud/__api__/v1/content same headers as control; compare status/content-type/len; repeat with Accept-Language: en
+impact: Unauthenticated content listing enumeration on Posit Cloud, info disclosure of apps/workspaces, potential BOLA chain to share IDs. Severity: Medium
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 88
+reasoning: 65 endpoints, 353 GUIDs/tokens public unauth reconfirmed 21:43 on prod/apitest/apistage identical (Cloudflare). Provides full map with example GUIDs, emails, billing structures. No auth required. 3-env mirror confirms systemic, not single misconfig.
+evidence_needed: Swagger JSON reachable unauth on all 3 envs; endpoint list parse confirms 65 endpoints; probe secondary endpoints show 401 vs 404 differential (licenses 404 vs workspaces 401) proving spec is actionable
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth parse count; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json compare len; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json compare; GET https://api.emsisoft.com/v1/licenses unauth; GET https://api.emsisoft.com/v1/workspaces?limit=1 unauth compare 401 vs 404
+impact: Complete unauth API reconnaissance enables targeted IDOR/BOLA/auth bypass discovery across billing/device/workspace APIs. Reconnaissance value High, direct info disclosure Medium
+testability: PASSIVE
+[PARKED] NONE — no hypothesis confidence <40, no REJECTED class (SSO oracle, SSRF docker-registry NXDOMAIN, AUTH via swagger example tokens fabricated, api.secrets 404) matches, all have concrete verify_steps
+[FINAL] Ranked 1) [HYP emsisoft] Systemic Swagger Exposure confidence 88 2) [HYP posit] Unauth Share UUIDv7 Enumeration confidence 72 3) [HYP posit] SPA Catch-All Masks Missing Auth confidence 68
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with headers Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en, no cookies/auth; then GET https://api.connect.posit.cloud/__api__/v1/content same headers as control; then GET https://connect.posit.cloud/__api__/v1/content same headers; log status, content-type, len, first 500 chars hash
+[LEARN] ACCEPTED MISCONFIG @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/12178->14332 reconfirmed 21:43 — per-object variance alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 mirrors staging 7 cycles vs api.connect 404 differential persists — SPA fallback systemic alive, needs Accept negotiation test
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 21:43 — systemic exposure alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 21:43 persists per 2026-08-26 directive — class dead drop
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains
+[RISK] 71 reason: Posit Cloud exposes two systemic unauth surfaces (share UUID enumeration with 5/7 hosts 200 and content API SPA fallback 200 vs api 404 across 7 cycles) plus Emsisoft 3-env swagger 65-endpoint full map public unauth provides high recon value; chain potential share ID -> content listing -> PII is highest, but no direct auth bypass/money flow proven yet, cloud metadata SSRF dead
