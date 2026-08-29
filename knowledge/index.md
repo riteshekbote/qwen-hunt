@@ -162,3 +162,7 @@
 - 2026-08-29 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 22:34 persists — class dead per 2026-08-26 directive, drop
 - 2026-08-29 REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example tokens: 401 identical prod vs apitest vs apistage — fabricated docs, auth bypass dead remains
 - 2026-08-29 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-29 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-28 22:34 persists dead per 2026-08-26 directive drop
+- 2026-08-29 REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example tokens: 401 identical prod/apitest/apistage fabricated docs dead remains
+- 2026-08-29 ACCEPTED MISCONFIG @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance reconfirmed 22:34 alive
+- 2026-08-29 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 mirrors staging across 6 cycles systemic SPA fallback alive
