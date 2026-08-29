@@ -1539,3 +1539,13 @@
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 11:03 persists dead per 2026-08-26 directive drop
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-29 15:38:21 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://connect.posit.cloud/__api__/v1/content with headers Accept: application/json, X-Requested-With: XMLHttpRequest, no auth/cookies; then GET htt
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ connect.posit.cloud/__api__/v1/content: 200 len2526 text/html unauth mirrors staging 7 cycles vs api subdomain 404 differential reconfirmed
+- LEARN: ACCEPTED MISCONFIG @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance reconfirmed 15:34 — per-object variance alive
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints public unauth 3-env reconfirmed 15:34 — systemic exposure alive
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
