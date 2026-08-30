@@ -227,3 +227,5 @@
 - 2026-08-30 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 13:17 persists per 2026-08-26 directive — class dead drop
 - 2026-08-30 REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead reconfirmed — need non-example ID path
 - 2026-08-30 ACCEPTED IDOR @ 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 13:17 alive
+- 2026-08-30 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 13:57 persists — class dead per 2026-08-26 directive
+- 2026-08-30 REJECTED AUTH @ https://api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, auth bypass via examples dead
