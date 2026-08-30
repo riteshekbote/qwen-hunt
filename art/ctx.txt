@@ -376,6 +376,11 @@ probe_allow: "duocircle|autospf|dmarcreport|phishprotection|outboundsmtp|tenantm
 - 2026-08-30 ACCEPTED IDOR @ 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 13:17 alive
 - 2026-08-30 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 13:57 persists — class dead per 2026-08-26 directive
 - 2026-08-30 REJECTED AUTH @ https://api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, auth bypass via examples dead
+- 2026-08-30 ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance reconfirmed 13:57 — per-object variance alive
+- 2026-08-30 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html unauth vs api.connect 404 persists, ?limit=1 still SPA fallback — systemic alive needs content-negotiation probe
+- 2026-08-30 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed — surface enumeration alive
+- 2026-08-30 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 13:57 persists — class dead per 2026-08-26 directive
+- 2026-08-30 REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated tokens dead
 === REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ===
 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud
@@ -933,18 +938,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY LAST LEADS (tail) ===
 none
 === AGGREGATED HYPOTHESES (tail) ===
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H: Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 2026-08-30 01:37-07:23 per-object varianc
-- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html vs api.connect 404 differential persists 7+ cycles systemic SPA fallb
-- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 07:23 persists per 2026-08-26 directive — class dead drop
-- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead reconfirmed
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-
-## RANKED HYPOTHESES 2026-08-30 13:17:37 UTC
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H: Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 2026-08-30 08:10 alive — per-object varia
@@ -973,21 +966,19 @@ none
 - LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 13:57 persists — class dead per 2026-08-26 directive
 - LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, auth bypass via examples d
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
-=== LATEST ROBOT PROBE RESULTS ===
-https://apistage.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
-https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
-https://github.com/posit/.github/workflows -> HTTP 404
 
-## 2026-08-30 08:10:15 UTC
-https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=14332 type=text/html
-https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -> HTTP 404
-https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
-https://connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
-https://api.connect.posit.cloud/__api__/v1/content -> HTTP 404
-https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://apistage.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://api.emsisoft.com/v1/workspaces?limit=1 -> HTTP 401
+## RANKED HYPOTHESES 2026-08-30 18:00:54 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H: Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance reconfirmed 13:57 — per-object variance alive
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html unauth vs api.connect 404 persists, ?limit=1 still SPA fallback — sys
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed — surface enumeration alive
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 13:57 persists — class dead per 2026-08-26 directive
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated tokens dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+=== LATEST ROBOT PROBE RESULTS ===
 https://api.emsisoft.com/v1/licenses -> HTTP 404
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
@@ -1034,3 +1025,17 @@ https://apistage.emsisoft.com/v1/licenses -> HTTP 404
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
+
+## 2026-08-30 18:00:59 UTC
+https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=14332 type=text/html
+https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -> HTTP 404
+https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://api.connect.posit.cloud/__api__/v1/content -> HTTP 404
+https://staging.connect.posit.cloud/__api__/v1/content?limit=1 -> 200 len=2526 type=text/html
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/licenses -> HTTP 404
+https://apitest.emsisoft.com/v1/devices -> HTTP 404
+https://apistage.emsisoft.com/v1/workspaces -> HTTP 401
+https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403

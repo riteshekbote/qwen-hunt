@@ -1049,3 +1049,37 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 13:57 persists — class dead per 2026-08-26 directive
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated tokens dead
 [RISK] 68 — posit share IDOR enumerability + systemic Connect API SPA fallback + emsisoft 3-env swagger 65-endpoint public exposure together give high enumerability/low gate; docker/cox/duocircle surfaces currently show only infra disclosure (200 vs 403 differentials) without direct auth bypass
+## 2026-08-30 20:49:46 UTC (model muse-spark)
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 78
+reasoning: 7+ probe cycles 2026-08-27 to 2026-08-30 show deterministic 5x200 vs 2x404 on UUIDv7 share subdomains with len variance 4745 vs 14332 vs 64888; 2 new 200s (019c1fdf/019c2310) at 00:33 extended enumeration; indicates share IDs are discoverable (CT-derived) and access control is per-object unauth check, not auth gate.
+evidence_needed: raw HTML body diff on 200 hosts proves distinct user content served unauth vs 404; check for PII/secrets/tokens inside 200 bodies + cache headers
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth baseline; GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ compare len/type; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ expect 404 control; sample 3-5 more from REAL INVENTORY (01919355.app.connect etc.) unauth
+impact: cross-tenant content disclosure — unauth retrieval of published Connect Cloud apps/dashboards/data potentially containing customer PII/business data; HIGH
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 85
+reasoning: /swagger/v1.0/swagger.json 200 unauth on prod/apitest/apistage 65 endpoints, 353 GUIDs/tokens, billing structures reconfirmed 08:10-18:00; not just docs — live API map with example GUIDs usable for BOLA fuzzing; prior AUTH bypass via example tokens 401 dead, but unauth spec remains systemic exposure.
+evidence_needed: swagger JSON parses and exposes authenticated paths (/v1/workspaces, /v1/licenses, /v1/devices) + schema for mass assignment/BOLA; confirm apitest/apistage mirror same 65 endpoints
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth parse endpoint count; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json diff; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json diff; GET https://api.emsisoft.com/v1/workspaces?limit=1 unauth expect 401 (control); OPTIONS on /v1/licenses for CORS/methods
+impact: complete attack surface map without auth enables targeted BOLA/IDOR on workspace/device/license GUIDs; MEDIUM-HIGH (info disclosure)
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 62
+reasoning: staging.connect.posit.cloud/__api__/v1/content and connect.posit.cloud/__api__/v1/content return 200 len2526 text/html unauth across 7 cycles vs api.connect.posit.cloud/__api__/v1/content 404 and ?limit=1 still 200 SPA fallback; consistent text/html suggests WAF/SPA router serving index.html not API response; requires Accept header negotiation to hit real API.
+evidence_needed: same path with Accept: application/json returns JSON (200/401/403) vs text/html; X-Requested-With bypass
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with H: Accept: application/json unauth; GET https://connect.posit.cloud/__api__/v1/content with H: Accept: application/json; GET https://api.connect.posit.cloud/__api__/v1/content with H: Accept: application/json control 404; GET staging with H: Accept: application/json, X-Requested-With: XMLHttpRequest
+impact: if JSON bypass succeeds, unauth listing of Connect Cloud content (IDOR/BOLA pre-cursor) vs confirmed SPA fallback; MEDIUM
+testability: PASSIVE
+[PARKED] NONE — all 3 confidence >=40, class not on REJECTED list (SSRF @ docker-registry.docker.com, SSO-oracle, OATH @ *.docker.com excluded), verify_steps concrete passive GETs on inventory hosts
+[FINAL] 1) [HYP posit] share.connect.posit.cloud UUIDv7 IDOR 78 2) [HYP emsisoft] api.emsisoft.com swagger systemic misconfig 85 (higher confidence but ranked second for business_value tie-break to IDOR) 3) [HYP posit] staging.connect.posit.cloud SPA fallback 62
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H: Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en-US,en;q=0.9 followed by GET https://connect.posit.cloud/__api__/v1/content same headers and GET https://api.connect.posit.cloud/__api__/v1/content same headers as control — compare status/len/content-type (expect JSON vs text/html to prove/disprove SPA-mask)
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 persists 13:57-18:00 — per-object variance alive (no fix)
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html mirrors staging 7 cycles vs api.connect 404 differential persists — systemic SPA fallback alive needs Accept negotiation
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 18:00 — systemic exposure alive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens|licenses via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains, need non-example ID path for BOLA
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 18:00 persists per 2026-08-26 directive — class dead drop
+[RISK] 71 reason: 2 systemic ALIVE misconfigs (emsisoft 65-endpoint swagger on 3 envs + posit Share per-object 200 vs 404 enumerability) plus 1 high-likelihood SPA-masked API (staging/connect __api__ 200 vs api 404) give unauth info disclosure + potential IDOR chain; no critical auth bypass proven but attack surface remains broadly enumerable without auth
