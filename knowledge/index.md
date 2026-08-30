@@ -229,3 +229,8 @@
 - 2026-08-30 ACCEPTED IDOR @ 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 13:17 alive
 - 2026-08-30 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 13:57 persists — class dead per 2026-08-26 directive
 - 2026-08-30 REJECTED AUTH @ https://api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, auth bypass via examples dead
+- 2026-08-30 ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance reconfirmed 13:57 — per-object variance alive
+- 2026-08-30 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html unauth vs api.connect 404 persists, ?limit=1 still SPA fallback — systemic alive needs content-negotiation probe
+- 2026-08-30 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed — surface enumeration alive
+- 2026-08-30 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 13:57 persists — class dead per 2026-08-26 directive
+- 2026-08-30 REJECTED AUTH @ api.emsisoft.com/v1/account via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated tokens dead

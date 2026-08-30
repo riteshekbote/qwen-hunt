@@ -8596,3 +8596,41 @@ testability: PASSIVE
 [HYP] Misconfigured Admin Endpoint
 [NEXT] PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 [RISK] 72
+## 2026-08-21 18:21:19 UTC (model qwen14b)
+[NEW] https://docker-registry.docker.com/v2/?param=169.254.169.254 (recurring SSRF error)
+[NEW] https://github.com/posit/.github/workflows?access_token=123 (404, new surface item)
+[CHANGED] https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+[CHANGED] https://docker-registry.docker.com/v2/ (ERR [Errno -2] recurring)
+[HYP] SSRF in Docker Registry
+class: SSRF
+asset: docker-registry.docker.com/v2/
+confidence: 65
+reasoning: Recurring [Errno -2] when param=169.254.169.254 (metadata IP) suggests SSRF.
+evidence_needed: Confirm SSRF resolves to internal metadata.
+verify_steps: GET https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+impact: Exfiltration of internal metadata (high severity).
+testability: PASSIVE
+[HYP] Misconfigured Admin Endpoint
+class: MISCONFIG
+asset: api.coxautoinc.com/endpoint
+confidence: 55
+reasoning: 403 on /endpoint?param=admin suggests missing auth or ACL.
+evidence_needed: Confirm token/auth resolves 403.
+verify_steps: GET https://api.coxautoinc.com/endpoint?param=admin&token=123
+impact: Admin access (high severity).
+testability: AUTH_HELPED
+[HYP] GitHub Workflow Misconfig
+class: MISCONFIG
+asset: github.com/posit/.github/workflows
+confidence: 50
+reasoning: 404 on workflows suggests missing visibility.
+evidence_needed: Confirm workflow files exist.
+verify_steps: GET https://github.com/posit/.github/workflows
+impact: Exposed workflows (medium severity).
+testability: PASSIVE
+[PARKED] GitHub Workflow Misconfig: confidence < 40
+[FINAL]
+[HYP] SSRF in Docker Registry
+[HYP] Misconfigured Admin Endpoint
+[NEXT] PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+[RISK] 72
