@@ -815,3 +815,38 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 23:35 persists dead drop
 [LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead
 [RISK] 72 reason: systemic public OpenAPI on 3 envs + systemic SPA fallback on connect __api__ vs api subdomain 404 + share UUIDv7 enumerability 5x200 vs 2x404 all alive passively confirmable; docker SSRF and emsisoft example-token AUTH confirmed dead limits SSRF/ATO blast radius
+## 2026-08-30 01:39:37 UTC (model muse-spark)
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 92
+reasoning: GET https://api.emsisoft.com/swagger/v1.0/swagger.json 200 application/json unauth reconfirmed 23:35-01:37; apitest.emsisoft.com and apistage.emsisoft.com serve near-identical 65-endpoint spec via Cloudflare HSTS. Example payloads contain 353 GUIDs/emails/billing structures per prior parsing.
+evidence_needed: Confirm spec still lists sensitive endpoints (/v1/workspaces, /v1/devices, /v1/licenses) and that unauth access to spec enables targeted AUTH/IDOR tests; verify no auth header required and staging spec not weaker.
+verify_steps: PASSIVE: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth compare Content-Length vs https://apitest.emsisoft.com/swagger/v1.0/swagger.json vs https://apistage.emsisoft.com/swagger/v1.0/swagger.json; GET https://api.emsisoft.com/swagger/v1.0/swagger.json with Accept: application/json diff 401 vs 404 on listed paths to map auth enforcement.
+impact: Complete API surface map publicly accessible without auth — enables chaining to IDOR/BOLA on workspace/device/billing endpoints, data exfiltration severity Medium-High.
+testability: PASSIVE
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 74
+reasoning: Passive CT inventory lists 28 share.connect.posit.cloud UUIDv7 subdomains; probes show 5x200 (019c9000 len14332, 019c8e24 len4745, 019c1fdf, 019c2310, plus 019c...) vs 2x404 (0191a3bb-a4f7-69b1-92d5-bd0c7502fde7, 019c241f) reconfirmed 15:34-01:37 with len variance 4745/12178->14332 indicating per-object content not uniform SPA.
+evidence_needed: Prove 200 responses return user content vs generic landing HTML and that direct unauth GET to UUIDv7 share ID bypasses auth for private content (PII/app data).
+verify_steps: PASSIVE READ-ONLY: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth record len/type/title; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth as control 404; GET https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ and https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ compare len variance and HTML title/content.
+impact: Cross-tenant content disclosure — enumerated share IDs via CT logs could expose private Posit Connect apps/dashboards, PII/severity High if private shares accessible unauth.
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud/__api__/v1/content
+confidence: 58
+reasoning: GET https://staging.connect.posit.cloud/__api__/v1/content unauth 200 len2526 text/html mirrors prod https://connect.posit.cloud/__api__/v1/content 200 len2526, while https://api.connect.posit.cloud/__api__/v1/content returns 404 across 7 cycles (23:30-01:37). Same 200 for ?limit=1 suggests SPA catch-all, not true API auth check.
+evidence_needed: Prove 200 is SPA HTML fallback not JSON API data by forcing content negotiation (Accept: application/json) and comparing status/len/type vs api subdomain.
+verify_steps: PASSIVE READ-ONLY: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest; GET https://connect.posit.cloud/__api__/v1/content same headers; GET https://api.connect.posit.cloud/__api__/v1/content same headers; compare status (200 vs 404) and Content-Type (text/html vs application/json) and len delta.
+impact: If Accept negotiation returns JSON unauth, indicates missing auth on content listing API — enumeration of tenant content, severity Medium; if always HTML, confirms SPA fallback no data leak but infra misconfig remains.
+testability: PASSIVE
+[PARKED] NONE — all 3 hypotheses confidence >=40, class not on REJECTED list (MISCONFIG/IDOR alive), concrete passive verify_steps provided; SSRF/docker-registry and AUTH/swagger-token bypass explicitly excluded per Knowledge Base REJECTED.
+[FINAL] 1. [HYP emsisoft] Systemic OpenAPI Spec Public Exposure — confidence 92
+[FINAL] 2. [HYP posit] Share Subdomain Per-Object Access Variance — confidence 74
+[FINAL] 3. [HYP posit] Connect Content API SPA Fallback — confidence 58
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en-US ; then GET https://connect.posit.cloud/__api__/v1/content same headers ; then GET https://api.connect.posit.cloud/__api__/v1/content same headers ; record status, Content-Type, Content-Length, first 500 chars to confirm SPA vs API.
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env (prod/apitest/apistage) public unauth reconfirmed 2026-08-29 23:35-01:37 alive
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 2026-08-29 21:43-01:37 per-object variance alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 01:37 persists per 2026-08-26 directive — class dead drop
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead reconfirmed
+[RISK] 68 — systemic unauth exposure: public 65-endpoint OpenAPI spec on 3 envs + enumerable share UUIDv7 IDs with consistent 200 vs 404 per-object variance + staging/prod SPA fallback 200 vs api subdomain 404 differential; SSRF dead and swagger token AUTH dead, but content enumeration surface remains high-value and chained IDOR plausible.

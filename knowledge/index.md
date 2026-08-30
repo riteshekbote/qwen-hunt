@@ -207,3 +207,7 @@
 - 2026-08-30 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-29 23:35 persists dead drop
 - 2026-08-30 REJECTED AUTH @ https://api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead
 - 2026-08-30 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-30 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env (prod/apitest/apistage) public unauth reconfirmed 2026-08-29 23:35-01:37 alive
+- 2026-08-30 ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 2026-08-29 21:43-01:37 per-object variance alive
+- 2026-08-30 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 01:37 persists per 2026-08-26 directive — class dead drop
+- 2026-08-30 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead reconfirmed
