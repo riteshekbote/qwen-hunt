@@ -1149,3 +1149,36 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens|licenses via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains - need non-example ID for BOLA
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 21:02 persists per 2026-08-26 directive - class dead drop
 [RISK] 74 — systemic unauth exposure on 2 targets: posit share IDOR with time-ordered UUIDv7 enumerability (5x200 vs 2x404) + SPA fallback hiding __api__/v1/content behind missing content-negotiation test (7+ cycles 200 vs 404 differential) + emsisoft 3-env public OpenAPI 65-endpoint map; no active SSRF/auth bypass but chained IDOR->PII and API disclosure risk high if negotiation leaks JSON
+## 2026-08-30 23:28:11 UTC (model muse-spark)
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 68
+reasoning: 5x200 (019c9000/019c8e24/019c1fdf/019c2310/019c8e24) vs 2x404 (0191a3bb/019c241f) differential persists 2026-08-30 18:00-23:20 with len variance 4745/14332/2526 vs 404. Not wildcard catch-all; indicates per-object ACL. Hosts from REAL SUBDOMAIN INVENTORY active CT UUIDv7 shares.
+evidence_needed: body hash diff of 200s to confirm distinct user app content vs generic SPA shell; presence of PII/app names in HTML
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth Accept:text/html + GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ + GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ compare status/len/hash; repeat for 019c1fdf/019c2310; sha256 hash bodies (do not log raw)
+impact: cross-tenant private Shiny/Connect app disclosure, PII leak if private shares unauth readable — HIGH if content is customer data, else MEDIUM info disclosure
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud/__api__/v1/content
+confidence: 72
+reasoning: prod 200 len2526 text/html unauth mirrors staging 7+ cycles vs api.connect.posit.cloud 404 differential (2026-08-30 18:00/20:50/23:20). ?limit=1 also 200 html. Indicates SPA fallback serving index.html on /__api__/ paths, not true API response. Requires Accept negotiation to bypass.
+evidence_needed: Accept: application/json vs text/html differential; status/ct change 200 html -> 200 json vs 401 vs 404
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest ; then GET https://connect.posit.cloud/__api__/v1/content same headers ; then GET https://api.connect.posit.cloud/__api__/v1/content same headers ; compare status/ct/len
+impact: unauth content listing enumeration bypassing SPA mask -> PII/app metadata dump — MEDIUM-HIGH
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 85
+reasoning: 65 endpoints 353 GUIDs/tokens public no auth on 3 envs prod/apitest/apistage reconfirmed 20:50 23:20 Cloudflare HSTS Swagger UI. Not example-token auth bypass (401 identical dead). Provides complete BOLA/IDOR attack surface map.
+evidence_needed: spec fetch across 3 envs and diff; enumerate /v1/workspaces /v1/devices endpoints returning 401 vs 404 differential for BOLA candidate; need non-example ID path
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json + GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json + GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json parse 65 endpoints; then GET https://api.emsisoft.com/v1/workspaces?limit=1 unauth vs auth (expect 401)
+impact: info disclosure LOW-MEDIUM alone, but HIGH as chaining primitive for BOLA/IDOR discovery
+testability: PASSIVE
+[PARKED] none: all hypotheses confidence >=40, class not on REJECTED list, concrete verify_steps present; SSRF docker-registry intentionally excluded (REJECTED NXDOMAIN 5+ cycles 2026-08-26 directive) and AUTH via swagger example tokens excluded (REJECTED 401 identical prod/apitest/apistage)
+[FINAL] ranked: 1) [HYP posit] staging/connect __api__ SPA fallback masking unauth JSON API (72) 2) [HYP posit] share.connect UUIDv7 per-object IDOR enumeration (68) 3) [HYP emsisoft] public OpenAPI spec enabling BOLA surface enumeration (85 but lower exploitability; ranked last for next-probe priority)
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 23:20 — per-object variance alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html vs api.connect 404 differential persists 7+ cycles — SPA fallback alive needs Accept negotiation
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 23:20 — systemic enumeration alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 23:20 persists per 2026-08-26 directive — class dead
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains
+[RISK] 64 reason: systemic low-auth surface: share subdomain IDOR variance (enumerable private app shares) + staging/prod SPA fallback masking /__api__/ content enumeration (unauth 200 html 7 cycles) + 65-endpoint public swagger on 3 envs; no direct SSRF/auth bypass proven, but chaining potential medium-high due to CloudFront/S3 + Connect Cloud multi-tenant hosting.
