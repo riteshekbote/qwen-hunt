@@ -1116,3 +1116,36 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html vs api.connect 404 differential persists 7+ cycles SPA fallback alive needs Accept negotiation
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 20:50 alive
 [RISK] 68 reason: posit Connect Cloud systemic SPA fallback (content listing) + share subdomain per-object 200/404 variance with len variance indicates unauth disclosure enumerable via UUIDv7 CT, plus emsisoft 65-endpoint 3-env public OpenAPI gives full BOLA map; both misconfigs alive unauth and chainable, other high-value auth/SSRF classes proven dead
+## 2026-08-30 23:20:28 UTC (model muse-spark)
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 85
+reasoning: 5x200 vs 2x404 differential on time-ordered UUIDv7 share subdomains reconfirmed 2026-08-30 20:50-21:02 (019c9000/019c8e24/019c1fdf/019c2310/019c9000 200 vs 0191a3bb/019c241f 404) with len variance 4745/14332 text/html. UUIDv7 encodes timestamp, enabling time-range enumeration. No auth tested, suggests per-object ACL variance not gateway auth.
+evidence_needed: GET unauth 200 body is app content vs SPA shell; compare Content-Type/len/timing for 200s vs 404s; test sequential UUIDv7 within same millisecond bucket returns distinct content
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET https://019c8e24-3be5-3542-ba1a-b2ddcd1154a2.share.connect.posit.cloud/ unauth; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth control 404; diff len 4745 vs 14332 vs 2526 SPA shell; check Cache-Control/CloudFront headers
+impact: Unauth disclosure of private Posit Connect share content (PII/code/data) + enumerability via UUIDv7 timestamp - High
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud/__api__/v1/content
+confidence: 78
+reasoning: staging.connect.posit.cloud/__api__/v1/content and connect.posit.cloud/__api__/v1/content return 200 len2526 text/html unauth across 7+ cycles while api.connect.posit.cloud/__api__/v1/content returns 404 same path. Indicates SPA catch-all serving index.html on unauth API routes, hiding real JSON behind Accept header. Needs content-negotiation probe.
+evidence_needed: Same path with Accept: application/json returns JSON (200/401) vs text/html; vs 404 on api subdomain with same header proves routing differential
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest; GET https://connect.posit.cloud/__api__/v1/content same headers; GET https://api.connect.posit.cloud/__api__/v1/content same headers (expect 404); also GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 same headers
+impact: Unauth API content listing/metadata disclosure bypassing SPA fallback - Medium-High if JSON leaks private content ids
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 82
+reasoning: 65 endpoints, 353 GUIDs/tokens, 3-env (prod/apitest/apistage) publicly accessible 200 application/json reconfirmed 20:50 without auth. AUTH bypass via swagger example UUIDs is proven dead (401 identical prod/apitest/apistage on /v1/account|workspaces|tokens|licenses), but OpenAPI spec exposes versioned /v1/workspaces/{id}, /v1/licenses, /v1/devices parameter schemas for BOLA via non-example IDs if any endpoint lacks object-level check.
+evidence_needed: Swagger parameter names (id/uid/workspace_id/email) + auth scheme (Bearer) + 401 vs 404 differential on real vs fake GUIDs to map BOLA surface without brute force
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth passive parse 65 endpoints; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json diff len; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json diff; grep for /v1/workspaces/{*} , /v1/licenses/{*} param types; no auth brute force
+impact: Full attack surface map for subsequent BOLA/mass-assignment on billing/workspace data - Medium (info disclosure, enables chained authz tests)
+testability: PASSIVE
+[FINAL] 1: [HYP posit] IDOR share UUIDv7 enumeration (85) | 2: [HYP emsisoft] MISCONFIG swagger surface (82) | 3: [HYP posit] MISCONFIG SPA content-negotiation (78)
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest, Accept-Language: en ; then GET https://connect.posit.cloud/__api__/v1/content same headers ; then GET https://api.connect.posit.cloud/__api__/v1/content same headers for 404 control ; compare status/content-type/len vs prior 200 len2526 text/html SPA shell (READ-ONLY, no auth, probe_allow: posit)
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 5x200 vs 2x404 UUIDv7 differential with len variance 4745/14332 reconfirmed 2026-08-30 20:50-21:02 per-object variance alive - enumerability increases
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: prod 200 len2526 text/html vs api.connect 404 differential persists 7+ cycles plus ?limit=1 still SPA fallback - needs Accept negotiation (reconfirmed)
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 20:50 - systemic exposure alive, surface enumeration
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens|licenses via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains - need non-example ID for BOLA
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-30 21:02 persists per 2026-08-26 directive - class dead drop
+[RISK] 74 — systemic unauth exposure on 2 targets: posit share IDOR with time-ordered UUIDv7 enumerability (5x200 vs 2x404) + SPA fallback hiding __api__/v1/content behind missing content-negotiation test (7+ cycles 200 vs 404 differential) + emsisoft 3-env public OpenAPI 65-endpoint map; no active SSRF/auth bypass but chained IDOR->PII and API disclosure risk high if negotiation leaks JSON
