@@ -283,3 +283,6 @@
 - 2026-08-31 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect 404 reconfirmed systemic SPA fallback alive needs Accept negotiation
 - 2026-08-31 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 15:27 persists class dead per 2026-08-26 directive
 - 2026-08-31 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains, needs non-example ID for BOLA
+- 2026-08-31 ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 with len variance 50444 reconfirmed 21:00 alive — per-object variance persists
+- 2026-08-31 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 systemic SPA fallback reconfirmed 21:00 alive — needs Accept negotiation
+- 2026-08-31 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 21:00 persists — dead per 2026-08-26 directive
