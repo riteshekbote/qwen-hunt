@@ -1748,3 +1748,13 @@
 - LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html vs api.connect 404 differential persists 7+ cycles SPA fallback alive
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 2026-08-30 23:28 alive
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-31 01:37:06 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest, Sec-Fetch-Mode: cors, Ac
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential with len 4745/14332/50444 at 2026-08-31 01:32 expands enumerability — per-object v
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints on 3 envs (api/apitest/apistage) still 200 unauth reconfirmed 01:32 — systemic enu
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html vs api.connect 404 persists 7+ cycles with SPA fallback — needs Accep
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

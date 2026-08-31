@@ -258,3 +258,6 @@
 - 2026-08-31 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html vs api.connect 404 differential persists 7+ cycles SPA fallback alive
 - 2026-08-31 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 2026-08-30 23:28 alive
 - 2026-08-31 REJECTED SSRF @ https://docker-registry.docker
+- 2026-08-31 ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential with len 4745/14332/50444 at 2026-08-31 01:32 expands enumerability — per-object variance alive
+- 2026-08-31 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints on 3 envs (api/apitest/apistage) still 200 unauth reconfirmed 01:32 — systemic enumeration alive
+- 2026-08-31 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html vs api.connect 404 persists 7+ cycles with SPA fallback — needs Accept negotiation, not yet proven JSON leak
