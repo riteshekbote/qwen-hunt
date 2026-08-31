@@ -266,3 +266,7 @@
 - 2026-08-31 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints on 3 envs public unauth reconfirmed 01:32 systemic enumeration alive
 - 2026-08-31 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 01:37 persists class dead drop
 - 2026-08-31 REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead
+- 2026-08-31 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/nonexistent-12345: 200 len2526 identical to /__api__/v1/content confirms systemic SPA catch-all, not isolated 404
+- 2026-08-31 ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 with new len 50444 at 01:32 expands per-object variance and enumerability confirms alive
+- 2026-08-31 ACCEPTED MISCONFIG @ api.emsisoft.com/v1/licenses: 404 vs /v1/workspaces 401 differential confirms endpoint existence oracle alive despite example token AUTH dead
+- 2026-08-31 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 07:33 persists per 2026-08-26 directive still dead

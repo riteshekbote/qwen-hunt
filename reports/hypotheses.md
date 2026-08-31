@@ -1770,3 +1770,14 @@
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 01:37 persists class dead drop
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account|workspaces|tokens via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-08-31 07:40:15 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest, Sec-Fetch-Mode: cors, Ac
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/nonexistent-12345: 200 len2526 identical to /__api__/v1/content confirms systemic SPA catch-all, not isolated 4
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 with new len 50444 at 01:32 expands per-object variance and enumerability confirms alive
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/v1/licenses: 404 vs /v1/workspaces 401 differential confirms endpoint existence oracle alive despite example token AUTH de
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 07:33 persists per 2026-08-26 directive still dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
