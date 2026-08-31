@@ -1342,3 +1342,39 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect 404 confirms systemic SPA catch-all alive needs content-negotiation test
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 07:40 persists — class dead per 2026-08-26 directive
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, need non-example ID path for BOLA
+## 2026-08-31 15:26:50 UTC (model muse-spark)
+class: IDOR
+asset: 0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud
+confidence: 82
+reasoning: 7x200 (4745/14332/50444 len variance) vs 2x404 (0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud 404) reconfirmed 2026-08-31 01:37/07:40/15:22 on CloudFront/S3 share.connect.posit.cloud; len variance proves per-object content not generic catch-all
+evidence_needed: GET 200 hosts return distinct app content vs 404 hosts, unauth; prove share IDs are predictable UUIDv7 and accessible without session
+verify_steps: GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ unauth vs GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth compare status/len/content-type; repeat for 01999e69-3b66-1ed9-d385-bfb5fe6e1803.share.connect.posit.cloud 200 vs 019c241f-91f4-a63b-1097-ed53083ffbbc.share.connect.posit.cloud 404; fetch with Accept:text/html vs Accept:application/json to rule SPA
+impact: unauth enumeration of private Posit Connect Cloud shares/apps -> cross-tenant PII/code leak, medium-high severity
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 90
+reasoning: GET https://api.emsisoft.com/swagger/v1.0/swagger.json 200 application/json reconfirmed 15:22; identical on apitest.emsisoft.com and apistage.emsisoft.com 65 endpoints public unauth Cloudflare HSTS; 401 vs 404 differential on /v1/workspaces 401 vs /v1/licenses 404 proves oracle alive despite example tokens 401
+evidence_needed: swagger 200 unauth all 3 envs with 65 endpoints parseable; 401 vs 404 differential consistent across envs
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth observe 200 JSON; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json compare len; GET https://api.emsisoft.com/v1/workspaces unauth ->401; GET https://api.emsisoft.com/v1/licenses unauth ->404 diff confirm oracle
+impact: complete API surface enumeration enables targeted BOLA/IDOR fuzzing without brute force, info disclosure high severity
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 68
+reasoning: GET https://staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html identical to GET https://staging.connect.posit.cloud/nonexistent-12345 200 len2526 vs GET https://api.connect.posit.cloud/__api__/v1/content 404 and vs connect.posit.cloud same 200 len2526 across 7+ cycles 01:37-15:22 confirms systemic SPA fallback not JSON API
+evidence_needed: same path with Accept: application/json returns JSON vs HTML to distinguish SPA catch-all from unauth API leak; 404 on api subdomain differential vs 200 on staging/prod
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H: Accept: application/json, X-Requested-With: XMLHttpRequest, Sec-Fetch-Mode: cors vs default Accept:text/html compare status/len/content-type; repeat on /nonexistent-12345 same headers; GET https://api.connect.posit.cloud/__api__/v1/content same headers -> expect 404; GET https://connect.posit.cloud/__api__/v1/content same headers for prod parity
+impact: if JSON negotiable, unauth content listing/api disclosure on Connect Cloud -> tenant app names/IDs leak, medium severity; if SPA only, confirms missing auth reporting but not direct data leak
+testability: PASSIVE
+[PARKED] SSRF @ docker-registry.docker.com/v2/?param=169.254.169.254: REJECTED class dead NXDOMAIN across 5+ cycles 2026-08-21 to 2026-08-31 15:22 per 2026-08-26 directive — no concrete verify possible, drop
+[FINAL] 1: [HYP emsisoft] Public OpenAPI spec 3-env oracle (90) — strongest passive proof, immediate surface map
+[FINAL] 2: [HYP posit] Share subdomain IDOR differential (82) — per-object variance alive, direct PII risk
+[FINAL] 3: [HYP posit] SPA catch-all content negotiation (68) — needs header test to upgrade from SPA MISCONFIG to API leak
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H1: Accept: application/json, X-Requested-With: XMLHttpRequest, Sec-Fetch-Mode: cors vs H2: Accept: text/html compare to GET https://staging.connect.posit.cloud/nonexistent-12345 same H1/H2 and GET https://api.connect.posit.cloud/__api__/v1/content H1 — expect SPA 200 len2526 text/html on both staging paths if catch-all, vs 404 on api subdomain; JSON response would prove true unauth API exposure
+[LEARN] ACCEPTED IDOR @ 0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud: 7x200 vs 2x404 with len variance 4745/14332/50444 reconfirmed 15:22 per-object variance alive
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 15:22 systemic enumeration alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect 404 systemic SPA fallback alive needs Accept negotiation
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-08-31 15:22 persists per 2026-08-26 directive class dead
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
+[RISK] 72 — two ALIVE systemic MISCONFIGs (3-env swagger enumeration + 7x200 share differential) + persistent SPA fallback 200 vs 404 differential indicates broad attack surface with enumeratable IDs; SSRF and example-token AUTH dead reduces cloud takeover risk but info disclosure/IDOR risk remains high
