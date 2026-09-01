@@ -1577,3 +1577,37 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces|/v1/licenses via swagger example GUIDs: 401 identical prod/apitest remains fabricated docs — example-token BOLA dead, requires non-example ID
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 05:31 — class dead per 2026-08-26 directive, drop from queue
 [RISK] 71 reason: high-value unauth enumerability (share UUIDv7 7x200 vs 2x404 with content variance), systemic public swagger 65 endpoints on 3 envs + 401/404 oracle, persistent SPA fallback masking on Connect Cloud, dealertrack SSO/admin/api differential instability — all passive-verifiable, no auth needed, chainable to PII/content dump
+## 2026-09-01 10:22:51 UTC (model muse-spark)
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 88
+reasoning: 65 endpoints public unauth on prod/apitest/apistage reconfirmed 05:40 application/json; /v1/workspaces 401 vs /v1/licenses 404 vs /v1/workspaces/00000000-0000-4000-a000-000000000000 404 proves unauth endpoint existence oracle without bruteforce; example GUIDs 401 fabricated but non-example GUID behavior not yet tested for BOLA
+evidence_needed: 401 vs 404 differential on non-example workspace/license IDs across 3 envs; swagger not gated behind auth or IP
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth compare apitest/apistage; GET https://api.emsisoft.com/v1/workspaces unauth expect 401; GET https://api.emsisoft.com/v1/licenses expect 404; GET /v1/workspaces/00000000-0000-4000-a000-000000000000 expect 404 — confirms oracle
+impact: full API surface enumeration for 65 endpoints without auth enables targeted BOLA/fuzzing; if BOLA succeeds -> cross-tenant workspace/license/billing PII dump (High)
+testability: PASSIVE
+class: IDOR
+asset: https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud
+confidence: 82
+reasoning: 7x200 vs 2x404 UUIDv7 differential reconfirmed 05:40 (0191902f 50444, 019c9000 14332, 01999e69 200 vs 0191a3bb 404, 019c241f 404); len variance 4745/14332/50444 indicates per-object content not uniform 200; CloudFront+S3 backend suggests S3 object routing by UUID subdomain
+evidence_needed: unauth GET body variance is real published Share content vs catch-all placeholder; 200 bodies contain user tenant content not generic SPA shell; 404 hosts truly absent vs access-controlled
+verify_steps: GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ vs https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ vs https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth compare status/len/content-type; GET with Accept: application/json to rule out SPA shell
+impact: unauth enumeration of share UUIDs allows cross-tenant content access if predictable UUIDv7 or leaked via CT/logs; PII/app data leak (High)
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com
+confidence: 72
+reasoning: sso.dealertrack.com 200 len0 text/xml unauth vs api.unifi.dealertrack.com 403 vs admin.pa1.dealertrack.com 503 at 05:31 vs prior 200 with Location REALMOID/SMAGENTNAME/TARGET leak; separate hosts on same suffix show 200 vs 403 vs 503 differential indicates inconsistent WAF/auth gating and CA Siteminder disclosure
+evidence_needed: REALMOID/SMAGENTNAME/TARGET params still leaked in 302 Location on admin.pa1 variants; 200 len0 xml is not auth-gated; api.unifi correctly blocks unauth with 403
+verify_steps: GET https://sso.dealertrack.com/ unauth observe 200 len0 text/xml; GET https://admin.pa1.dealertrack.com/ unauth follow redirect observe Location header for REALMOID/SMAGENTNAME; GET https://api.unifi.dealertrack.com/ unauth expect 403; compare to https://admin.pa.unifipa.dealertrack.com
+impact: infra fingerprint (Apache/CA Siteminder) + session parameter disclosure aids targeted auth bypass; inconsistent 200 vs 403 suggests non-uniform enforcement across dealer finance APIs (Medium-High)
+testability: PASSIVE
+[PARKED] NONE — all 3 hypotheses confidence >=40, class not on REJECTED list (SSO-oracle, OATH, SSRF docker-registry), concrete passive verify_steps present
+[FINAL] 1. [HYP emsisoft] Emsisoft Swagger public OpenAPI + 401 vs 404 oracle -> BOLA surface (88) 2. [HYP posit] Posit Connect Cloud share subdomain per-object IDOR variance (82) 3. [HYP coxautomotive] Dealertrack CA Access Gateway infra disclosure + inconsistent auth differential (72)
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H1 Accept: application/json, H2 X-Requested-With: XMLHttpRequest, H3 Sec-Fetch-Mode: cors; comparison probes GET https://staging.connect.posit.cloud/nonexistent-12345 with same headers, GET https://api.connect.posit.cloud/__api__/v1/content with same headers — proves SPA catch-all false positive vs true JSON leak; also GET https://connect.posit.cloud/__api__/v1/content with same headers
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 endpoint oracle reconfirmed 05:40 alive
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential with len variance 4745/14332/50444 reconfirmed 05:40 per-object variance alive
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 len0 xml vs 403 vs 503 differential reconfirmed 05:31 infra disclosure and inconsistent auth alive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 05:40 fabricated docs — example-token BOLA dead, requires non-example ID
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 05:40 persists per 2026-08-26 directive class dead
+[RISK] 68 reason: systemic misconfig exposure persists — 3-env public swagger (65 endpoints) + endpoint existence oracle, 7x200 share IDOR differential with enumerability, and SPA catch-all vs true API differential on connect.posit.cloud with inconsistent dealertrack gateway auth (200/403/503); no active SSRF/auth bypass proven but surface allows passive enumeration and targeted BOLA/IDOR without auth

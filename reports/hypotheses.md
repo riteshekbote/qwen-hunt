@@ -1871,3 +1871,15 @@
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces|/v1/licenses via swagger example GUIDs: 401 identical prod/apitest remains fabricated docs — example-token BOLA d
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 05:31 — class dead per 2026-08-26 directive, drop from queue
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-09-01 10:23:05 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H1 Accept: application/json, H2 X-Requested-With: XMLHttpRequest, H3 Sec-Fetch-Mod
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 endpoint oracle reconfirmed 05:40 alive
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential with len variance 4745/14332/50444 reconfirmed 05:40 per-object variance alive
+- LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 len0 xml vs 403 vs 503 differential reconfirmed 05
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 05:40 fabricated docs — ex
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 05:40 persists per 2026-08-26 directive class dead
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
