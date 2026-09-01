@@ -1513,3 +1513,34 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 00:29 persists per 2026-08-26 directive dead
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
 [RISK] 64 exposure from unauth share IDOR enumerability + systemic SPA fallback masking API + 3-env public OpenAPI spec with oracle, but no proven JSON leak or BOLA bypass yet
+## 2026-09-01 05:31:18 UTC (model muse-spark)
+class: IDOR
+asset: api.emsisoft.com/v1/workspaces
+confidence: 62
+reasoning: swagger 65 endpoints public unauth reconfirmed 00:36 on 3 envs; /v1/workspaces 401 vs /v1/licenses 404 vs /v1/workspaces/00000000-0000-4000-a000-000000000000 404 shows ID-aware auth differential not generic 401; enables enumeration of valid IDs without auth bypass via example tokens (already proven 401 dead).
+evidence_needed: repeat 401 on /v1/workspaces vs 404 on /v1/licenses and on non-existent UUID with same token-less request; confirm oracle stable across apitest/apistage
+verify_steps: GET https://api.emsisoft.com/v1/workspaces unauth; GET https://api.emsisoft.com/v1/licenses unauth; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-4000-a000-000000000000 unauth; GET https://apitest.emsisoft.com/v1/workspaces unauth; compare status/body
+impact: unauth endpoint existence + ID enumeration oracle -> BOLA/BFLA targeting, pivots to IDOR if object-level check missing; Medium
+testability: PASSIVE
+class: IDOR
+asset: 0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/
+confidence: 71
+reasoning: 7x200 vs 2x404 differential stable 01:32-00:36 cycle; 0191902f 200 len50444 vs 0191a3bb 404; len variance 4745/14332/50444 indicates distinct per-object content not generic SPA; share.connect.posit.cloud hosts user Shiny/Connect apps.
+evidence_needed: fetch 3x 200 hosts vs 2x 404 hosts with identical unauth headers, compare body hashes/titles to confirm not wildcard parking; check /__api__ or manifest leakage
+verify_steps: GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ unauth; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET https://019c241f-91f4-a63b-1097-ed53083ffbbc.share.connect.posit.cloud/ unauth
+impact: unauth access to private Connect Cloud content (PII, data, code) across tenants if share ID predictable/enumerable; High if confirmed not public sample
+testability: PASSIVE
+class: MISCONFIG
+asset: admin.pa1.dealertrack.com
+confidence: 58
+reasoning: LIVE host returns CA Access Gateway Error Report with REALMOID/SMAGENTNAME/TARGET leak in redirect Location reconfirmed 2026-08-27; api.unifi* 403 vs sso.dealertrack 200 len0 xml vs admin.pa1 503 flip shows inconsistent WAF/auth
+evidence_needed: capture Location header on 302 from admin.pa1 vs sso vs api.unifi to confirm REALMOID/SMAGENTNAME leak and differential status
+verify_steps: GET https://admin.pa1.dealertrack.com/ unauth follow_redirects=false; GET https://sso.dealertrack.com/ unauth; GET https://api.unifi.dealertrack.com/ unauth; compare status 200/302/403 and Location contents
+impact: infra fingerprint (CA SSO version, realm IDs), aids SSO bypass / open redirect -> OAuth code theft chain; Low-Medium alone, High when chained
+testability: PASSIVE
+[FINAL] 1: [HYP posit] Per-object IDOR / enumerability on UUIDv7 share subdomains (71) 2: [HYP emsisoft] BOLA endpoint oracle (62) 3: [HYP coxautomotive] CA Access Gateway infra disclosure (58)
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H1: Accept: application/json H2: X-Requested-With: XMLHttpRequest H3: Sec-Fetch-Mode: cors vs baseline text/html; also GET https://staging.connect.posit.cloud/nonexistent-12345 with same H1 and GET https://api.connect.posit.cloud/__api__/v1/content with H1 to prove SPA catch-all false positive vs real JSON leak (expected: staging with Accept json still 200 len2526 text/html = SPA dead, api.connect 404 = secure)
+[LEARN] ACCEPTED IDOR @ 0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential with len variance 4745/14332/50444 reconfirmed 00:36 alive
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 00:36 persists dead per 2026-08-26 directive
+[RISK] 68 — posit share enumerability + emsisoft full API surface enumeration alive and stable, cox infra disclosure alive; staging SPA fallback confirmed false-positive (200 == nonexistent) reduces API IDOR risk but share IDOR remains highest exploitable exposure.
