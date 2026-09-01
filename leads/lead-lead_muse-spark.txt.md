@@ -1714,3 +1714,37 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage at 15:07 fabricated docs dead remains
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 15:07 persists class dead per 2026-08-26 directive
 [RISK] 68 reason: Two systemic unauth exposures reconfirmed 2026-09-01 (emsisoft 3-env 65-endpoint spec + posit share 7x200 vs 2x404 IDOR) plus infra disclosure on sso.dealertrack 200 len0 vs api.unifi 403 vs admin.pa1 503 differential; staging __api__ still unresolved SPA false-positive reduces confidence on direct data leak but overall enumeration surface remains high, auth bypass via example tokens proven dead limits immediate exploitability
+## 2026-09-01 18:28:54 UTC (model muse-spark)
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 92
+reasoning: 200 application/json unauth on prod/apitest/apistage reconfirmed 15:11; 65 endpoints; 401 on /v1/workspaces vs 404 on /v1/licenses differential leaks existence; Cloudflare+HSTS+Swagger UI stack.
+evidence_needed: raw spec diff across 3 envs + 401/404 oracle stable + example GUID/email/billing structures in spec
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json; GET https://api.emsisoft.com/v1/workspaces unauth Expect 401; GET https://api.emsisoft.com/v1/licenses unauth Expect 404; GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 Expect 404
+impact: full API surface map (65 endpoints, schemas) enables targeted BOLA/IDOR fuzzing; endpoint oracle aids brute-force; low direct PII but systemic exposure HIGH
+testability: PASSIVE
+class: IDOR
+asset: https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud
+confidence: 78
+reasoning: 7x200 (0191902f len50444, 019c9000 len14332, 019c1fdf/019c2310/019c8e24 etc) vs 2x404 (0191a3bb 404) across 8+ cycles 08:55-15:11; len variance 4745/14332/50444 proves distinct content not SPA fallback; CloudFront+S3.
+evidence_needed: prove 200 hosts serve distinct share content unauth without session cookie vs 404 truly not existent; fetch and diff body hash/len + check for private app/data titles
+verify_steps: GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ unauth; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth Expect 404; GET https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ ; compare len/type and title
+impact: unauth enumeration of share content IDs; if IDs predictable/sequential or leaked via CT, cross-tenant data leak; severity HIGH if PII/code shown
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 62
+reasoning: 200 len2526 text/html unauth == 200 len2526 on /nonexistent-12345 and on ?limit=1; api.connect.posit.cloud/__api__/v1/content is 404 differential suggests systemic SPA fallback not auth; need content-negotiation to prove false positive vs JSON leak.
+evidence_needed: Accept: application/json vs text/html differential; X-Requested-With + Sec-Fetch-Mode behavior
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth Accept:text/html; GET https://staging.connect.posit.cloud/__api__/v1/content unauth Accept:application/json; GET https://staging.connect.posit.cloud/__api__/v1/content unauth Accept:application/json + X-Requested-With:XMLHttpRequest; GET https://api.connect.posit.cloud/__api__/v1/content unauth Accept:application/json Expect 404; GET https://staging.connect.posit.cloud/nonexistent-12345 Accept:application/json compare
+impact: if JSON returned, unauth content/app listing leak across staging+prod (200 mirrors prod); enables further IDOR/BOLA; else confirms SPA false positive and deprioritizes class
+testability: PASSIVE
+[FINAL] 1. [HYP emsisoft] Swagger surface + 401 vs 404 oracle (92) 2. [HYP posit] UUIDv7 share IDOR differential (78) 3. [HYP posit] SPA catch-all vs API leak (62) — all confidence >=40, not on REJECTED list, verify_steps concrete.
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H1 Accept: application/json H2 X-Requested-With: XMLHttpRequest H3 Sec-Fetch-Mode: cors ; parallel GET https://staging.connect.posit.cloud/__api__/v1/content unauth Accept: application/json ; parallel GET https://api.connect.posit.cloud/__api__/v1/content Accept: application/json ; parallel GET https://staging.connect.posit.cloud/nonexistent-12345 Accept: application/json — compare status/len/content-type to distinguish SPA false positive vs JSON leak.
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints on prod/apitest/apistage public unauth 200 + 401 vs 404 oracle reconfirmed 15:11 systemic alive
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential len 4745/14332/50444 reconfirmed 15:11 per-object variance alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 reconfirmed 15:11 systemic SPA fallback alive needs Accept negotiation
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage at 15:07 fabricated docs dead remains
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN 5+ cycles through 2026-09-01 15:11 per 2026-08-26 directive dead drop
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 len0 xml vs 403 vs 503 differential reconfirmed infra disclosure alive
+[RISK] 71 reason: 3-env public OpenAPI (65 endpoints) gives full attack map + stable 401/404 oracle; 7x200 vs 2x404 share subdomain enumerability with len variance proves per-object variance; staging __api__ SPA fallback masks potential unauth content listing (needs Accept test); dealertrack infra leak persists; overall exposure high but not yet proven direct PII exfiltration.

@@ -323,3 +323,9 @@
 - 2026-09-01 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 systemic SPA fallback reconfirmed 15:07 needs Accept negotiation
 - 2026-09-01 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage at 15:07 fabricated docs dead remains
 - 2026-09-01 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 15:07 persists class dead per 2026-08-26 directive
+- 2026-09-01 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints on prod/apitest/apistage public unauth 200 + 401 vs 404 oracle reconfirmed 15:11 systemic alive
+- 2026-09-01 ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential len 4745/14332/50444 reconfirmed 15:11 per-object variance alive
+- 2026-09-01 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 reconfirmed 15:11 systemic SPA fallback alive needs Accept negotiation
+- 2026-09-01 REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage at 15:07 fabricated docs dead remains
+- 2026-09-01 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN 5+ cycles through 2026-09-01 15:11 per 2026-08-26 directive dead drop
+- 2026-09-01 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 len0 xml vs 403 vs 503 differential reconfirmed infra disclosure alive
