@@ -314,3 +314,7 @@
 - 2026-09-01 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 len0 vs 403 vs 503 differential reconfirmed 05:31 alive
 - 2026-09-01 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 05:40 persists dead per 2026-08-26 directive drop
 - 2026-09-01 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest dead remains fabricated docs
+- 2026-09-01 ACCEPTED IDOR @ 0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 len variance 4745/14332/50444 reconfirmed 05:40 per-object variance alive
+- 2026-09-01 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect 404 reconfirmed 05:40 systemic SPA catch-all alive needs Accept negotiation to prove JSON leak
+- 2026-09-01 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 05:40 persists per 2026-08-26 directive class dead drop
+- 2026-09-01 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID for BOLA
