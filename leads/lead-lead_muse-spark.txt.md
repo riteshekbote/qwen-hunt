@@ -1611,3 +1611,37 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/account|/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 05:40 fabricated docs — example-token BOLA dead, requires non-example ID
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 05:40 persists per 2026-08-26 directive class dead
 [RISK] 68 reason: systemic misconfig exposure persists — 3-env public swagger (65 endpoints) + endpoint existence oracle, 7x200 share IDOR differential with enumerability, and SPA catch-all vs true API differential on connect.posit.cloud with inconsistent dealertrack gateway auth (200/403/503); no active SSRF/auth bypass proven but surface allows passive enumeration and targeted BOLA/IDOR without auth
+## 2026-09-01 10:27:23 UTC (model muse-spark)
+class: IDOR
+asset: https://api.emsisoft.com
+confidence: 72
+reasoning: swagger at /swagger/v1.0/swagger.json 200 public unauth 65 endpoints on prod/apitest/apistage reconfirmed 05:40. Unauth GET /v1/workspaces -> 401, /v1/licenses -> 404, /v1/workspaces/00000000-0000-4000-a000-000000000000 -> 404 (05:31,05:40). 401 vs 404 before auth indicates path existence check enables unauth endpoint mapping without valid token. Example swagger GUIDs all 401 per 2026-08-22+ dead, but oracle remains alive for non-example IDs.
+evidence_needed: demonstrate valid ID returns 401 vs invalid returns 404 on same endpoint family, then use leaked real GUID from public source to trigger BOLA
+verify_steps: GET https://api.emsisoft.com/v1/workspaces unauth -> expect 401; GET https://api.emsisoft.com/v1/licenses unauth -> expect 404; GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 unauth -> compare 401 vs 404; repeat on apitest/apistage same paths; brute compare swagger-listed endpoint set for 401/404 clustering
+impact: unauth API surface enumeration + BOLA/IDOR to workspaces/licenses/billing PII if real GUID obtained; severity High
+testability: PASSIVE
+class: IDOR
+asset: https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud
+confidence: 78
+reasoning: 28 share subdomains from CT. Probes show 7x200 (019c9000,019c8e24,019c1fdf,019c2310,0191902f,01999e69 etc) vs 2x404 (0191a3bb-a4f7-69b1-92d5-bd0c7502fde7,019c241f) reconfirmed 05:31-05:40 with len variance 4745/14332/50444 text/html. 200 hosts serve Shiny app HTML without auth, 404 hosts not found, indicates per-object ACL variance not global auth. Inventory shows app.connect.posit.cloud hosts with same UUID prefix suggests tenant share link guessability.
+evidence_needed: body diff showing app content vs login wall on 200 hosts, header diff, content-length variance persists with Accept negotiation
+verify_steps: GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ unauth Accept:text/html -> record len 50444; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth -> len 14332; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth -> expect 404; repeat with Accept:application/json and X-Requested-With:XMLHttpRequest to test API exposure
+impact: unauth access to private Posit Connect Cloud content (PII, source code, data) cross-tenant dump; severity High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com
+confidence: 65
+reasoning: sso.dealertrack.com 200 len0 text/xml vs api.unifi.dealertrack.com 403 vs admin.pa1.dealertrack.com 503 flip reconfirmed 05:31-05:40. CA Access Gateway error report on admin.pa1 leaks REALMOID, SMAGENTNAME, TARGET in redirect Location (ACCEPTED 2026-08-26). 200 len0 xml suggests unauth endpoint returns empty XML not redirect, inconsistent enforcement across 3 hosts.
+evidence_needed: Location header with REALMOID/SMAGENTNAME/TARGET on admin.pa1, and manipulation of TARGET to external domain shows open redirect / auth bypass
+verify_steps: GET https://sso.dealertrack.com/ unauth -> record 200 len0 xml; GET https://admin.pa1.dealertrack.com/ unauth -> record 503 + Location if any; GET https://admin.pa1.dealertrack.com/?TARGET=https://example.com unauth -> observe redirect; GET https://api.unifi.dealertrack.com/ unauth -> expect 403; compare headers Server:Apache vs CloudFront
+impact: infra disclosure + open redirect -> OAuth code theft / session fixation on DealerTrack financial workflow; severity Medium-High
+testability: PASSIVE
+[PARKED] none — all 3 hypotheses confidence >=65, class not on REJECTED list (SSRF docker-registry, SSO oracle, example-token AUTH dead are excluded), verify_steps concrete passive unauth GETs
+[FINAL] 1: [HYP posit] Cross-tenant IDOR via predictable UUIDv7 share subdomains (conf 78) 2: [HYP emsisoft] BOLA oracle via 401 vs 404 (conf 72) 3: [HYP coxautomotive] CA SiteMinder infra disclosure (conf 65)
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with H1 Accept: application/json H2 X-Requested-With: XMLHttpRequest H3 Sec-Fetch-Mode: cors ; GET https://staging.connect.posit.cloud/nonexistent-12345 same headers ; GET https://api.connect.posit.cloud/__api__/v1/content same headers ; compare status/len/content-type to confirm SPA catch-all false-positive vs true JSON leak (re-tests systemic 200 len2526 text/html signal)
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential len 4745/14332/50444 reconfirmed 05:40 per-object variance alive
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 05:40 systemic exposure alive
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 len0 vs 403 vs 503 differential reconfirmed 05:31 alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-01 05:40 persists dead per 2026-08-26 directive drop
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest dead remains fabricated docs
+[RISK] 78 reason: systemic unauth surface persists on 3 high-value clusters — emsisoft 65-endpoint swagger + 401/404 oracle (enumeration without auth), posit share 7x200 IDOR cluster (per-object unauth content), coxautomotive CA gateway leak + inconsistent 200/403/503; no direct auth bypass proven via example tokens but enumerability + SPA fallback systemic + CloudFront/S3 hosting increases chaining potential
