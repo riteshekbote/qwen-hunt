@@ -2147,3 +2147,37 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-02 persists - class dead per 2026-08-26 directive
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs - example-token BOLA dead remains
 [RISK] 68 reason: posit Connect Cloud share subsystem shows systemic enumerability (7x200 vs 2x404, unauth) + emsisoft 3-env 65-endpoint spec fully public with 401/404 oracle + coxautomotive dealer track CA gateway infra disclosure; no SSRF/metadata or session forgery proven, but unauth content variance and complete surface exposure keep program moderately high risk
+## 2026-09-02 17:16:29 UTC (model muse-spark)
+class: IDOR
+asset: 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud
+confidence: 78
+reasoning: 7x200 vs 2x404 differential persists 2026-09-02 13:28-15:18 unauth. 200 hosts show len variance 14332 vs 50444 indicating distinct app content not generic placeholder. All 28 share subdomains in inventory are UUIDv7 format, enumerable.
+evidence_needed: body hash/content-type of 200 vs 404 hosts, confirm 200 returns actual Shiny app HTML with customer data vs public template, check sso.posit.cloud interaction
+verify_steps: GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ unauth; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth; diff status/len/content-type/body title; GET 2 more inventory IDs 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud and 019c241f-91f4-a63b-1097-ed53083ffbbc.share.connect.posit.cloud to extend differential
+impact: unauthenticated cross-tenant Shiny app data disclosure, PII/source leak, high severity
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 72
+reasoning: https://api.emsisoft.com/swagger/v1.0/swagger.json 200 unauth reconfirmed 2026-09-02 13:28 on prod/apitest/apistage, 65 endpoints, 353 GUIDs/tokens exposed. GET https://api.emsisoft.com/v1/workspaces 401 vs GET https://api.emsisoft.com/v1/licenses 404 vs GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 404 proves unauth oracle. Example-token AUTH is dead (401 identical 3 envs) but oracle alive.
+evidence_needed: swagger JSON parse for path param patterns, confirm 401 vs 404 differential persists with no Authorization header, test non-example UUID extraction
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth; GET https://api.emsisoft.com/v1/workspaces unauth; GET https://api.emsisoft.com/v1/licenses unauth; GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 unauth compare 401/404; repeat on https://apitest.emsisoft.com/swagger/v1.0/swagger.json and https://apistage.emsisoft.com/swagger/v1.0/swagger.json
+impact: full API surface mapping without auth, enables targeted BOLA/mass-assignment on billing/license endpoints, systemic exposure
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 68
+reasoning: GET https://staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html == GET https://staging.connect.posit.cloud/nonexistent-12345 200 len2526, while GET https://api.connect.posit.cloud/__api__/v1/content 404. Indicates CloudFront S3 SPA catch-all on staging.connect vs true API subdomain api.connect, masking potential backend JSON API.
+evidence_needed: response with Accept: application/json vs text/html, content-type/len diff, JSON body vs HTML fallback
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H1 Accept: application/json H2 Accept: application/json,text/plain,*/* H3 X-Requested-With: XMLHttpRequest; GET https://staging.connect.posit.cloud/nonexistent-12345 same headers control; GET https://api.connect.posit.cloud/__api__/v1/content same headers; compare status/len/content-type
+impact: unauthenticated listing of Posit Connect Cloud customer content (apps/datasets), tenant enumeration, medium-high severity if JSON leaks
+testability: PASSIVE
+[PARKED] NONE: all 3 hypotheses confidence 68-78 >40, classes IDOR/MISCONFIG not on REJECTED list (SSRF docker-registry and AUTH example-token bypass excluded), concrete verify_steps provided
+[FINAL] 1) share.connect UUIDv7 per-object IDOR enumeration 78 2) swagger 401 vs 404 endpoint existence oracle enables BOLA enumeration 72 3) staging.connect SPA fallback masks unauth __api__ content disclosure via content-negotiation 68
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with Accept: application/json ; GET https://staging.connect.posit.cloud/__api__/v1/content unauth with Accept: application/json,text/plain,*/* ; GET https://staging.connect.posit.cloud/nonexistent-12345 unauth with Accept: application/json control ; GET https://api.connect.posit.cloud/__api__/v1/content unauth with Accept: application/json control - compare status/len/content-type to distinguish SPA fallback vs true JSON leak
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 7x200 vs 2x404 UUIDv7 differential len14332/50444 reconfirmed 2026-09-02 13:28-15:18 per-object variance persists
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-02 13:28 systemic exposure alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 confirms SPA catch-all systemic alive needs content-negotiation
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-02 persists per 2026-08-26 directive class dead
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
+[RISK] 71 systemic unauth share enumeration (7x200) + 3-env swagger surface mapping with 401/404 oracle + staging SPA fallback masking potential Connect Cloud content API leak; no SSRF/cloud-metadata chain proven but tenant data exposure surface is high and freshly reconfirmed
