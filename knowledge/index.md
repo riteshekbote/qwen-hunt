@@ -368,3 +368,6 @@
 - 2026-09-02 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs https://api.connect.posit.cloud/__api__/v1/content 404 SPA fallback reconfirmed alive needs content-negotiation
 - 2026-09-02 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-02 persists dead per 2026-08-26 directive drop
 - 2026-09-02 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces|/v1/licenses via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
+- 2026-09-02 ACCEPTED IDOR @ 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud: 7x200 vs 2x404 len14332/50444 differential persists 2026-09-02 per-object variance alive
+- 2026-09-02 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-02 persists per 2026-08-26 directive dead drop
+- 2026-09-02 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
