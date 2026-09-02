@@ -2305,3 +2305,17 @@ https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text
 https://staging.connect.posit.cloud/nonexistent-12345 -> 200 len=2526 type=text/html
 https://api.connect.posit.cloud/__api__/v1/content -> HTTP 404
 https://docker-registry.docker.com/v2/?param=169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
+
+## 2026-09-02 22:32:18 UTC
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/workspaces -> HTTP 401
+https://api.emsisoft.com/v1/licenses -> HTTP 404
+https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 -> HTTP 404
+https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=14332 type=text/html
+https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ -> 200 len=50444 type=text/html
+https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -> HTTP 404
+https://019c241f-91f4-a63b-1097-ed53083ffbbc.share.connect.posit.cloud/ -> HTTP 404
+https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://staging.connect.posit.cloud/nonexistent-12345 -> 200 len=2526 type=text/html
+https://api.connect.posit.cloud/__api__/v1/content -> HTTP 404
