@@ -2155,3 +2155,12 @@
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-03 00:13 persists dead per 2026-08-26 directive — drop class
 - LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html == /nonexistent-12345 vs api.connect 404 systemic SPA fallback reconf
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-09-03 04:33:36 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth H1 Accept:text/html H2 Accept:application/json H3 HEAD, plus GET https
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: new 200 hosts 0190c2c9 178193 + 01935672 extend differential to 9x200 vs 3x404 at 00:34, per-object variance + enumer
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 differential reconfirmed 00:34 systemi
+- LEARN: REJECTED SSRF @ https://docker-registry.docker

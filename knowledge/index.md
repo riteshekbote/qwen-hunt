@@ -405,3 +405,5 @@
 - 2026-09-03 REJECTED AUTH @ api.emsisoft.com/v1/workspaces|/v1/licenses via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
 - 2026-09-03 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-03 00:13 persists dead per 2026-08-26 directive — drop class
 - 2026-09-03 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html == /nonexistent-12345 vs api.connect 404 systemic SPA fallback reconfirmed alive needs content-negotiation
+- 2026-09-03 ACCEPTED IDOR @ share.connect.posit.cloud: new 200 hosts 0190c2c9 178193 + 01935672 extend differential to 9x200 vs 3x404 at 00:34, per-object variance + enumerability alive
+- 2026-09-03 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 differential reconfirmed 00:34 systemic SPA fallback alive needs Accept negotiation

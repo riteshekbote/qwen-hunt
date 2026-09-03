@@ -2384,3 +2384,34 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-03 00:13 persists dead per 2026-08-26 directive — drop class
 [LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 text/html == /nonexistent-12345 vs api.connect 404 systemic SPA fallback reconfirmed alive needs content-negotiation
 [RISK] 78 — High enumerability IDOR on share.connect.posit.cloud (predictable UUIDv7, 7x200 vs 2x404 with len variance, 30+ untested share hosts) + systemic public swagger 3-env 65 endpoints with 401 vs 404 oracle enabling BOLA recon + staging/connect SPA catch-all masking potential unauth API; low gate, high cloud surface, no auth required for probes
+## 2026-09-03 04:33:25 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 78
+reasoning: New host from REAL INVENTORY returns 200 len=178193 text/html unauth at 00:34 vs controls 0191a3bb/01912861/019c241f 404. Prior 200s 14332/50444 show per-object len variance not SPA uniform. CloudFront+S3 stack.
+evidence_needed: Verify body is distinct app content not SPA fallback (title/hash), check for private app/data exposure
+verify_steps: GET / unauth Accept:text/html -> record len/title/sha256; GET / Accept:application/json; HEAD /; compare to 0191a3bb 404 control and 019c9000 14332
+impact: Cross-tenant IDOR/BOLA share disclosure — attacker enumerates UUIDv7 share IDs unauth, dumps customer apps/PII; High
+testability: PASSIVE
+class: IDOR
+asset: https://01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud/
+confidence: 72
+reasoning: New inventory host returns 200 text/html; charset=utf-8 unauth at 00:34, expands differential to 9x200 vs 3x404. Extends enumerability proof beyond 019c9000/0191902f set. Charset differs from 0190c2c9 variant.
+evidence_needed: Resolve len, content-type, cache headers, body hash to confirm unique app vs SPA
+verify_steps: GET / unauth -> capture len/content-type; GET / with Accept:application/json,text/plain,*/*; GET /nonexistent-12345 on same host as SPA control
+impact: Confirms brute-force UUIDv7 share enumeration viable, mass unauth content harvesting; High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 65
+reasoning: 200 len=2526 text/html identical to /nonexistent-12345 at 00:34 vs https://api.connect.posit.cloud/__api__/v1/content 404 differential persists 6+ cycles. Proves SPA fallback not auth, needs content-negotiation to prove true leak.
+evidence_needed: Accept-header negotiation to bypass SPA and trigger JSON vs HTML response
+verify_steps: GET /__api__/v1/content Accept:application/json unauth; GET same with X-Requested-With:XMLHttpRequest; GET /__api__/v1/content?limit=1 Accept:application/json; compare to api.connect 404 control
+impact: If JSON leaks, unauth API content listing/systemic missing auth across prod/staging; Medium-High else false positive
+testability: PASSIVE
+[PARKED] NONE: all hypotheses confidence >=40, class not on REJECTED list (IDOR/MISCONFIG alive), verify_steps concrete read-only PASSIVE, asset in REAL INVENTORY/LIVE HOSTS
+[FINAL] Ranked surviving:
+[NEXT] PROBE: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth H1 Accept:text/html H2 Accept:application/json H3 HEAD, plus GET https://01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud/ unauth to resolve len/content-type; compare both bodies (len, title, sha256) vs controls https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ 404 and https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ 14332
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: new 200 hosts 0190c2c9 178193 + 01935672 extend differential to 9x200 vs 3x404 at 00:34, per-object variance + enumerability alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 differential reconfirmed 00:34 systemic SPA fallback alive needs Accept negotiation
+[RISK] 78: 9x200 vs 3x404 share UUIDv7 differential with new 178k variant proves systemic unauth per-object exposure on CloudFront/S3; swagger 65-endpoint 3-env public spec still alive; staging SPA fallback differential persists — high IDOR/mass enumeration exposure, no SSRF/AUTH bypass via swagger examples (dead)
