@@ -2470,3 +2470,17 @@ https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 -> H
 https://api.emsisoft.com/v1/licenses/01900000-0000-4000-a000-000000000000 -> HTTP 404
 https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
 https://staging.connect.posit.cloud/nonexistent-12345 -> 200 len=2526 type=text/html
+
+## 2026-09-03 20:47:48 UTC
+https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -> 200 len=178193 type=text/html
+https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ -> 200 len=50444 type=text/html
+https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -> HTTP 404
+https://share.connect.posit.cloud/ -> HTTP 503
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/workspaces -> HTTP 401
+https://api.emsisoft.com/v1/licenses -> HTTP 404
+https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 -> HTTP 404
+https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://api.connect.posit.cloud/__api__/v1/content -> HTTP 404
+https://staging.connect.posit.cloud/nonexistent-12345 -> 200 len=2526 type=text/html
