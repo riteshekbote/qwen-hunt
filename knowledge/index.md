@@ -425,3 +425,8 @@
 - 2026-09-03 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 09:33 — enumeration alive
 - 2026-09-03 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains, needs non-example ID
 - 2026-09-03 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN 5+ cycles through 2026-09-03 persists — class dead per 2026-08-26 directive
+- 2026-09-03 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-03 09:33 alive
+- 2026-09-03 ACCEPTED IDOR @ https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/: 9x200 vs 3x404 len178193/50444 differential reconfirmed 09:33 alive
+- 2026-09-03 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 persists, needs Accept negotiation
+- 2026-09-03 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN 5+ cycles through 2026-09-03 13:35 dead per 2026-08-26 directive
+- 2026-09-03 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains

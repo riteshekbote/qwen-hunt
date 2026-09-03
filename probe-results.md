@@ -2414,3 +2414,17 @@ https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403
 https://github.com/posit/.github/workflows -> HTTP 404
 https://docker-registry.docker.com/v2/?param=http://169.254.169.254 -> ERR <urlopen error [Errno -2] Name or service not know
 https://api.coxautoinc.com/endpoint?param=admin&token=123 -> HTTP 403
+
+## 2026-09-03 13:50:13 UTC
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://apistage.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/workspaces -> HTTP 401
+https://api.emsisoft.com/v1/licenses -> HTTP 404
+https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 -> HTTP 404
+https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -> 200 len=178193 type=text/html
+https://01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud/ -> 200 len=? type=text/html; charset=utf-8
+https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -> HTTP 404
+https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ -> 200 len=50444 type=text/html
+https://staging.connect.posit.cloud/__api__/v1/content -> 200 len=2526 type=text/html
+https://staging.connect.posit.cloud/nonexistent-12345 -> 200 len=2526 type=text/html
