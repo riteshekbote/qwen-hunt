@@ -2222,3 +2222,15 @@
 - LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN 5+ cycles through 2026-09-03 13:35 dead per 2026-08-26 directive
 - LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-09-03 17:14:05 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H1 Accept:application/json H2 Accept:text/html H3 Accept:application/json,text/plain,*/
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED IDOR @ https://share.connect.posit.cloud UUIDv7 subdomains: 9x200 vs 3x404 len178193/50444 differential reconfirmed 09:33-13:50 — per-object variance a
+- LEARN: ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 13:50 — enumeration ali
+- LEARN: ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 — SPA fallback systemic alive needs 
+- LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN 5+ cycles through 2026-09-03 — dead per 2026-08-26 directive
+- LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead
