@@ -489,3 +489,6 @@
 - 2026-09-04 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect.posit.cloud 404 proves systemic SPA catch-all not isolated endpoint — needs Accept negotiation to confirm true leak
 - 2026-09-04 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive 2026-09-04 17:35 — enumeration class alive
 - 2026-09-04 ACCEPTED IDOR @ 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud: 9x200 vs 3x404 len178193/50444 variance reconfirmed alive per-object variance
+- 2026-09-04 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/50444 reconfirmed 2026-09-04 18:58 unauth per-object variance alive
+- 2026-09-04 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-04 18:58 alive
+- 2026-09-04 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 systemic SPA catch-all reconfirmed 2026-09-04 18:58 needs Accept negotiation — false-positive risk
