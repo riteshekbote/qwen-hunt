@@ -1,50 +1,63 @@
 [0m
 > build · muse-spark-1.2-contributor-free
 [0m
-NO_DELTA
+STEP 1 — DELTA:
+[CHANGED posit] staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html now identical to /nonexistent-12345 200 len2526 vs api.connect.posit.cloud/__api__/v1/content 404 — proves systemic SPA catch-all, not isolated API misconfig (2026-09-04 17:35)
+[CHANGED coxautomotive] admin.pa1.dealertrack.com flipped 503 (2026-09-04 17:35) vs prior 200 len0 xml CA Access Gateway leak — sso.dealertrack.com 200 len0 xml vs api.unifi.dealertrack.com 403 vs admin.pa1 503 differential persists, inconsistent auth still alive
+[CHANGED emsisoft] api.emsisoft.com/swagger/v1.0/swagger.json 3-env (prod/apitest/apistage) still 200 + 401 vs 404 oracle extended: /v1/workspaces 401 vs /v1/workspaces/01900000-0000-4000-a000-000000000000 404 and /v1/licenses 404 — non-example ID BOLA oracle alive
+[CHANGED posit] share.connect.posit.cloud cohort stable 9x200 vs 3x404 with len variance 178193/50444/14332/4745 reconfirmed 2026-09-04 17:35 — no new hosts but variance persists
 
-[PRIO posit] asset: share.connect.posit.cloud score: 8.0 (attack:9 business:8 tech:7 gate:10 cloud:6 fresh:6)
-[PRIO emsisoft] asset: api.emsisoft.com/swagger/v1.0/swagger.json score: 7.7 (attack:8 business:7 tech:9 gate:10 cloud:5 fresh:6)
-[PRIO posit] asset: staging.connect.posit.cloud/__api__/v1/content score: 7.5 (attack:7 business:8 tech:8 gate:9 cloud:5 fresh:7)
+STEP 2 — PRIORITIZE:
+[PRIO emsisoft] asset: api.emsisoft.com/swagger/v1.0/swagger.json — score 8.2 (attack_surface:9 business_value:7 tech_exposure:9 gate_ease:10 cloud_surface:6 freshness:7) — 65 endpoints public no auth, Cloudflare, 401vs404 endpoint oracle
+[PRIO posit] asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud — score 8.1 (attack_surface:9 business_value:8 tech_exposure:7 gate_ease:10 cloud_surface:5 freshness:8) — 9x200 vs 3x404 UUIDv7 per-object variance, unauth text/html len178193
+[PRIO posit] asset: staging.connect.posit.cloud — score 7.0 (attack_surface:6 business_value:6 tech_exposure:7 gate_ease:10 cloud_surface:5 freshness:9) — systemic SPA fallback 200 len2526 == /nonexistent vs api.connect 404, needs Accept negotiation
+[PRIO coxautomotive] asset: admin.pa1.dealertrack.com — score 6.9 (attack_surface:7 business_value:7 tech_exposure:8 gate_ease:8 cloud_surface:4 freshness:6) — CA REALMOID/SMAGENTNAME/TARGET leak via redirect Location, 503/403/200 differential
+[PRIO docker] asset: auth.docker.com — score 5.2 (attack_surface:5 business_value:5 tech_exposure:6 gate_ease:9 cloud_surface:5 freshness:4) — x-docker-app-version/trace-id/dckr-sessid leak but session forgery proven dead
 
-[HYP posit] IDOR per-object share subdomain access variance
+STEP 3 — HYPOTHESES:
+[HYP posit] Unauthenticated cross-tenant content exposure via share UUIDv7 subdomains
 class: IDOR
 asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
-confidence: 78
-reasoning: 9x200 vs 3x404 on UUIDv7 share.connect.posit.cloud subdomains reconfirmed 2026-09-04 16:05 len178193 vs 404/14332/50444 variance; unauth 200 text/html on CloudFront/S3; api.connect.posit.cloud differential pattern matches
-evidence_needed: body comparison of 200 vs 404 to confirm user content vs placeholder; auth header test to prove unauth access to tenant data
-verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ unauth; diff len/content-type and sample 200 body for PII/app data vs generic
-impact: cross-tenant content disclosure on Posit Connect Cloud, enumerability of share IDs, medium-high
+confidence: 82
+reasoning: 9x200 vs 3x404 differential on inventory UUIDv7 share hosts (200 hosts 0190c2c9/019c9000/019c1fdf etc len178193/50444 vs 404 hosts 01912861/0191a3bb) reconfirmed 2026-09-04 17:35 shows per-object access control variance, not wildcard. 200 serves text/html unauth with no auth header, CloudFront+S3.
+evidence_needed: body of 200 hosts contains user app/data vs generic SPA shell; comparison of 200 vs 404 body signatures and auth-bypass via share ID bruteforce enumerability
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth (Accept text/html) save body hash; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ compare 404 body; GET https://01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud/ compare len variance; passive title extraction only
+impact: cross-tenant PII/app data leak on Posit Connect Cloud shares — high, unauth enumeration of share IDs
 testability: PASSIVE
 
-[HYP emsisoft] MISCONFIG public OpenAPI spec enables endpoint oracle and BOLA targeting
+[HYP emsisoft] Public OpenAPI enables authenticated endpoint enumeration via 401 vs 404 oracle (BOLA primer)
 class: MISCONFIG
 asset: api.emsisoft.com
-confidence: 92
-reasoning: /swagger/v1.0/swagger.json 200 unauth on prod/apitest/apistage reconfirmed 2026-09-04 16:05 with 65 endpoints; /v1/workspaces 401 vs /v1/workspaces/<uuid> 404 vs /v1/licenses 404 differential confirms endpoint existence oracle unauth
-evidence_needed: swagger body shows 65 endpoints and example GUIDs; 401 vs 404 differential proves auth not uniform and targetable IDs exist
-verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth; GET https://api.emsisoft.com/v1/workspaces unauth expect 401; GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 unauth expect 404; repeat on apitest/apistage
-impact: full API surface map for BOLA/IDOR fuzzing, information disclosure low-medium alone but high as chaining primitive
+confidence: 88
+reasoning: /swagger/v1.0/swagger.json 200 unauth on prod/apitest/apistage 65 endpoints reconfirmed 2026-09-04 17:35; /v1/workspaces 401 unauth vs /v1/workspaces/01900000-0000-4000-a000-000000000000 404 proves endpoint existence oracle without auth; example swagger GUIDs 401 identical across envs proves fabricated docs but oracle still maps real vs fake IDs
+evidence_needed: swagger JSON valid OpenAPI with 65 endpoints + systematic 401 vs 404 mapping for /v1/workspaces /v1/licenses /v1/tokens with random UUIDs
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth compare to https://apitest.emsisoft.com/swagger/v1.0/swagger.json hash; GET https://api.emsisoft.com/v1/workspaces unauth expect 401; GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 unauth expect 404; GET https://api.emsisoft.com/v1/licenses unauth vs with UUID
+impact: full API surface map + endpoint existence oracle enables targeted BOLA/IDOR once non-example valid ID obtained — medium-high recon exposure
 testability: PASSIVE
 
-[HYP posit] MISCONFIG SPA catch-all masks potential unauth API content listing
+[HYP posit] Systemic SPA catch-all masks true API auth on staging.connect vs api.connect — needs content-negotiation to prove JSON leak
 class: MISCONFIG
 asset: staging.connect.posit.cloud
-confidence: 68
-reasoning: staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html unauth reconfirmed 2026-09-04 16:05 mirrors prod and equals /nonexistent-12345 vs api.connect.posit.cloud/__api__/v1/content 404 differential; type text/html suggests SPA fallback not true API response
-evidence_needed: content-negotiation to prove if Accept: application/json returns JSON listing vs same HTML fallback
-verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content unauth H1 Accept: application/json H2 Accept: text/html H3 no Accept; GET https://staging.connect.posit.cloud/nonexistent-12345 same headers as control; GET https://api.connect.posit.cloud/__api__/v1/content control expect 404
-impact: if JSON leaks, unauth content enumeration on Posit Connect, medium; if SPA only, false-positive but confirms inconsistent routing
+confidence: 58
+reasoning: staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html identical to /nonexistent-12345 200 len2526 but api.connect.posit.cloud/__api__/v1/content 404 on 2026-09-04 17:35; prior 7+ cycles same 2526 html suggests CloudFront S3 SPA fallback, not real API. Without Accept: application/json test, false-positive risk high.
+evidence_needed: differential response with Accept: application/json vs text/html vs no header; api subdomain 404 vs staging 200 proves routing inconsistency
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with H1 Accept: application/json, H2 Accept: text/html, H3 no Accept; GET https://staging.connect.posit.cloud/nonexistent-12345 same 3 headers; GET https://api.connect.posit.cloud/__api__/v1/content same 3 headers; compare status/len/content-type
+impact: if JSON accepted returns 200 json vs html fallback, indicates missing auth on API eux — PII/content dump; if only html, class is SPA misconfig low impact
 testability: PASSIVE
 
-[PARKED] none: all hypotheses confidence >=40 and not on REJECTED list with concrete verify_steps
+STEP 4 — SELF-CRITIQUE:
+[PARKED] none — all three hypotheses confidence >=40, class not on REJECTED list (IDOR/MISCONFIG accepted), concrete verify_steps present
+[FINAL] 1. [HYP emsisoft] Public OpenAPI + 401vs404 oracle — 88 — passive hash + oracle mapping; 2. [HYP posit] Unauthenticated share UUIDv7 exposure — 82 — body variance analysis; 3. [HYP posit] SPA catch-all content-negotiation — 58 — Accept header differential
 
-[FINAL] 1. MISCONFIG public OpenAPI spec enables endpoint oracle and BOLA targeting (emsisoft) 92; 2. IDOR per-object share subdomain access variance (posit) 78; 3. MISCONFIG SPA catch-all masks potential unauth API content listing (posit) 68
+STEP 5 — NEXT ACTION:
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with 3 parallel header variants — H1 Accept: application/json H2 Accept: text/html H3 (no Accept) + control GET https://staging.connect.posit.cloud/nonexistent-12345 same 3 headers + GET https://api.connect.posit.cloud/__api__/v1/content same 3 headers — compare status/len/content-type to prove SPA false positive vs true JSON leak. Second probe same cycle: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ vs https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ to capture body hashes.
 
-[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with 3 parallel header variants — H1 Accept: application/json H2 Accept: text/html H3 no Accept header; plus control GET https://staging.connect.posit.cloud/nonexistent-12345 with same variants and GET https://api.connect.posit.cloud/__api__/v1/content Accept: application/json
-
-[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/50444 reconfirmed 2026-09-04 per-object variance alive
-[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-04 alive
+STEP 6 — LEARNING:
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect.posit.cloud 404 proves systemic SPA catch-all not isolated endpoint — needs Accept negotiation to confirm true leak
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive 2026-09-04 17:35 — enumeration class alive
+[LEARN] ACCEPTED IDOR @ 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud: 9x200 vs 3x404 len178193/50444 variance reconfirmed alive per-object variance
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-04 persists dead per 2026-08-26 directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
 
-[RISK] 68 reason: systemic unauth surface on posit share subdomains (enumerable IDOR differential) + 3-env public swagger with 401/404 oracle on emsisoft + SPA fallback obscuring api content endpoint; high gate_ease (unauth 200s) but no proven PII dump yet
+STEP 7 — RISK SCORE:
+[RISK] 72 — high unauth share content variance (9x200 vs 3x404) plus 3-env public swagger with live 401vs404 oracle gives systemic enumeration + per-object PII leak potential; staging SPA fallback currently false-positive risk but api.connect 404 differential keeps inconsistent routing alive

@@ -3089,3 +3089,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-04 alive
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-04 persists dead per 2026-08-26 directive
 [RISK] 68 reason: systemic unauth surface on posit share subdomains (enumerable IDOR differential) + 3-env public swagger with 401/404 oracle on emsisoft + SPA fallback obscuring api content endpoint; high gate_ease (unauth 200s) but no proven PII dump yet
+## 2026-09-04 18:57:59 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 82
+reasoning: 9x200 vs 3x404 differential on inventory UUIDv7 share hosts (200 hosts 0190c2c9/019c9000/019c1fdf etc len178193/50444 vs 404 hosts 01912861/0191a3bb) reconfirmed 2026-09-04 17:35 shows per-object access control variance, not wildcard. 200 serves text/html unauth with no auth header, CloudFront+S3.
+evidence_needed: body of 200 hosts contains user app/data vs generic SPA shell; comparison of 200 vs 404 body signatures and auth-bypass via share ID bruteforce enumerability
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth (Accept text/html) save body hash; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ compare 404 body; GET https://01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud/ compare len variance; passive title extraction only
+impact: cross-tenant PII/app data leak on Posit Connect Cloud shares — high, unauth enumeration of share IDs
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 88
+reasoning: /swagger/v1.0/swagger.json 200 unauth on prod/apitest/apistage 65 endpoints reconfirmed 2026-09-04 17:35; /v1/workspaces 401 unauth vs /v1/workspaces/01900000-0000-4000-a000-000000000000 404 proves endpoint existence oracle without auth; example swagger GUIDs 401 identical across envs proves fabricated docs but oracle still maps real vs fake IDs
+evidence_needed: swagger JSON valid OpenAPI with 65 endpoints + systematic 401 vs 404 mapping for /v1/workspaces /v1/licenses /v1/tokens with random UUIDs
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth compare to https://apitest.emsisoft.com/swagger/v1.0/swagger.json hash; GET https://api.emsisoft.com/v1/workspaces unauth expect 401; GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 unauth expect 404; GET https://api.emsisoft.com/v1/licenses unauth vs with UUID
+impact: full API surface map + endpoint existence oracle enables targeted BOLA/IDOR once non-example valid ID obtained — medium-high recon exposure
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 58
+reasoning: staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html identical to /nonexistent-12345 200 len2526 but api.connect.posit.cloud/__api__/v1/content 404 on 2026-09-04 17:35; prior 7+ cycles same 2526 html suggests CloudFront S3 SPA fallback, not real API. Without Accept: application/json test, false-positive risk high.
+evidence_needed: differential response with Accept: application/json vs text/html vs no header; api subdomain 404 vs staging 200 proves routing inconsistency
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with H1 Accept: application/json, H2 Accept: text/html, H3 no Accept; GET https://staging.connect.posit.cloud/nonexistent-12345 same 3 headers; GET https://api.connect.posit.cloud/__api__/v1/content same 3 headers; compare status/len/content-type
+impact: if JSON accepted returns 200 json vs html fallback, indicates missing auth on API eux — PII/content dump; if only html, class is SPA misconfig low impact
+testability: PASSIVE
+[PARKED] none — all three hypotheses confidence >=40, class not on REJECTED list (IDOR/MISCONFIG accepted), concrete verify_steps present
+[FINAL] 1. [HYP emsisoft] Public OpenAPI + 401vs404 oracle — 88 — passive hash + oracle mapping; 2. [HYP posit] Unauthenticated share UUIDv7 exposure — 82 — body variance analysis; 3. [HYP posit] SPA catch-all content-negotiation — 58 — Accept header differential
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with 3 parallel header variants — H1 Accept: application/json H2 Accept: text/html H3 (no Accept) + control GET https://staging.connect.posit.cloud/nonexistent-12345 same 3 headers + GET https://api.connect.posit.cloud/__api__/v1/content same 3 headers — compare status/len/content-type to prove SPA false positive vs true JSON leak. Second probe same cycle: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ vs https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ to capture body hashes.
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 identical to /nonexistent-12345 vs api.connect.posit.cloud 404 proves systemic SPA catch-all not isolated endpoint — needs Accept negotiation to confirm true leak
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive 2026-09-04 17:35 — enumeration class alive
+[LEARN] ACCEPTED IDOR @ 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud: 9x200 vs 3x404 len178193/50444 variance reconfirmed alive per-object variance
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-04 persists dead per 2026-08-26 directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
+[RISK] 72 — high unauth share content variance (9x200 vs 3x404) plus 3-env public swagger with live 401vs404 oracle gives systemic enumeration + per-object PII leak potential; staging SPA fallback currently false-positive risk but api.connect 404 differential keeps inconsistent routing alive
