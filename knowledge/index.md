@@ -483,3 +483,6 @@
 - 2026-09-04 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-04 11:37 systemic exposure alive
 - 2026-09-04 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-04 persists dead per 2026-08-26 directive — drop class
 - 2026-09-04 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
+- 2026-09-04 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 2026-09-04 11:37 — surface enumeration alive
+- 2026-09-04 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/50444 per-object variance reconfirmed 2026-09-04 11:37 — enumerability alive
+- 2026-09-04 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-04 11:37 persists — class dead drop per 2026-08-26 directive
