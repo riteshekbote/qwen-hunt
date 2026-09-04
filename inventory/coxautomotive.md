@@ -1417,3 +1417,10 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
+
+## 2026-09-04 09:36:34 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- CHANGED admin.pa1.dealertrack.com: 503 (prev 200 CA REALMOID leak) vs sso.dealertrack.com 200 len0 text/xml vs api.unifi.dealertrack.com 403 — inconsistent auth state flip 2026-09-04 06:24:38
+- NEW api.coxautoinc.com/endpoint?param=admin: 403 probed 2026-09-04 05:08 — consistent 403 on param admin (no delta vs prior 403 class)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)

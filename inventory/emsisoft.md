@@ -609,3 +609,6 @@
 ## 2026-09-04 05:08:36 UTC
 
 ## 2026-09-04 06:24:32 UTC
+
+## 2026-09-04 09:36:34 UTC
+- CHANGED api.emsisoft.com/v1/licenses: 404 vs /v1/workspaces 401 differential reconfirmed 2026-09-04 05:08 — endpoint existence oracle persists (401 vs 404)
