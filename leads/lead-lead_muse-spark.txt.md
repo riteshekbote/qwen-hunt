@@ -3421,3 +3421,36 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists through 2026-09-05 06:12 per 2026-08-26 directive — class dead
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
 [RISK] 71 reason: high unauth surface persists — 65-endpoint swagger public on 3 envs with oracle (7.8), enumeratable 9x200 share subdomains with per-object len variance indicating private content exposure (7.95), staging SPA systemic 200 vs api 404 differential needs negotiation but still unauth HTML disclosure; cloud metadata SSRF and secrets endpoints dead but IDOR/MISCONFIG chainable for PII exfiltration.
+## 2026-09-05 10:52:04 UTC (model muse-spark)
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 95
+reasoning: 65 endpoints public unauth on prod/apitest/apistage reconfirmed 2026-09-05 09:02; /v1/workspaces 401 vs /v1/licenses 404 differential persists, enables endpoint enumeration even though example GUID tokens are fabricated (401 identical across envs).
+evidence_needed: 401 vs 404 differential on non-example UUID + swagger fetch unauth to prove surface map
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth compare to https://apitest.emsisoft.com/swagger/v1.0/swagger.json; GET https://api.emsisoft.com/v1/workspaces unauth (expect 401) vs GET https://api.emsisoft.com/v1/workspaces/01900000-0000-4000-a000-000000000000 (expect 404); GET https://api.emsisoft.com/v1/licenses (expect 404)
+impact: Full 65-endpoint API surface enumeration, versioning, auth model leak; aids BOLA/IDOR hunt; low direct but high chain value — INFO-HIGH
+testability: PASSIVE
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 88
+reasoning: 9x200 vs 3x404 differential on *.share.connect.posit.cloud reconfirmed 2026-09-05 09:02: 200 hosts (0190c2c9 len178193, 019c9000 len14332 etc) vs 404 hosts (01912861, 0191a3bb etc) with len variance 4745/14332/50444/178193, all unauth GET / 200 text/html.
+evidence_needed: Body/title divergence proving user content vs generic placeholder; fetch 2x200 vs 1x404 unauth and diff
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ unauth (expect 404); diff Content-Length and <title> / Shiny/Connect markers
+impact: Unauthenticated access to shared apps/reports if 200 hosts contain real user content; cross-tenant PII/data leak — HIGH
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 65
+reasoning: staging/__api__/v1/content 200 len2526 text/html unauth identical to /nonexistent-12345 across 7+ cycles, vs https://api.connect.posit.cloud/__api__/v1/content 404; systemic SPA fallback confirmed, but JSON leak not yet proven — needs content-negotiation probe.
+evidence_needed: Accept: application/json vs text/html divergence; if JSON returns data vs HTML fallback then true misconfig
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with H1 Accept: application/json H2 Accept: text/html H3 no Accept; GET https://api.connect.posit.cloud/__api__/v1/content with same headers; GET https://staging.connect.posit.cloud/nonexistent-12345 with Accept: application/json as control
+impact: If JSON returns content listing unauth, systemic auth bypass on content API across prod/staging — HIGH; if only HTML fallback, false positive — LOW
+testability: PASSIVE
+[PARKED] NONE — all 3 confidence >=65, classes not on REJECTED list (SSRF docker-registry, AUTH example-token bypass, SSO-oracle remain parked), verify_steps concrete passive.
+[FINAL] 1) [HYP emsisoft] swagger oracle 95 2) [HYP posit] share IDOR 88 3) [HYP posit] staging SPA negotiation 65
+[NEXT] PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with 3 parallel header variants — H1 Accept: application/json H2 Accept: text/html H3 (no Accept); repeat same 3 on https://api.connect.posit.cloud/__api__/v1/content and control GET https://staging.connect.posit.cloud/nonexistent-12345 Accept: application/json — compare status/len/content-type to prove JSON leak vs SPA false positive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-05 09:02 persists per 2026-08-26 directive — class dead, do not re-probe
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, need non-example ID for BOLA; oracle MISCONFIG (401 vs 404) remains alive
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed alive — systemic exposure
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 differential reconfirmed alive — per-object variance persists
+[RISK] 72 — Posit share enumeration unauth (9x200 vs 3x404) + systemic staging SPA fallback requiring negotiation + Emsisoft 3-env swagger full surface public give chainable enumeration; mitigated by api.connect 404 hardening and example-token AUTH dead, but unauth content variance keeps exposure high until JSON vs HTML proven.
