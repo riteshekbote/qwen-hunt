@@ -1788,3 +1788,9 @@
 - CHANGED https://docker-registry.docker.com/v2/ (ERR [Errno -2] recurring)
 - NEW docker-registry.docker.com/v2/ (DNS resolution failure)
 - CHANGED docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure persists)
+
+## 2026-09-05 00:23:58 UTC
+- NEW https://docker-registry.docker.com/v2/?param=169.254.169.254 (recurring SSRF error)
+- CHANGED https://docker-registry.docker.com/v2/ (ERR [Errno -2] recurring)
+- NEW docker-registry.docker.com/v2/ (DNS resolution failure)
+- CHANGED docker-registry.docker.com/v2/?param=169.254.169.254 (DNS resolution failure persists)
