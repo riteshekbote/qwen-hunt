@@ -2518,3 +2518,16 @@
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, need non-example ID for BOLA; o
 - LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed alive — systemic exposure
 - LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 differential reconfirmed alive — per-object variance persists
+
+## RANKED HYPOTHESES 2026-09-05 12:40:46 UTC
+- [92] api.emsisoft.com: Staging Connect SPA Catch-All Masquerading as API Content Listing (from reports/hypotheses-lead_muse-spark.txt.txt)
+- [92] api.emsisoft.com: Posit Connect Share Unauthenticated Cross-Tenant Content Disclosure (from reports/hypotheses-lead_muse-spark.txt.txt)
+- [92] api.emsisoft.com: Emsisoft 65-Endpoint Swagger Systemic Exposure + Auth Oracle (from reports/hypotheses-lead_muse-spark.txt.txt)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: GET https://staging.connect.posit.cloud/__api__/v1/content unauth with 3 parallel header variants — H1 Accept:application/json H2 Accept:text/html H3 no 
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-05 10:52 alive
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/14332 differential reconfirmed 2026-09-05 10:52 per-object variance alive
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 5+ cycles through 2026-09-05 10:52 per 2026-08-26 directive dead drop
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest apistage fabricated docs dead remains — need non-example ID

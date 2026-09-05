@@ -529,3 +529,7 @@
 - 2026-09-05 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, need non-example ID for BOLA; oracle MISCONFIG (401 vs 404) remains alive
 - 2026-09-05 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed alive — systemic exposure
 - 2026-09-05 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 differential reconfirmed alive — per-object variance persists
+- 2026-09-05 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-05 10:52 alive
+- 2026-09-05 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/14332 differential reconfirmed 2026-09-05 10:52 per-object variance alive
+- 2026-09-05 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 5+ cycles through 2026-09-05 10:52 per 2026-08-26 directive dead drop
+- 2026-09-05 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest apistage fabricated docs dead remains — need non-example ID for BOLA

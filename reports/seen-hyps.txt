@@ -20,3 +20,6 @@ ee862a0f90964073 GitHub Misconfiguration in Posit
 cdef171a95f8a7d7 Emsisoft API example tokens authenticate
 eb10f5f5a9507dc8 Posit secrets staging environment accessible
 df316b3d8b79f581 Emsisoft API workspace GUIDs return 404 not 401
+3f46ede5ab3412df Emsisoft 65-Endpoint Swagger Systemic Exposure + Auth Oracle
+d16afdbfa3b7d382 Posit Connect Share Unauthenticated Cross-Tenant Content Disclosure
+924de939c59a9bbd Staging Connect SPA Catch-All Masquerading as API Content Listing
