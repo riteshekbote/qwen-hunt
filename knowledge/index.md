@@ -573,3 +573,7 @@
 - 2026-09-05 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 confirms systemic SPA catch-all alive, needs Accept negotiation to prove leak
 - 2026-09-05 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-05 21:43 persists dead per 2026-08-26 directive drop
 - 2026-09-05 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID for BOLA
+- 2026-09-05 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/14332 differential reconf 22:47 unauth per-object variance alive
+- 2026-09-05 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconf 22:47 alive
+- 2026-09-05 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 systemic SPA fallback alive needs Accept negotiation not yet proven JSON leak
+- 2026-09-05 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-05 22:47 persists per 2026-08-26 directive class dead drop
