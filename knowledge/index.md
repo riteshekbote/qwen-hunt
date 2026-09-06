@@ -577,3 +577,7 @@
 - 2026-09-05 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconf 22:47 alive
 - 2026-09-05 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 systemic SPA fallback alive needs Accept negotiation not yet proven JSON leak
 - 2026-09-05 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-05 22:47 persists per 2026-08-26 directive class dead drop
+- 2026-09-06 REJECTED SSRF @ https://docker-registry.docker
+- 2026-09-06 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-05 23:19 reconfirmed dead per 2026-08-26 directive - drop class
+- 2026-09-06 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential with len178193/14332 reconfirmed 23:19 per-object variance alive - enumerability persists
+- 2026-09-06 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle alive 23:19 systemic exposure
