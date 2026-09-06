@@ -605,3 +605,4 @@
 - 2026-09-06 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 systemic SPA fallback reconfirmed — alive needs Accept negotiation, false-positive risk
 - 2026-09-06 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-06 11:21 persists per 2026-08-26 directive — class dead drop, do not re-probe
 - 2026-09-06 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive
+- 2026-09-06 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 persists 2026-09-06 — SPA catch-all alive, needs Accept negotiation remains

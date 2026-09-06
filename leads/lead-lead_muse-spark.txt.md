@@ -4055,3 +4055,33 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-06 11:21 persists per 2026-08-26 directive — class dead drop, do not re-probe
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive
 [RISK] 74 reason: 9x200 unauth share subdomains with per-object len variance (high enumerability), 65-endpoint swagger on 3 envs unauth with 401/404 oracle, plus systemic SPA fallback on staging/connect 7+ cycles — no auth bypass proven but surface enumeration is trivial passively, chaining to BOLA/content leak is plausible
+## 2026-09-06 14:24:36 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 78
+reasoning: 9x200 vs 3x404 UUIDv7 differential reconfirmed 2026-08-27..2026-09-06 14:03 (0190c2c9 len178193 vs 01912861 404 vs 019c9000 len14332); len variance 14332/50444/178193 persists unauth text/html, indicates per-object access control not uniform SPA
+evidence_needed: body diff 200 hosts vs 404 + Content-Type variance + title/JS app payload to prove real private content not generic SPA shell
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; diff headers+body len/type, then GET same with -H "Accept: application/json"
+impact: unauth enumeration + disclosure of private Shiny/Connect apps, tenant data, PII; HIGH if UUIDv7 predictable
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 92
+reasoning: 200 len=? application/json unauth on prod/apitest/apistage reconfirmed 2026-09-06 11:21; 65 endpoints, 401 on /v1/workspaces vs 404 on /v1/licenses vs 404 on /v1/workspaces/01900000-0000-4000-a000-000000000000 gives reliable existence oracle
+evidence_needed: swagger endpoint list + 401 vs 404 differential on non-example UUID to confirm BOLA surface without auth bypass via example tokens (already 401 dead)
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json ; GET https://api.emsisoft.com/v1/workspaces ; GET https://api.emsisoft.com/v1/licenses ; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json ; compare
+impact: complete attack surface enumeration for BOLA/IDOR hunt, no direct PII yet; MEDIUM systemic info disclosure
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 55
+reasoning: 200 len2526 text/html identical to /nonexistent-12345 on staging, vs 404 on https://api.connect.posit.cloud/__api__/v1/content reconfirmed 14:03; systemic SPA fallback suggests not real API, needs content negotiation to prove leak
+evidence_needed: Accept: application/json responses vs text/html; status/content-type diff staging vs api subdomain vs control path
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -H "Accept: application/json" ; GET https://api.connect.posit.cloud/__api__/v1/content -H "Accept: application/json" ; GET https://staging.connect.posit.cloud/nonexistent-12345 -H "Accept: application/json" ; GET https://staging.connect.posit.cloud/__api__/v1/content (no Accept)
+impact: if JSON leaks -> unauth content listing across staging/prod; if stays HTML -> false positive, no impact; LOW-HIGH conditional
+testability: PASSIVE
+[PARKED] NONE — all 3 hypotheses confidence >=40, class not on REJECTED list (SSRF docker-registry, SSO oracle, OATH docker dead dropped), verify_steps concrete passive
+[FINAL] Ranked survivors:
+[NEXT] PROBE: 4 parallel unauth GETs to resolve SPA false-positive — curl -s -D - https://staging.connect.posit.cloud/__api__/v1/content -H "Accept: application/json"; curl -s -D - https://api.connect.posit.cloud/__api__/v1/content -H "Accept: application/json"; curl -s -D - https://staging.connect.posit.cloud/nonexistent-12345 -H "Accept: application/json"; curl -s -D - https://staging.connect.posit.cloud/__api__/v1/content (baseline)
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs api.connect 404 persists 2026-09-06 — SPA catch-all alive, needs Accept negotiation remains
+[RISK] 68 reason: persistent unauth per-object variance on share.connect.posit.cloud (9x200/3x404) + public 65-endpoint swagger on 3 emsisoft envs with 401/404 oracle gives systemic enumeration; staging SPA masks true auth posture, not yet proven leak but high breadth
