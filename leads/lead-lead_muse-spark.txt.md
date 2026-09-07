@@ -4518,3 +4518,34 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 06:05 persists dead per 2026-08-26 directive
 [LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
 [RISK] 71 persistent unauth per-object variance on 9 share.connect hosts (CloudFront) + 3-env swagger 65-endpoint public surface with 401/404 oracle + systemic SPA fallback 200 vs 404 differential; no proven JSON PII yet but enumerability and gate_ease high
+## 2026-09-07 12:25:51 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 78
+reasoning: 9x200 vs 3x404 UUIDv7 differential persists through 2026-09-07 12:04 (0190c2c9 178193 vs 019c9000 14332 vs 01912861 404); len variance 178193/14332/50444 confirms not uniform SPA shell. CloudFront+S3 unauth.
+evidence_needed: body diff proving per-object content (not SPA shell) and any PII/app data in 200s vs 404 shell
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ with -D - compare len+type+hash body; then same 3 with Header Accept: application/json
+impact: unauth cross-tenant share enumeration + content/PII disclosure; High if PII
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 88
+reasoning: GET /swagger/v1.0/swagger.json 200 application/json unauth on prod/apitest/apistage reconf 12:04 65 endpoints; GET /v1/workspaces 401 vs GET /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs GET /v1/licenses 404 confirms oracle alive
+evidence_needed: 401 base vs 404 UUID path delta reconf on all 3 envs; swagger 200 without auth
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json ; GET https://api.emsisoft.com/v1/workspaces (expect 401) ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 (expect 404) ; repeat on https://apitest.emsisoft.com
+impact: full API surface enumeration, BOLA prep via oracle, systemic exposure 3-env; Medium
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 58
+reasoning: GET /__api__/v1/content 200 len2526 text/html identical to GET /nonexistent-12345 200 len2526 vs GET https://api.connect.posit.cloud/__api__/v1/content 404 reconf 12:04; ?limit=1 also 200 same body confirms catch-all not API auth failure
+evidence_needed: Accept: application/json vs text/html differential to prove true JSON leak vs SPA fallback false positive
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -H Accept: application/json -D ; GET https://staging.connect.posit.cloud/nonexistent-12345 -H Accept: application/json ; GET https://api.connect.posit.cloud/__api__/v1/content -H Accept: application/json (expect 404)
+impact: if JSON leaks -> unauth content listing/PII; if SPA only -> info disclosure low; needs proof
+testability: PASSIVE
+[FINAL] 1: [HYP emsisoft] Public Swagger + 401 vs 404 oracle 88; 2: [HYP posit] Share Connect IDOR 78; 3: [HYP posit] Staging SPA catch-all 58
+[NEXT] PROBE: 5 parallel unauth GETs read-only to resolve IDOR PII vs SPA shell + Accept negotiation: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content
+[LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 variance reconf 2026-09-07 12:04 unauth persists per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle to /v1/workspaces/000... reconf alive 2026-09-07 12:04 systemic enumeration
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 12:04 persists dead per 2026-08-26 directive drop
+[RISK] 71 reason: posit share IDOR enumerability 9x200 vs 3x404 with len variance live unauth + emsisoft 65-endpoint swagger public 3-env + 401 vs 404 oracle systemic alive; staging SPA fallback persistent false-positive risk requires Accept proof

@@ -659,3 +659,6 @@
 - 2026-09-07 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 SPA catch-all systemic alive needs Accept negotiation
 - 2026-09-07 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 06:05 persists dead per 2026-08-26 directive
 - 2026-09-07 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
+- 2026-09-07 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 variance reconf 2026-09-07 12:04 unauth persists per-object variance alive needs body PII proof
+- 2026-09-07 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle to /v1/workspaces/000... reconf alive 2026-09-07 12:04 systemic enumeration
+- 2026-09-07 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 12:04 persists dead per 2026-08-26 directive drop
