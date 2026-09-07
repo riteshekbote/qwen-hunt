@@ -4420,3 +4420,36 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 00:51 persists dead per 2026-08-26 directive — do not re-probe
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage dead remains
 [RISK] 71 reason: high unauth enumerability persists — 9x200 share IDOR with distinct lengths (PII risk) + 65-endpoint swagger public on 3 envs with 401/404 oracle + staging SPA fallback differential unresolved; docker SSRF dead, emsisoft example-token BOLA dead, but surface remains broadly fingerprintable
+## 2026-09-07 05:52:27 UTC (model muse-spark)
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 88
+reasoning: 200 len=? application/json unauth on prod/apitest/apistage reconfirmed 2026-09-07 01:00 with 65 endpoints, 353 GUIDs in history. New probe /v1/workspaces 401 vs /v1/licenses 404 vs /v1/workspaces/000... 404 confirms endpoint existence oracle extends to UUID path — allows enumeration without auth.
+evidence_needed: Confirm swagger still 200 unauth and 401 vs 404 differential stable on prod vs apitest, extract 2-3 non-example workspace-lookup endpoints requiring BOLA test with real leaked ID
+verify_steps: 1) curl -s -D - https://api.emsisoft.com/swagger/v1.0/swagger.json | head -n 30 2) curl -s -o /dev/null -w "%{http_code}\n" https://api.emsisoft.com/v1/workspaces 3) curl -s -o /dev/null -w "%{http_code}\n" https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 4) curl -s https://api.emsisoft.com/swagger/v1.0/swagger.json | grep -o "/v1/[^"]*" | sort -u | head -20
+impact: Full API surface map unauth + endpoint existence oracle bypasses auth gate for targeted BOLA/IDOR on workspaces/licenses/tokens; severity Medium-High (PII/billing/misconfig)
+testability: PASSIVE
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 77
+reasoning: 9x200 vs 3x404 UUIDv7 differential reconfirmed 2026-09-07 01:00 unauth. Large len variance 178193 vs 14332 vs 50444 on same host pattern indicates distinct user content served, not static SPA shell. Predictable UUIDv7 share IDs enumeratable from CT recon inventory.
+evidence_needed: Body inspection to prove dynamic user content vs identical SPA shell; header/content-type diff 200 vs 404; title/H1 extraction
+verify_steps: 1) curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -n 80 2) curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | head -n 80 3) curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ | head -n 40 4) diff len + grep -i -E "posit|shiny|connect|user|email|title" on 200 bodies
+impact: Unauthenticated access to arbitrary tenant share content/PII via enumerated UUIDv7 share subdomains; severity High (IDOR, cross-tenant data leak)
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 62
+reasoning: staging.connect 200 len2526 text/html identical to /nonexistent-12345 vs api.connect 404 reconfirmed 2026-09-07 01:00 across 7+ cycles. Proves systemic SPA fallback not isolated endpoint. api.connect.posit.cloud correctly returns 404, suggests real API gate lives there not staging. Needs content-negotiation to distinguish false positive.
+evidence_needed: Accept: application/json response code/content-type differential vs text/html SPA
+verify_steps: 1) curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content 2) curl -s -D - -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content 3) curl -s -D - https://staging.connect.posit.cloud/__api__/v1/content?limit=1 -H "Accept: application/json" 4) curl -s -D - https://staging.connect.posit.cloud/nonexistent-12345 -H "Accept: application/json"
+impact: If JSON returns 200 vs HTML fallback, unauth API content listing leak on staging; if all 200 HTML with Accept JSON then false-positive SPA — severity Low-Medium if leaked
+testability: PASSIVE
+[FINAL] Rank 1: [HYP emsisoft] Swagger unauth 65-endpoint exposure + 401 vs 404 BOLA oracle — confidence 88, concrete passive verify, not on REJECTED list
+[FINAL] Rank 2: [HYP posit] Share Connect wildcard IDOR per-object content variance — confidence 77, passive body inspection confirms PII vs shell, not REJECTED
+[FINAL] Rank 3: [HYP posit] Staging Connect SPA catch-all Accept negotiation — confidence 62, needs probe to resolve false-positive, not REJECTED
+[NEXT] PROBE: 5 parallel unauth GETs to resolve share IDOR PII vs SPA shell + staging Accept negotiation: 1) curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -n 100 2) curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | head -n 100 3) curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ | head -n 50 4) curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content 5) curl -s -D - -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000: 404 vs 401 base confirms endpoint existence oracle extends to UUID path alive 2026-09-07
+[LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud UUIDv7 subdomains: 9x200 vs 3x404 with len178193/14332 variance persists unauth 2026-09-07 — per-object variance alive, enumerability confirmed
+[LEARN] ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs https://api.connect.posit.cloud/__api__/v1/content 404 confirms systemic SPA catch-all not isolated endpoint — needs Accept negotiation to prove true leak vs false positive
+[RISK] 71 reason: Full 65-endpoint swagger unauth on 3 envs + stable 401 vs 404 BOLA oracle extendable to UUID paths + 9x200 vs 3x404 unauth share IDOR with massive len variance indicating real user content enumeratable via CT UUIDv7 inventory — systemic enumeration high, exploitability pending PII body proof

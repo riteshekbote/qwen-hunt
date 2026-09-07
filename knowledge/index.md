@@ -647,3 +647,6 @@
 - 2026-09-07 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 variance reconfirmed unauth 00:51 per-object variance alive
 - 2026-09-07 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 00:51 persists dead per 2026-08-26 directive — do not re-probe
 - 2026-09-07 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage dead remains
+- 2026-09-07 ACCEPTED MISCONFIG @ https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000: 404 vs 401 base confirms endpoint existence oracle extends to UUID path alive 2026-09-07
+- 2026-09-07 ACCEPTED IDOR @ https://share.connect.posit.cloud UUIDv7 subdomains: 9x200 vs 3x404 with len178193/14332 variance persists unauth 2026-09-07 — per-object variance alive, enumerability confirmed
+- 2026-09-07 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs https://api.connect.posit.cloud/__api__/v1/content 404 confirms systemic SPA catch-all not isolated endpoint — needs Accept negotiation to prove true leak vs false positive
