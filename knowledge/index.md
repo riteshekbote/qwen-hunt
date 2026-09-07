@@ -654,3 +654,8 @@
 - 2026-09-07 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json+v1/workspaces/00000000-0000-0000-0000-000000000000: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive — systemic enumeration
 - 2026-09-07 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 05:52 persists per 2026-08-26 directive — class dead drop, do not re-probe
 - 2026-09-07 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
+- 2026-09-07 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/14332 variance reconfirmed unauth 2026-09-07 06:05 per-object variance alive needs body PII proof
+- 2026-09-07 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle to /v1/workspaces/000... reconfirmed alive
+- 2026-09-07 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 SPA catch-all systemic alive needs Accept negotiation
+- 2026-09-07 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-07 06:05 persists dead per 2026-08-26 directive
+- 2026-09-07 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
