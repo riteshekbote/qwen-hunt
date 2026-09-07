@@ -650,3 +650,7 @@
 - 2026-09-07 ACCEPTED MISCONFIG @ https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000: 404 vs 401 base confirms endpoint existence oracle extends to UUID path alive 2026-09-07
 - 2026-09-07 ACCEPTED IDOR @ https://share.connect.posit.cloud UUIDv7 subdomains: 9x200 vs 3x404 with len178193/14332 variance persists unauth 2026-09-07 — per-object variance alive, enumerability confirmed
 - 2026-09-07 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs https://api.connect.posit.cloud/__api__/v1/content 404 confirms systemic SPA catch-all not isolated endpoint — needs Accept negotiation to prove true leak vs false positive
+- 2026-09-07 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/14332 variance persists unauth 05:52 — per-object variance alive needs body PII proof
+- 2026-09-07 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json+v1/workspaces/00000000-0000-0000-0000-000000000000: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive — systemic enumeration
+- 2026-09-07 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 05:52 persists per 2026-08-26 directive — class dead drop, do not re-probe
+- 2026-09-07 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA

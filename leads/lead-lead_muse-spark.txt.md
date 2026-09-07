@@ -4453,3 +4453,35 @@ testability: PASSIVE
 [LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud UUIDv7 subdomains: 9x200 vs 3x404 with len178193/14332 variance persists unauth 2026-09-07 — per-object variance alive, enumerability confirmed
 [LEARN] ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent-12345 vs https://api.connect.posit.cloud/__api__/v1/content 404 confirms systemic SPA catch-all not isolated endpoint — needs Accept negotiation to prove true leak vs false positive
 [RISK] 71 reason: Full 65-endpoint swagger unauth on 3 envs + stable 401 vs 404 BOLA oracle extendable to UUID paths + 9x200 vs 3x404 unauth share IDOR with massive len variance indicating real user content enumeratable via CT UUIDv7 inventory — systemic enumeration high, exploitability pending PII body proof
+## 2026-09-07 06:04:47 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 74
+reasoning: 9x200 vs 3x404 unauth differential persists across 05:52 cycle with per-object len variance 178193 vs 14332 vs 50444; passively enumerated CT inventory shows 29x share subdomains predictable UUIDv7; no auth required gate_ease 10; content-type text/html not yet proven PII vs SPA shell
+evidence_needed: unauth GET body diff between 200 hosts contains user content vs generic Posit Connect shell; presence of app data, titles, user emails vs identical SPA boilerplate
+verify_steps: 1) curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; 2) curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; 3) curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; 4) diff len + title + body hash sha256sum; 5) curl -s -H "Accept: application/json" same 200 hosts to check JSON leak vs HTML shell
+impact: cross-tenant unauth content disclosure, PII/app data dump, enumerability of private shares — high severity IDOR
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 68
+reasoning: /swagger/v1.0/swagger.json 200 unauth len? 65 endpoints, 3-env (prod/apitest/apistage) reconfirmed 05:52; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 differential proves endpoint existence oracle unauth; example UUID tokens 401 identical across envs dead for AUTH but oracle enables enumeration
+evidence_needed: 404 vs 401 differential stable across 5+ cycles; swagger spec lists workspace/license/token GUID params enumerating attack surface for BOLA with non-example IDs
+verify_steps: 1) curl -s -D - https://api.emsisoft.com/swagger/v1.0/swagger.json | head -c 500 ; 2) curl -s -i https://api.emsisoft.com/v1/workspaces ; 3) curl -s -i https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 ; 4) curl -s -i https://api.emsisoft.com/v1/licenses ; 5) compare prod vs apitest vs apistage same paths for differential
+impact: full API surface map + endpoint existence oracle enabling targeted BOLA/fuzz of workspace IDs, billing data structures exposed — medium-high
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 51
+reasoning: /__api__/v1/content 200 len2526 text/html unauth identical to /nonexistent-12345 vs api.connect.posit.cloud 404 proves systemic SPA fallback not isolated endpoint; reconfirmed across 7+ cycles 00:51-05:52 with ?limit=1 still 200 same len; true JSON leak not yet proven, false-positive high
+evidence_needed: Accept: application/json negotiation returns JSON vs same HTML shell; differential vs api subdomain hardened 404 shows inconsistent routing between connect vs staging
+verify_steps: 1) curl -s -D - https://staging.connect.posit.cloud/__api__/v1/content ; 2) curl -s -D -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; 3) curl -s -D - https://staging.connect.posit.cloud/nonexistent-12345 ; 4) curl -s -D - https://api.connect.posit.cloud/__api__/v1/content ; 5) curl -s -D -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content ; compare len/content-type
+impact: potential unauth content listing/api disclosure if negotiation bypasses SPA fallback, else false positive — medium if proven
+testability: PASSIVE
+[FINAL] 1) share.connect.posit.cloud unauth IDOR via UUIDv7 share subdomain enumeration 2) api.emsisoft.com swagger public spec plus 401 vs 404 BOLA oracle 3) staging.connect.posit.cloud SPA catch-all masks __api__/v1/content auth
+[NEXT] PROBE: 5 parallel unauth GETs unauth read-only to resolve IDOR PII vs SPA shell + Accept negotiation — curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -D -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/14332 variance persists unauth 05:52 — per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json+v1/workspaces/00000000-0000-0000-0000-000000000000: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive — systemic enumeration
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 05:52 persists per 2026-08-26 directive — class dead drop, do not re-probe
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
+[RISK] 71 reason: posit Connect share subdomains 9x200 vs 3x404 unauth enumerability with per-object len variance high exposure plus emsisoft 65-endpoint swagger public 3-env + 401vs404 oracle systemic plus staging SPA fallback masking API auth; SSRF docker dead reduces overall but IDOR+MISC chain risk remains high — passive body inspection required to confirm PII dump vs SPA false positive
