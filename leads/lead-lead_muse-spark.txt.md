@@ -4981,3 +4981,36 @@ testability: PASSIVE
 [NEXT] PROBE: 5 parallel unauth read-only GETs to close top gaps (PII vs shell + Accept negotiation): 1) curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -n 100 2) curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | head -n 100 3) curl -s -i -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content 4) curl -s -i -H "Accept: application/json" https://staging.connect.posit.cloud/nonexistent-12345 5) curl -s -i https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000
 [LEARN] NO_NEW_LEARN 2026-09-08 17:24: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists, REJECTED AUTH @ api.emsisoft.com example GUIDs 401 dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json, ACCEPTED MISCONFIG @ staging.connect SPA fallback reconfirmed alive — no class transition
 [RISK] 68 reason: systemic exposure — 65 endpoints public unauth on 3 envs + 401 vs 404 existence oracle + 9x200 vs 3x404 enumeratable UUIDv7 share hosts with per-object len variance (178193/13874) + staging SPA catch-all systemic (200 len2526 == nonexistent vs api 404) suggests missing auth/isolation; no direct auth bypass yet but high enumeration/infra disclosure surface
+## 2026-09-08 20:10:09 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 78
+reasoning: 9x200 vs 3x404 differential reconfirmed 2026-09-08 17:32 on inventory hosts (0190c2c9/019c9000 200 vs 01912861 404); len variance 178193 vs 13874 vs 50444 indicates distinct bodies per UUID not uniform SPA shell; prior requires body PII proof to upgrade from enumerability to data leak.
+evidence_needed: body diff shows tenant PII/app data vs public 404 shell; Content-Type not uniform text/html shell; hash divergence
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -i ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -i ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -i ; diff bodies sha256sum, check for user emails/tokens vs SPA marker len2526
+impact: unauth cross-tenant PII/content dump via predictable UUIDv7 subdomain enumeration — high (confidentiality)
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 88
+reasoning: /swagger/v1.0/swagger.json 200 application/json unauth on prod/apitest/apistage reconfirmed 2026-09-08 17:32; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 confirms unauth endpoint existence oracle; example swagger GUIDs 401 dead confirms need non-example ID for BOLA but oracle remains alive.
+evidence_needed: swagger 65 endpoints 353 GUIDs parse confirmed; oracle differential stable across 3 envs; non-example ID not yet tested
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -H Accept:application/json ; GET https://api.emsisoft.com/v1/workspaces -i ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -i ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json -i ; compare 401 vs 404
+impact: full API surface map + endpoint existence oracle enables targeted BOLA/IDOR without auth brute force — medium-high
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 65
+reasoning: /__api__/v1/content 200 len2526 text/html == /nonexistent-12345 200 len2526 vs api.connect.posit.cloud/__api__/v1/content 404 proves systemic SPA fallback on staging/connect not isolated; state needs Accept negotiation to reveal true API response; api subdomain correctly 404 indicates inconsistent hardening.
+evidence_needed: Accept: application/json returns JSON 401/404 instead of HTML shell on staging; Content-Negotiation bypass proves false-positive vs true leak
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -H Accept:application/json -i ; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 -H Accept:application/json -i ; GET https://api.connect.posit.cloud/__api__/v1/content -H Accept:application/json -i ; GET https://staging.connect.posit.cloud/nonexistent-12345 -H Accept:application/json -i ; compare status/content-type
+impact: auth bypass hidden by SPA fallback could expose content listing API unauth if negotiation succeeds — medium
+testability: PASSIVE
+[PARKED] NONE — all 3 hypotheses confidence >=40 and classes not on REJECTED list (SSRF docker-registry, SSO oracle, example-token AUTH excluded by design)
+[FINAL] 1) [HYP emsisoft] Public Swagger + 401vs404 oracle (88) 2) [HYP posit] Share Connect IDOR per-object (78) 3) [HYP posit] Staging SPA catch-all (65)
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-08 across 5+ cycles — class dead remains per 2026-08-26 directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA; MISCONFIG oracle alive
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential reconfirmed 2026-09-08 — enumerability alive, dynamic content variance extends, needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs404 oracle reconfirmed 2026-09-08 alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: SPA catch-all 200 len2526 == /nonexistent vs api.connect 404 systemic alive — needs Accept negotiation, false-positive risk remains
+[RISK] 71 systemic unauth enumeration high (public swagger 3-env + predictable share UUID subdomain differential 9x200/3x404 with len divergence) but direct auth bypass/SSRF dead (docker-registry NXDOMAIN, example-token 401, staging SPA masks true 404 until content-negotiation proves JSON leak); overall program exposure medium-high pending body PII and negotiation proofs
