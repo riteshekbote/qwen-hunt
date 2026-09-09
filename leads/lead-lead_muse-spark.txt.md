@@ -5246,3 +5246,37 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-09 across 5+ cycles per directive — class dead drop
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest fabricated docs dead remains — need non-example ID for BOLA
 [RISK] 62 — share.connect.posit.cloud 9x200 vs 3x404 unauth enumerability persists with dynamic len variance (13874/178193) plus api.emsisoft.com 65-endpoint public swagger with 401 vs 404 oracle gives systemic surface map; staging SPA fallback is false-positive risk until Accept negotiation proves JSON leak
+## 2026-09-09 11:46:19 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 72
+reasoning: 9x200 vs 3x404 on UUIDv7 share subdomains reconfirmed 2026-09-09 01:15/06:00/11:18 unauth; len variance 178193 vs 13874 vs 50444 indicates per-object content not uniform 404; 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud 404 vs 0190c2c9 200 confirms enumerability alive.
+evidence_needed: body of 200 hosts contains user PII / app data vs generic HTML shell; check title, meta, JS bundle vs rendered content
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ unauth, compare headers+body head -n 300, grep PII patterns; passive only, no brute
+impact: cross-tenant content disclosure, user PII/session leakage, IDOR/BOLA chained to ATO, high severity if PII confirmed
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 88
+reasoning: https://api.emsisoft.com/swagger/v1.0/swagger.json 200 application/json unauth on prod/apitest/apistage reconfirmed 2026-09-09 11:18; 65 endpoints, 3-env identical; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 confirms oracle alive.
+evidence_needed: swagger 200 persists unauth across 3 envs; 401 vs 404 differential stable; no auth bypass via example GUIDs (401 expected)
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json ; GET https://api.emsisoft.com/v1/workspaces ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 unauth compare status
+impact: complete API map disclosure, GUID/email/billing schema leak, enables targeted BOLA/fuzzing, medium-high
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 62
+reasoning: https://staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html unauth mirrors https://staging.connect.posit.cloud/nonexistent-12345 200 len2526 identical; vs https://api.connect.posit.cloud/__api__/v1/content 404 differential reconfirmed 06:00/11:18 across 7+ cycles confirms systemic SPA fallback not isolated endpoint.
+evidence_needed: Accept: application/json vs text/html negotiation to prove JSON leak vs HTML shell false positive; if JSON returns 200 with data then true misconfig
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: application/json ; GET https://staging.connect.posit.cloud/__api__/v1/content with Accept: text/html ; GET https://api.connect.posit.cloud/__api__/v1/content ; GET https://staging.connect.posit.cloud/nonexistent-12345 unauth compare status+content-type+len
+impact: if JSON leaks, unauth API content disclosure / IDOR; if shell only, info disclosure + inconsistent auth, low-medium
+testability: PASSIVE
+[PARKED] NONE: all hypotheses confidence >=40 and class not on REJECTED list (IDOR and MISCONFIG are ACCEPTED per knowledge base); SSRF @ docker-registry.docker.com deliberately excluded per NXDOMAIN 5+ cycles 2026-08-26 to 2026-09-09 directive dead
+[FINAL] 1) [HYP emsisoft] Public swagger exposure + 401 vs 404 endpoint oracle (88) 2) [HYP posit] Unauthenticated IDOR per-object PII exposure via UUIDv7 share subdomains (72) 3) [HYP posit] Systemic SPA catch-all masks API auth state (62)
+[NEXT] PROBE: 5 parallel unauth read-only GETs to close PII vs shell + Accept negotiation gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -n 300 ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | head -n 300 ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ | head -n 20 ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content | head -n 100 ; curl -s -D - -H "Accept: text/html" https://staging.connect.posit.cloud/__api__/v1/content | head -n 50
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 per-object variance reconfirmed alive 2026-09-09 11:18 — needs body PII proof, no class transition
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed alive — no transition
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 SPA fallback alive — needs Accept negotiation, no transition
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-09 dead per directive — drop class
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive
+[RISK] 68 reason: persistent unauth enumerability (9x200 vs 3x404 UUIDv7 share) with len variance suggests real per-object disclosure risk pending PII proof; 65-endpoint swagger on 3 envs public unauth + stable 401 vs 404 oracle gives full attack map; SPA fallback systemic on staging vs hardened api subdomain indicates inconsistent auth but not yet proven JSON leak; overall exposure medium-high, exploitability not yet proven without body content.
