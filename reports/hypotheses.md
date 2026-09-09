@@ -3149,3 +3149,11 @@
 - LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 SPA catch-all persists alive needs Accept ne
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-09 across 5+ cycles per directive — class dead drop
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID f
+
+## RANKED HYPOTHESES 2026-09-09 19:24:32 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth read-only GETs to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cl
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: NO_NEW_LEARN 2026-09-09 18:51 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists (5+ cycles 2026-08-26 to 2026-09-09) and REJECTED AUTH @ a
