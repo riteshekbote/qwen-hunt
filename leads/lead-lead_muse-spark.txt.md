@@ -5415,3 +5415,32 @@ testability: PASSIVE
 [NEXT] PROBE: 5 parallel unauth read-only GETs to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content
 [LEARN] NO_NEW_LEARN 2026-09-09 18:51 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists (5+ cycles 2026-08-26 to 2026-09-09) and REJECTED AUTH @ api.emsisoft.com via swagger example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404 per-object variance alive needs body PII proof; ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints 3-env +401 vs 404 oracle alive; ACCEPTED MISCONFIG @ staging.connect SPA fallback alive needs Accept negotiation — no class transition
 [RISK] 68 — unauth per-object IDOR variance on enumerable Connect shares + systemic 3-env swagger/oracle exposure remains alive; staging SPA is false-positive risk until Accept-proven, docker-registry SSRF and example-token BOLA remain dead
+## 2026-09-09 21:41:23 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 72
+reasoning: 9x200 vs 3x404 differential persistent 2026-08-27 to 2026-09-09 19:24 reconfirmed; len 178193 vs 13874 vs 404 indicates distinct bodies not uniform SPA shell; unauth GET 200 text/html on CloudFront+S3; needs body PII proof vs shell
+evidence_needed: body hash/content diff shows user PII/app data vs generic HTML shell; Accept: application/json variant returns JSON vs HTML
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ (404 control); re-GET each with -H "Accept: application/json" and -H "Accept: text/html"; sha256sum bodies compare len/type
+impact: cross-tenant unauth enumeration of shared Posit Connect content; PII/app data disclosure if bodies contain user data — High
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 92
+reasoning: GET /swagger/v1.0/swagger.json 200 unauth reconfirmed 2026-09-09 18:51 on prod/apitest/apistage identical 65 endpoints; 401 on /v1/workspaces vs 404 on /v1/workspaces/00000000-0000-0000-0000-000000000000 and /v1/licenses confirms oracle alive; Cloudflare HSTS Swagger UI
+evidence_needed: spec fetch unauth proves systemic exposure; 401 vs 404 differential proves endpoint enumeration without auth
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -H "Accept: application/json"; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json; GET https://api.emsisoft.com/v1/workspaces; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000; GET https://api.emsisoft.com/v1/licenses
+impact: full 65-endpoint attack surface map, example GUID/email/billing structures leaked, enables BOLA/IDOR targeting — Medium, chaining enabler
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 58
+reasoning: GET /__api__/v1/content 200 len2526 text/html == /nonexistent-12345 vs GET https://api.connect.posit.cloud/__api__/v1/content 404 reconfirmed 7+ cycles through 2026-09-09 19:24; identical len proves SPA fallback not isolated; ?limit=1 still 200 len2526; needs content-negotiation to prove JSON leak vs false positive
+evidence_needed: Accept: application/json returns JSON listing vs HTML shell; api subdomain correctly hardened 404 proves differential
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content ; GET https://staging.connect.posit.cloud/nonexistent-12345 ; GET https://api.connect.posit.cloud/__api__/v1/content ; GET https://staging.connect.posit.cloud/__api__/v1/content -H "Accept: application/json" ; GET https://staging.connect.posit.cloud/__api__/v1/content?limit=1 -H "Accept: application/json"
+impact: if JSON leaks, unauth API content listing disclosure on staging (potential prod mirror) — Medium, false-positive risk until proven
+testability: PASSIVE
+[FINAL] 1: [HYP posit] Unauth IDOR per-object variance on share.connect UUIDv7 subdomains (72) | 2: [HYP emsisoft] Public OpenAPI spec exposure + 401 vs 404 oracle (92) | 3: [HYP posit] SPA catch-all misconfig on staging.connect __api__ (58) — ranked by exploitability+busvalue despite emsisoft higher confidence, IDOR retains top chaining value
+[NEXT] PROBE: 5 parallel unauth read-only GETs to close PII vs shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - -H "Accept: application/json" https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; sha256sum bodies + compare len/content-type
+[LEARN] NO_NEW_LEARN 2026-09-09 19:24 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists 2026-08-26 to 2026-09-09 and REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints 3-env +401 vs 404 oracle, ACCEPTED MISCONFIG @ staging.connect SPA fallback reconfirmed alive — no class transition
+[RISK] 71 — persistent unauth 9x200 vs 3x404 enumerability on share.connect with len variance (PII unverified), systemic 65-endpoint swagger public on 3 envs + 401 vs 404 oracle, and SPA catch-all 200==nonexistent vs api 404 on Posit Connect; chaining to PII/IDOR remains plausible but needs body proof and Accept negotiation to escalate from MISCONFIG to confirmed IDOR
