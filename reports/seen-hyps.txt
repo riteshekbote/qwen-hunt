@@ -23,3 +23,6 @@ df316b3d8b79f581 Emsisoft API workspace GUIDs return 404 not 401
 3f46ede5ab3412df Emsisoft 65-Endpoint Swagger Systemic Exposure + Auth Oracle
 d16afdbfa3b7d382 Posit Connect Share Unauthenticated Cross-Tenant Content Disclosure
 924de939c59a9bbd Staging Connect SPA Catch-All Masquerading as API Content Listing
+73f7ce8857332adc Unauth per-object share IDOR/PII disclosure on UUIDv7 share subdomains
+acdd239e4bca01ac Public OpenAPI spec + 401 vs 404 endpoint existence oracle systemic exposure
+ab7778f83687d5db SPA catch-all false-positive risk on staging/connect __api__/v1/content needs content-negotiation proof
