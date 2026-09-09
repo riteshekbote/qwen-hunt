@@ -5349,3 +5349,39 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-09 persists dead per directive — drop class
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
 [RISK] 68 reason: Persistent unauth 9x200 vs 3x404 share subdomain variance with dynamic len178193 vs 13874 unauth exposes enumerability; 3-env public 65-endpoint swagger + 401 vs 404 oracle gives full surface map; staging SPA 200==nonexistent indicates systemic fallback masking true auth, but api.connect 404 shows hardening — overall High enumerability, Medium immediate PII risk pending body proof.
+## 2026-09-09 18:51:28 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 75
+reasoning: 9x200 vs 3x404 unauth persists 2026-09-09 11:18/15:19 with len variance 178193 vs 13874 vs 404; real CT-derived UUIDv7 hosts; text/html 200 on valid vs 404 on invalid proves per-object access control variance not generic wildcard
+evidence_needed: unauth body contains user PII/content beyond SPA shell and Accept: application/json still returns 200 html vs 404 differential
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth -D - ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth -D - ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ unauth expect 404 ; diff len/body hash + grep for email/token/PII
+impact: unauth enumeration and per-object share disclosure -> cross-tenant PII/content leak; severity High if PII confirmed
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 85
+reasoning: GET /swagger/v1.0/swagger.json 200 len=? application/json on prod/apitest/apistage reconfirmed 2026-09-09 15:19 public no auth; 65 endpoints; GET /v1/workspaces 401 vs GET /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs GET /v1/licenses 404 proves oracle alive despite example-token AUTH dead
+evidence_needed: 3-env spec byte-identical + consistent 401 base vs 404 UUID path differential confirms enumerability without auth
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -H "Accept: application/json" ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json ; GET https://api.emsisoft.com/v1/workspaces ->401 ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 ->404 ; GET https://api.emsisoft.com/v1/licenses ->404
+impact: complete attack surface map (65 endpoints, schemas, example GUIDs) enables targeted BOLA/IDOR; severity Medium (info disclosure -> enables exploit)
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 68
+reasoning: GET /__api__/v1/content 200 len2526 text/html identical to GET /nonexistent-12345 200 len2526 on staging, while GET https://api.connect.posit.cloud/__api__/v1/content 404 and ?limit=1 404 reconfirmed 2026-09-09 16:18; suggests systemic SPA fallback not real API auth bypass
+evidence_needed: Accept: application/json negotiation still returns 200 html (proves SPA) vs 401/404 json (would prove real leak)
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -H "Accept: text/html" ; GET https://staging.connect.posit.cloud/__api__/v1/content -H "Accept: application/json" ; GET https://staging.connect.posit.cloud/nonexistent-12345 -H "Accept: application/json" compare hash ; GET https://api.connect.posit.cloud/__api__/v1/content -H "Accept: application/json" expect 404
+impact: if JSON returns data unauth -> sensitive content listing IDOR; if SPA only -> info disclosure false-positive, low severity
+testability: PASSIVE
+[PARKED] NONE: all three confidence >=40, classes IDOR/MISCONFIG are ACCEPTED, all have concrete verify_steps; SSRF @ docker-registry.docker.com/v2 excluded per REJECTED list NXDOMAIN 2026-08-26 to 2026-09-09 and AUTH via swagger example tokens excluded per REJECTED 401 fabricated docs
+[FINAL] 1. [HYP emsisoft] Public OpenAPI spec + 401 vs 404 endpoint existence oracle systemic exposure (85)
+[FINAL] 2. [HYP posit] Unauth per-object IDOR/PII on UUIDv7 share subdomains 9x200 vs 3x404 (75)
+[FINAL] 3. [HYP posit] SPA catch-all false-positive risk on staging __api__/v1/content needs content-negotiation proof (68)
+[NEXT] PROBE: 5 parallel unauth read-only GETs to close PII vs shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -H "Accept: application/json" -D - https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -H "Accept: application/json" -D - https://api.connect.posit.cloud/__api__/v1/content ; diff bodies/hashes, grep -i "email|user|token|guid" and check Content-Type
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 unauth per-object variance reconfirmed 2026-09-09 alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-09 alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 SPA catch-all persists alive needs Accept negotiation
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-09 across 5+ cycles per directive — class dead drop
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID for BOLA
+[RISK] 71 reason: 9x200 vs 3x404 unauth share IDOR with len variance alive + 65-endpoint 3-env public swagger + 401 vs 404 oracle systemic alive on emsisoft, plus SPA fallback systemic on staging requires negotiation; offset by docker-registry SSRF dead and example-token AUTH dead, but enumerability remains high
