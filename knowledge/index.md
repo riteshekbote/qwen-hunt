@@ -768,3 +768,4 @@
 - 2026-09-10 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 reconfirmed 2026-09-10 per-object variance alive needs body PII proof
 - 2026-09-10 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect 404 SPA fallback alive needs Accept negotiation
 - 2026-09-10 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-10 persists dead — drop class
+- 2026-09-10 NO_NEW_LEARN 2026-09-10 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists and REJECTED AUTH @ api.emsisoft.com via swagger example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger 65 endpoints 3-env +401vs404 oracle, ACCEPTED MISCONFIG @ staging.connect SPA fallback remain alive — no class transition
