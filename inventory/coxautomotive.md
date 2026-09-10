@@ -1825,3 +1825,8 @@
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
 - NEW https://api.coxautoinc.com/endpoint?param=admin -> HTTP 403 2026-09-09 23:57 (first admin-param probe variant)
+
+## 2026-09-10 04:00:07 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
