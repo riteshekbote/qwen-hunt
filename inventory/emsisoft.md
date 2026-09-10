@@ -770,3 +770,6 @@
 ## 2026-09-09 23:30:54 UTC
 
 ## 2026-09-09 23:57:04 UTC
+
+## 2026-09-10 01:29:47 UTC
+- NEW https://api.emsisoft.com/swagger/v1.0/swagger.json reconfirmed 200 application/json unauth + /v1/workspaces 401 vs /v1/workspaces/00000000-... 404 oracle persists 23:57
