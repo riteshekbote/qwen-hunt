@@ -5984,3 +5984,37 @@ testability: PASSIVE
 [NEXT] PROBE: 5 parallel unauth read-only GETs -D to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content
 [LEARN] NO_NEW_LEARN this cycle: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists 2026-08-26 to 2026-09-10 dead; REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example GUIDs 401 fabricated dead; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404 len178193/13874 per-object variance alive needs body PII proof; ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json 65 endpoints 3-env +401 vs404 oracle alive; ACCEPTED MISCONFIG @ staging.connect.posit.cloud SPA fallback 200 len2526 == /nonexistent vs api 404 alive needs Accept negotiation — no class transition
 [RISK] 68 — high business value PII surface on share.connect.posit.cloud (unauth per-object 200 vs 404 enumerability) + systemic public swagger 65-endpoint map 3-env with endpoint oracle (401 vs404) enlarges attack surface, but staging SPA proven catch-all lowers immediate JSON leak likelihood; no active SSRF/auth bypass proven.
+## 2026-09-11 04:35:07 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 68
+reasoning: 9x200 vs 3x404 UUIDv7 differential reconfirmed 2026-09-10 22:23 len178193 vs 13874 text/html unauth; 01912861 404 control proves variance not wildcard; needs body PII proof to close SPA-shell vs leak gap.
+evidence_needed: HTML body diff on 200 hosts contains user PII/app data vs generic shell; headers show no auth challenge
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -D unauth; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -D unauth; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -D unauth; diff len+body SHA256 hash
+impact: Unauthenticated cross-tenant PII/app source dump via predictable UUIDv7 enumeration - High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 82
+reasoning: 65 endpoints 3-env (api/apitest/apistage) 200 unauth Cloudflare reconfirmed 2026-09-10; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 confirms endpoint existence oracle alive despite example-token AUTH dead.
+evidence_needed: Full OpenAPI spec download shows auth scheme + real endpoint map; 401 vs 404 differential persists across envs for non-example UUID path
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json; GET https://api.emsisoft.com/v1/workspaces (expect 401); GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 (expect 404); repeat on apitest/apistage
+impact: Complete API surface enumeration enables targeted BOLA/fuzzing on billing/workspace/license flows - Medium
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 55
+reasoning: 200 len2526 text/html unauth mirrors /nonexistent-12345 and prod staging.connect identical across 7+ cycles; api.connect.posit.cloud/__api__/v1/content 404 proves api subdomain correctly hardened - systemic SPA fallback not isolated 404.
+evidence_needed: Accept: application/json negotiation still returns 200 text/html vs 401/404 JSON - proves false-positive SPA fallback not auth bypass
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -H Accept:text/html -D; GET https://staging.connect.posit.cloud/__api__/v1/content -H Accept:application/json -D; GET https://staging.connect.posit.cloud/nonexistent-12345 -D compare; GET https://api.connect.posit.cloud/__api__/v1/content -D compare
+impact: If Accept JSON returns 200 JSON unauth then mass content listing leak - High if proven, else false-positive
+testability: PASSIVE
+[FINAL] 1. [HYP posit] share.connect.posit.cloud unauth per-object content disclosure (68) - survives, concrete unauth variance + len delta
+[FINAL] 2. [HYP emsisoft] api.emsisoft.com swagger enumeration + 401 vs 404 BOLA oracle (82) - survives, reconfirmed alive per 2026-09-10
+[FINAL] 3. [HYP posit] staging.connect.posit.cloud SPA catch-all vs true JSON leak (55) - survives, needs Accept negotiation to disprove false-positive
+[NEXT] PROBE: 5 parallel unauth read-only GETs -D to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content; curl -s -D - https://api.connect.posit.cloud/__api__/v1/content
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-10 persists - class dead per directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains - need non-example ID for BOLA
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential per-object variance alive reconfirmed 2026-09-10 needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle alive reconfirmed 2026-09-10
+[RISK] 62 reason: unauth enumerability on share.connect (9x200 vs 3x404) + systemic public swagger surface (65 endpoints 3-env) + systemic SPA fallback (200==/nonexistent vs api 404) keeps exposure medium-high; no proven PII/JSON leak yet, but attack surface remains countable and probe-allow expandable
