@@ -6113,3 +6113,33 @@ testability: PASSIVE
 [NEXT] PROBE: 5 parallel unauth read-only GETs -D to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/nonexistent-12345
 [LEARN] NO_NEW_LEARN 2026-09-11: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN 5+ cycles 2026-08-26 to 2026-09-11 persists dead; REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger 65 endpoints 3-env +401 vs404 oracle, ACCEPTED MISCONFIG @ staging.connect SPA fallback 200==/nonexistent vs api 404 reconfirmed alive — no class transition
 [RISK] 71 reason: 3 systemic alive positives unauth (share IDOR enumerability 9x200 vs 3x404 len178193/13874, 65-endpoint swagger 3-env public, SPA fallback 2526 systemic) with high gate_ease 10 but no proven PII JSON leak yet; prod api.connect correctly 404 mitigates; broad CT inventory amplifies enumeration risk
+## 2026-09-11 13:32:56 UTC (model muse-spark)
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 78
+reasoning: 200 application/json unauth on prod/apitest/apistage reconfirmed 09:33, 65 endpoints live. /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 and /v1/licenses 404 reconfirmed — unauth oracle enumerates valid endpoints without token.
+evidence_needed: raw swagger.json endpoint count + 401 vs 404 differential on 2+ paths to prove targetable BOLA surface
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json (no auth); GET https://api.emsisoft.com/v1/workspaces (expect 401); GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 (expect 404); GET https://api.emsisoft.com/v1/licenses (expect 404)
+impact: full API surface map + endpoint existence oracle for BOLA/IDOR fuzzing; medium severity enumeration, enables targeted authz bypass
+testability: PASSIVE
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 82
+reasoning: REAL INVENTORY UUIDv7 hosts show persistent 9x200 vs 3x404. Latest 0190c2c9 200 len178193 vs 019c9000 200 len13874 vs 01912861 404 proves per-object variance, no auth. Length variance indicates dynamic user content, not static SPA shell.
+evidence_needed: response bodies/headers proving 200s serve distinct user content (not same HTML shell) + PII/email/app data in HTML
+verify_steps: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ (expect 404); diff Content-Length, title, body for PII
+impact: unauth access to private Shiny apps/content via subdomain enumeration; high severity cross-tenant PII/content leak
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 62
+reasoning: staging /__api__/v1/content 200 len2526 text/html == /nonexistent-12345 200 len2526 proves systemic SPA catch-all on staging. https://api.connect.posit.cloud/__api__/v1/content 404 differential proves prod API correctly hardened. Staging may return JSON with Accept: application/json instead of HTML.
+evidence_needed: Accept: application/json response differing from HTML shell (JSON content list vs 2526 HTML) to prove true unauth data leak vs false-positive SPA
+verify_steps: curl -s -D - https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/nonexistent-12345 ; curl -s -D - https://api.connect.posit.cloud/__api__/v1/content
+impact: unauth content inventory disclosure on staging (app names, owners, metadata); medium severity if JSON leak confirmed
+testability: PASSIVE
+[PARKED] NONE — all 3 hypotheses confidence >=62, class not on REJECTED list (SSRF docker-registry NXDOMAIN, AUTH example GUIDs both dead per 2026-08-26/22 remain dropped), verify_steps concrete passive GETs.
+[FINAL] 1: [HYP posit] Share subdomain IDOR enumerability — unauth per-object variance (82) | 2: [HYP emsisoft] Swagger surface + 401vs404 oracle (78) | 3: [HYP posit] SPA catch-all masks API leak — Accept negotiation gap (62)
+[NEXT] PROBE: 5 parallel unauth read-only GETs -D to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content ; curl -s -D - https://api.connect.posit.cloud/__api__/v1/content
+[LEARN] NO_NEW_LEARN 2026-09-11: REJECTED SSRF @ https://docker-registry.docker.com/v2/ NXDOMAIN 5+ cycles 2026-08-26 to 2026-09-11 persists dead — keep dropped; REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via example swagger GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints, ACCEPTED MISCONFIG @ staging.connect SPA fallback 200==/nonexistent vs api 404 remain alive — no class transition
+[RISK] 71 — persistent unauth IDOR enumerability (9x200 vs 3x404 with len divergence 178k/13k) + systemic 3-env swagger exposure (65 endpoints) with 401 vs 404 oracle + staging SPA catch-all systemic (7+ cycles) leaving Accept-negotiation unproven; docker SSRF and example-token AUTH classes dead, limiting SSRF chain but IDOR/PII and enumeration exposure remains high
