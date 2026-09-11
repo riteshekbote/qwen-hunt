@@ -3377,3 +3377,14 @@
 - NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth read-only GETs -D to close PII vs SPA shell + Accept gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
 - LEARN: NO_NEW_LEARN 2026-09-11: REJECTED SSRF @ https://docker-registry.docker.com/v2/ NXDOMAIN 5+ cycles 2026-08-26 to 2026-09-11 persists dead — keep dropped; REJECT
+
+## RANKED HYPOTHESES 2026-09-11 13:45:51 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -D -H "Accept: text/html" and -H "Accept: application/json" to close PII vs SPA gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle alive reconfirmed 2026-09-11
+- LEARN: ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 per-object variance alive reconfirmed 2026-09-11 needs body PII proof
+- LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-11 persists — class dead per 2026-08-26 directive keep d
+- LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs dead remains need non-ex
