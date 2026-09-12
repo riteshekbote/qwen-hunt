@@ -833,3 +833,7 @@
 - 2026-09-12 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle alive 2026-09-12
 - 2026-09-12 NO_NEW_LEARN 2026-09-12 18:48 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists dead per 2026-08-26 directive; REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints +401vs404 oracle, ACCEPTED MISCONFIG @ staging.connect SPA fallback reconfirmed alive — no class transition
 - 2026-09-12 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-12 persists per 2026-08-26 directive — class dead
+- 2026-09-12 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-12 persists per 2026-08-26 directive — class dead, drop.
+- 2026-09-12 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs — example-token BOLA dead remains, need non-example ID.
+- 2026-09-12 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-12 alive.
+- 2026-09-12 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential reconfirmed 2026-09-12 alive — per-object variance persists, needs body PII proof to upgrade from MISCONFIG to IDOR-PII.
