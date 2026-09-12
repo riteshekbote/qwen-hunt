@@ -831,3 +831,6 @@
 ## 2026-09-12 04:39:03 UTC
 
 ## 2026-09-12 06:19:54 UTC
+
+## 2026-09-12 08:50:07 UTC
+- CHANGED api.emsisoft.com/v1/licenses 404 reconfirms oracle extends beyond /v1/workspaces (vs 00:15 only workspaces); staging.connect.posit.cloud/__api__/v1/content 200 len2526 == /nonexistent-12345 vs api.con
