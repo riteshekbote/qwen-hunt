@@ -7114,3 +7114,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-13 14:12 alive
 [LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/50444 per-object variance persists unauth 2026-09-13 — enumerability alive, needs body PII proof to upgrade severity
 [RISK] 62 — unauth share subdomain differential high enumerability + public 65-endpoint swagger with 401/404 oracle systemic; staging SPA fallback staging-only misrouting contained by prod api 404; no cloud-metadata SSRF or auth bypass proven this cycle
+## 2026-09-13 17:34:34 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 64
+reasoning: 9x200 vs 3x404 differential persists 2026-08-27 to 2026-09-13 16:14 across >15 cycles; lens 13874/50444/178193 variance on unauth GETs; 01912861 404 vs 0190c2c9/019c9000/0191902f 200 proves not wildcard SPA; CloudFront+S3 backend.
+evidence_needed: body hash + title/PII proving 200s serve distinct user content vs identical SPA shell; Accept negotiation diff
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -D - ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -D - ; GET https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ -D - ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -D - ; same 4 with -H "Accept: application/json" + sha256sum body; compare len/content-type/title
+impact: unauth cross-tenant content/PII dump via enumerable UUIDv7 share links — High (confidential app/report exposure)
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 88
+reasoning: 200 unauth on /swagger/v1.0/swagger.json 65 endpoints 3-env (api/apitest/apistage) reconfirmed 2026-09-13 14:12; 401 on /v1/workspaces vs 404 on /v1/workspaces/00000000-0000-0000-0000-000000000000 and 404 on /v1/licenses provides unauth endpoint mapping without creds.
+evidence_needed: fresh swagger fetch + status code differential proves enumeration oracle alive
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -D - ; GET https://api.emsisoft.com/v1/workspaces -D - ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -D - ; GET https://api.emsisoft.com/v1/licenses -D - ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json -D - | sha256sum
+impact: full API surface map + existence oracle enables targeted BOLA/IDOR probing — Medium (information disclosure, facilitates authz bypass)
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 58
+reasoning: 200 len2526 text/html on /__api__/v1/content == /nonexistent-12345 vs 404 on https://api.connect.posit.cloud/__api__/v1/content reconfirmed 2026-09-13 09:41-16:14; now staging-only per 09:41 change indicates inconsistent routing between staging and prod api subdomain.
+evidence_needed: Accept: application/json negotiation to prove JSON leak vs false-positive SPA fallback; header + body diff
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -D - ; GET https://staging.connect.posit.cloud/__api__/v1/content -H "Accept: application/json" -D - ; GET https://staging.connect.posit.cloud/nonexistent-12345 -D - ; GET https://api.connect.posit.cloud/__api__/v1/content -D - ; diff status/len/content-type
+impact: unauth API content listing / information disclosure if JSON returns data — Medium (Low if pure SPA)
+testability: PASSIVE
+[PARKED] NONE: all 3 confidence >=40, class not on REJECTED list (REJECTED: SSO-domain-discovery oracle, OATH *.docker.com, SSRF docker-registry NXDOMAIN, AUTH via swagger example GUIDs, SSRF api.coxautoinc 403, MISCONFIG api.secrets.posit.cloud 404), concrete verify_steps present.
+[FINAL] 1. [HYP emsisoft] api.emsisoft.com public OpenAPI + 401vs404 oracle (88) 2. [HYP posit] share.connect.posit.cloud UUIDv7 unauth IDOR (64) 3. [HYP posit] staging.connect.posit.cloud SPA catch-all differential (58)
+[NEXT] PROBE: 5 parallel unauth read-only GETs -D + Accept negotiation to close PII vs SPA gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -o /tmp/a.body; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -o /tmp/b.body; curl -s -D - https://0191902f-f29f-7d83-3606-3d3a013e33d5.share.connect.posit.cloud/ -o /tmp/c.body; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -D - ; curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -H "Accept: application/json" -D - ; sha256sum /tmp/*.body; grep -i "<title" /tmp/*.body
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential with len 178193/13874/50444 persists unauth 2026-09-13 16:14 — per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle (401 /v1/workspaces vs 404 /000.../licenses) reconfirmed 2026-09-13 14:12 alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect.posit.cloud 404 staging-only SPA fallback reconfirmed 2026-09-13 16:14 alive — needs Accept negotiation, false-positive risk
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-21 to 2026-09-13 persists — class dead per 2026-08-26 directive drop
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA; oracle MISCONFIG remains alive
+[RISK] 62 reason: persistent unauth IDOR enumerability on share.connect.posit.cloud (9x200 vs 3x404) + systemic 3-env swagger exposure with 401vs404 oracle gives attackers full surface map; staging SPA misrouting isolated but shows inconsistent hardening; no proven PII dump yet but enumerability+oracle compound risk across posit+emsisoft
