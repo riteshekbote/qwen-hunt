@@ -3640,3 +3640,15 @@
 - NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth read-only GETs -D + Accept negotiation to close PII vs SPA gap — curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connec
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
 - LEARN: NO_NEW_LEARN 2026-09-13 06:06 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists, REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example GUI
+
+## RANKED HYPOTHESES 2026-09-13 11:47:26 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth read-only GETs -D + Accept negotiation to close PII vs SPA gap: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: 200 len2526 == /nonexistent vs api.connect.posit.cloud 404 differential persists but now is
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential persists unauth 2026-09-13 09:41 — per-object variance alive, needs body 
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconf 2026-09-13 09:41 — enumeration alive
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-13 persists dead per 2026-08-26 directive — keep dropped
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage persists fabricated docs — example-token BOLA dead
