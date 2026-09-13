@@ -878,3 +878,6 @@
 - 2026-09-13 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-13 14:12 alive
 - 2026-09-13 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/50444 per-object variance persists unauth 2026-09-13 alive needs body PII proof
 - 2026-09-13 ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs api.connect 404 change 2026-09-13 09:41 staging SPA fallback alive needs Accept negotiation
+- 2026-09-13 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/50444 differential reconfirmed 2026-09-13 18:48 unauth per-object variance alive needs body PII proof
+- 2026-09-13 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-13 18:48 alive
+- 2026-09-13 ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs api.connect 404 reconfirmed 2026-09-13 18:48 staging SPA fallback alive needs Accept negotiation
