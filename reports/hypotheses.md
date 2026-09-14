@@ -3838,3 +3838,15 @@
 - LEARN: ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-14 14:01 alive
 - LEARN: ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874 differential unauth persists 2026-09-14 alive needs body PII proof (not
 - LEARN: ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs https://api.connect.posit.cloud/__api__
+
+## RANKED HYPOTHESES 2026-09-14 20:49:46 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -D + body sha256 + 200-char snippet to close PII vs SPA gap — GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-14 19:20 alive
+- LEARN: ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential persists unauth 2026-09-14 alive — needs body PII proof to upgrad
+- LEARN: ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs https://api.connect.posit.cloud/__api__
+- LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists dead per directive — keep dropped
+- LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
