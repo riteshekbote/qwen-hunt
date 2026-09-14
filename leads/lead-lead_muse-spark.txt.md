@@ -7654,3 +7654,36 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists dead per directive — drop class
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive
 [RISK] 64 reason: Two systemic enumerability primitives alive and repeatedly reconfirmed (9x200 vs 3x404 share IDOR surface unauth + 65-endpoint swagger 3-env public with 401-vs-404 oracle) plus staging SPA fallback + CA Gateway leak; SSRF-to-metadata class dead (NXDOMAIN) and example-token BOLA dead limit direct takeover, but surface enables PII enumeration/BOLA hunting — exposure Medium-High, exploitability pending PII proof and content-negotiation
+## 2026-09-14 23:46:10 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 75
+reasoning: 9x200 vs 3x404 differential persists 2026-09-14 20:49-22:47 unauth; 0190c2c9 len178193 vs 019c9000 len13874 vs 019c1fdf len? vs 01912861 404 and 0191a3bb 404 confirms per-object variance not SPA catch-all; all content-type text/html requires body PII proof to upgrade from MISCONFIG to IDOR-PII
+evidence_needed: body sha256 + 200-char snippet differential showing non-identical HTML with user-controlled content/PII vs 404 bodies; Content-Length variance 13874 vs 178193 vs 50444
+verify_steps: 5 parallel unauth GET -D: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ (404 control); GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ (404 control) - record status, len, content-type, body sha256, first 200 chars
+impact: unauth cross-tenant read of Posit Connect Cloud shared content - PII/project data leak, medium-high severity if PII confirmed
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 85
+reasoning: /swagger/v1.0/swagger.json 200 unauth on prod/apitest/apistage reveals 65 endpoints + 353 GUIDs/emails/billing structures; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 confirms unauth endpoint existence oracle; example swagger GUIDs 401 identical across 3 env proves fabricated docs but oracle alive
+evidence_needed: fresh GET swagger.json sha256 + 401 vs 404 differential on non-example UUID path vs base path; confirms enumeration without auth bypass via examples
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -D; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json -D; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json -D; GET https://api.emsisoft.com/v1/workspaces -D; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -D; compare status/text
+impact: full API surface map unauth + oracle enables targeted BOLA/IDOR brute-force on real IDs harvested elsewhere, info disclosure high
+testability: PASSIVE
+class: MISCONFIG
+asset: admin.pa1.dealertrack.com
+confidence: 65
+reasoning: admin.pa1 503 (22:47) vs 403 (19:20) flapping vs sso.dealertrack.com 200 len0 text/xml vs api.unifi.dealertrack.com 403 vs authorize.unifi2np 200? shows inconsistent auth gateway routing; prior redirect chain leaked REALMOID/SMAGENTNAME/TARGET - CA Access Gateway Error Report banner on admin.pa1
+evidence_needed: -D headers Location leak + status/body cross-host diff proving infra disclosure and auth inconsistency persists post-flap
+verify_steps: GET https://admin.pa1.dealertrack.com/ -D; GET https://sso.dealertrack.com/ -D; GET https://api.unifi.dealertrack.com/ -D; GET https://admin.pa.unifipa.dealertrack.com/ -D; record status, Server, Location REALMOID/SMAGENTNAME/TARGET, body len/type
+impact: infra fingerprinting + potential auth bypass/open-redirect chain via TARGET param leakage, low-medium alone but chainable to ATO
+testability: PASSIVE
+[FINAL] ranked surviving: 1) [HYP emsisoft] Swagger oracle 85, 2) [HYP posit] share IDOR 75, 3) [HYP coxautomotive] CA Gateway MISCONFIG 65
+[NEXT] PROBE: 5 parallel unauth GET -D + body sha256 + 200-char snippet to close PII vs SPA gap — GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -D ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -D ; GET https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -D ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -D ; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -D ; for each compute sha256sum of body and log first 200 chars, compare len 178193 vs 13874 vs ? vs 404
+[LEARN] ACCEPTED MISCONFIG @ 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud: 9x200 vs 3x404 with len 178193/13874 differential persists unauth 2026-09-14 22:47 - per-object variance alive, needs body PII proof to upgrade to IDOR-PII
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle on /v1/workspaces/000... reconfirmed 22:47 alive - systemic enumeration
+[LEARN] ACCEPTED MISCONFIG @ admin.pa1.dealertrack.com: 503 vs sso.dealertrack.com 200 len0 xml vs api.unifi 403 differential flapping reconfirmed 22:47 - infra disclosure alive, not fixed
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists - class dead drop per 2026-08-26 directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains - need non-example ID for BOLA
+[RISK] 72 - multiple systemic unauth exposures alive: Posit share 9x200 per-object variance enumerability + isolated staging SPA fallback vs api.connect 404 hardening, Emsisoft 3-env swagger 65-endpoint public map + 401 vs 404 oracle, Cox dealer Gateway TARGET leak + inconsistent auth flap; no evidence of fix, but PII proof and non-example BOLA still pending - high breadth, medium immediate exploitability
