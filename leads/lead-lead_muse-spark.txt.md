@@ -7552,3 +7552,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874 differential persists unauth 2026-09-14 14:01 alive needs body PII proof
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists dead per directive
 [RISK] 72 systemic enumeration via emsisoft swagger 65 endpoints 3-env public + per-object share.connect IDOR 9x200 vs 3x404 unauth enumerability + staging SPA fallback inconsistency persists but PII not yet proven
+## 2026-09-14 19:20:13 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 72
+reasoning: 9x200 vs 3x404 differential on UUIDv7 share subdomains persists 2026-08-27 to 2026-09-14 (0190c2c9 178193 vs 019c9000 13874 vs 01912861 404 vs 0191a3bb 404). Content length variance 13874/50444/178193 and dynamic shifts suggest per-object data, not SPA fallback. Unauth GET returns 200 text/html.
+evidence_needed: Body sha256 + 200-char snippet + title extraction showing non-identical HTML with tenant/user data vs generic SPA; differential must not be identical HTML hash
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -i (unauth) ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -i ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -i (expect 404) ; GET https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -i ; hash bodies, compare snippets
+impact: Cross-tenant content enumeration and PII/app data disclosure (200 cacheable share objects) — High if PII confirmed
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 90
+reasoning: 65-endpoint spec publicly accessible unauth 200 on 3 envs (api/apitest/apistage, Cloudflare) reconfirmed 2026-09-14 14:01. Base /v1/workspaces ->401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 ->404 and /v1/licenses ->404 gives stable oracle. Swagger example GUIDs are fabricated (401 identical prod/apitest/apistage) but structure leaks billing/workspace schemas.
+evidence_needed: Fresh 200 swagger.json + 401 vs 404 differential on 2+ endpoints proving oracle; count endpoints/GUIDs
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -i ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json -i ; GET https://apistage.emsisoft.com/swagger/v1.0/swagger.json -i ; GET https://api.emsisoft.com/v1/workspaces -i (expect 401) ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -i (expect 404)
+impact: Complete API surface map + GUID/email/billing schemas + endpoint oracle for directed BOLA — Medium, enables next-stage IDOR
+testability: PASSIVE
+class: MISCONFIG
+asset: https://admin.pa1.dealertrack.com/
+confidence: 65
+reasoning: Redirect Location leaks REALMOID, SMAGENTNAME, TARGET smagentname values (CA Access Gateway Error Report, Apache) reconfirmed pre-2026-09-14. Differential: sso.dealertrack.com 200 len0 xml vs api.unifi* 403 vs admin.pa1 503/200 indicates inconsistent auth enforcement and infra fingerprinting.
+evidence_needed: Location header with REALMOID/SMAGENTNAME/TARGET + status/body length differential across sso vs admin.pa1 vs api.unifi
+verify_steps: GET https://admin.pa1.dealertrack.com/ -i --max-redirects 0 ; GET https://sso.dealertrack.com/ -i ; GET https://api.unifi.dealertrack.com/ -i ; GET https://api.unifipa.dealertrack.com/ -i ; compare status, Location, Server headers
+impact: Infrastructure disclosure (CA Access Gateway realm/agent) + auth bypass surface mapping on dealer/finance platform — Medium
+testability: PASSIVE
+[PARKED] none: all hypotheses confidence >=40, class not on REJECTED list, concrete verify_steps provided
+[FINAL] 1: [HYP emsisoft] Public OpenAPI spec exposure + 401 vs 404 oracle (90) | 2: [HYP posit] Unauthenticated share object IDOR per-object variance (72) | 3: [HYP coxautomotive] CA Access Gateway infra disclosure (65)
+[NEXT] PROBE: 5 parallel unauth GETs -D + body sha256 + 200-char snippet to close PII vs SPA gap: for h in 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud 0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud; do echo "=== $h ==="; curl -s -D - https://$h/ -o /tmp/body.$h.html --max-time 15; echo "LEN=$(wc -c < /tmp/body.$h.html) SHA256=$(sha256sum /tmp/body.$h.html | cut -d' ' -f1)"; head -c 200 /tmp/body.$h.html | cat -A; done
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists per 2026-08-26 directive — class dead drop
+[LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-14 14:01 alive
+[LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874 differential unauth persists 2026-09-14 alive needs body PII proof (not yet upgraded)
+[LEARN] ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs https://api.connect.posit.cloud/__api__/v1/content 404 SPA fallback reconfirmed 2026-09-14 14:01 alive needs Accept: application/json negotiation to prove leak vs SPA false-positive
+[RISK] 62 reason: Two systemic alive surfaces dominate exposure: posit share UUIDv7 9x200 vs 3x404 per-object variance (unauth enumerability, body PII not yet proven, PASSIVE) + emsisoft 65-endpoint swagger 3-env public unauth with 401 vs 404 oracle (enumeration, not direct auth bypass); staging SPA fallback isolated to staging since 2026-09-13 but still alive; coxauto CA gateway leak persists; SSRF/docker-registry NXDOMAIN and emsisoft example-token BOLA remain dead.
