@@ -7487,3 +7487,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874 differential persists unauth 2026-09-14 01:40 — per-object variance alive needs body PII proof
 [LEARN] ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs https://api.connect.posit.cloud 404 systemic SPA fallback alive needs Accept negotiation
 [RISK] 72 — systemic enumerability alive: 65-endpoint swagger 3-env public unauth + BOLA oracle (401 vs 404) plus 9x200 vs 3x404 unauth share subdomain variance with dynamic len178193/13874/50444 unauth content exposure; staging SPA catch-all was prod-wide but now staging-isolated, prod api correctly 404 hardens but staging misrouting persists
+## 2026-09-14 14:00:34 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 68
+reasoning: 9x200 vs 3x404 differential reconfirmed 2026-09-14 10:55 unauth (0190c2c9 178193 text/html vs 01912861 404 vs 019c9000 13874). UUIDv7 subdomain pattern enumeratable, len variance indicates distinct object states not uniform SPA. Body not yet inspected for PII vs SPA fallback.
+evidence_needed: body html diff, sha256 + snippet for PII/app data vs generic SPA shell; headers (cache, x-amz) differential; 200 vs 404 body comparison proves per-object authz variance
+verify_steps: curl -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -n 100; curl -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; diff len + sha256sum body
+impact: unauth access to private Posit Connect Cloud Shiny apps/data, cross-tenant PII dump / source exposure - High
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com
+confidence: 88
+reasoning: https://api.emsisoft.com/swagger/v1.0/swagger.json 200 unauth Cloudflare reconfirmed 2026-09-14 (65 endpoints, 3-env apitest/apistage identical). 401 on /v1/workspaces vs 404 on /v1/workspaces/00000000-0000-0000-0000-000000000000 and /v1/licenses differential proves endpoint existence oracle unauth.
+evidence_needed: swagger.json 200 unauth + Content-Type application/json, 401 vs 404 differential on UUID path vs base persists
+verify_steps: curl -s -D - https://api.emsisoft.com/swagger/v1.0/swagger.json | wc -c; curl -s -D - https://api.emsisoft.com/v1/workspaces; curl -s -D - https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000; curl -s -D - https://api.emsisoft.com/v1/licenses
+impact: full API surface map for BOLA/IDOR brute-force, billing/license structure disclosure - Medium (chained to BOLA High if GUID leaked)
+testability: PASSIVE
+class: MISCONFIG
+asset: staging.connect.posit.cloud
+confidence: 55
+reasoning: staging.connect.posit.cloud/__api__/v1/content 200 len2526 text/html == /nonexistent-12345 (SPA fallback) while api.connect.posit.cloud/__api__/v1/content 404 reconfirmed 2026-09-14 10:55. Staging CloudFront/S3 fallback masks real API. Prod hardened, staging not. Content-Negotiation not yet tested.
+evidence_needed: response with Accept: application/json vs text/html; Content-Type flip to application/json and body JSON vs SPA html proves true API leak vs false positive
+verify_steps: curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content; curl -s -D - -H "Accept: application/json" https://api.connect.posit.cloud/__api__/v1/content; curl -s -D - https://staging.connect.posit.cloud/nonexistent-12345 (control)
+impact: unauth content/listing disclosure on staging (and potential prod misrouting regression) - Medium
+testability: PASSIVE
+[PARKED] none: all 3 hypotheses confidence >=40, class not on REJECTED list (IDOR/MISCONFIG are ACCEPTED), concrete verify_steps present
+[FINAL] 1. [HYP emsisoft] Swagger public exposure + 401 vs 404 oracle (conf 88) 2. [HYP posit] Share Connect IDOR per-object differential (conf 68) 3. [HYP posit] Staging SPA catch-all Accept-negotiation (conf 55)
+[NEXT] PROBE: 5 parallel unauth read-only GETs -D + body sha256 + snippet to close PII vs SPA gap: for h in 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud 0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud; do echo "== $h =="; curl -s -D - https://$h/ -o /tmp/$h.html; echo "LEN $(wc -c < /tmp/$h.html) SHA $(sha256sum /tmp/$h.html | cut -c1-16)"; head -n 80 /tmp/$h.html; echo; done ; plus curl -s -D - -H "Accept: application/json" https://staging.connect.posit.cloud/__api__/v1/content -o /tmp/staging.json; cat /tmp/staging.json | head -n 80
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential unauth reconfirmed 2026-09-14 10:55 per-object variance alive - needs body PII proof to upgrade severity
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-14 alive - systemic enumeration alive
+[LEARN] ACCEPTED MISCONFIG @ staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs api.connect.posit.cloud 404 SPA fallback reconfirmed 2026-09-14 alive - needs Accept negotiation
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists dead per directive - drop class
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains - need non-example ID for BOLA (oracle MISCONFIG remains)
+[RISK] 68 reason: 9x200 vs 3x404 IDOR enumerability on share.connect.posit.cloud unauth alive + swagger 65-endpoint 3-env public spec + 401 vs 404 oracle enables BOLA pre-enumeration + staging SPA fallback persists; prod api.connect correctly hardens (404), SSRF docker-registry NXDOMAIN dead and example-token AUTH dead reduce chainability until body PII proof via next probe
