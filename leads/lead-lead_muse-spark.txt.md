@@ -7452,3 +7452,38 @@ testability: PASSIVE
 [LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential unauth persists alive needs body PII proof
 [LEARN] ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs api.connect 404 SPA fallback alive needs Accept negotiation
 [RISK] 64 reason: public share enumeration (9x200 vs 3x404) with per-object variance exposes customer content unauth; swagger 65-endpoint spec public on 3 envs gives full attack surface + 401 vs 404 oracle; staging SPA fallback persists but api.connect correctly 404s — no proven critical auth bypass, SSRF dead, overall medium-high exposure
+## 2026-09-14 10:55:28 UTC (model muse-spark)
+class: IDOR
+asset: https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000
+confidence: 72
+reasoning: swagger 65 endpoints public unauth on 3 env (api/apitest/apistage) reconfirmed 2026-09-14 01:40; /v1/workspaces 401 vs /v1/workspaces/000... 404 differential persists = endpoint existence oracle alive; example swagger GUIDs 401 fabricated dead but oracle proves authz not 404
+evidence_needed: 401 vs 404 variance on non-example UUID + JSON body difference vs HTML SPA
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -D; GET https://api.emsisoft.com/v1/workspaces -w %{http_code}; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -D; repeat on apitest/apistage; compare 401 vs 404 vs 200 with Accept: application/json
+impact: BOLA / endpoint enumeration -> workspace/tenant ID oracle, 3-env systemic exposure, medium-high
+testability: PASSIVE
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 78
+reasoning: 9x200 vs 3x404 unauth differential reconfirmed 2026-09-14 01:40 len178193/13874/50444; CloudFront+S3, no auth; len variance suggests real content not SPA catch-all; needs body PII proof to upgrade MISCONFIG->IDOR-PII
+evidence_needed: body sha256 + Content-Type + PII text vs 404 baseline across 5 hosts
+verify_steps: 5 parallel unauth GET -D: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/, https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/, https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/, https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ (404 ctl), https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ (404 ctl) — capture headers+body sha256
+impact: enumeratable unauth content/app dump, per-object access control failure, high if PII
+testability: PASSIVE
+class: MISCONFIG
+asset: https://staging.connect.posit.cloud/__api__/v1/content
+confidence: 65
+reasoning: staging 200 len2526 text/html identical to /nonexistent-12345 vs https://api.connect.posit.cloud/__api__/v1/content 404; isolated staging-only since 2026-09-13 09:41 proves prod correctly hardens but staging misroutes all paths to SPA; false-positive risk until Accept negotiation
+evidence_needed: Accept: application/json response Content-Type/len divergence from SPA baseline
+verify_steps: GET https://staging.connect.posit.cloud/__api__/v1/content -H Accept: application/json -D; GET https://staging.connect.posit.cloud/nonexistent-12345 -H Accept: application/json -D; GET https://api.connect.posit.cloud/__api__/v1/content -H Accept: application/json -D; compare status/len/type
+impact: if JSON leak then unauth API content listing; if SPA then low-info disclosure only
+testability: PASSIVE
+[PARKED] SSRF @ docker-registry.docker.com/v2/?param=169.254.169.254: REJECTED class — NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists per 2026-08-26 directive, drop — confidence 0, class dead
+[PARKED] AUTH via swagger example GUIDs @ api.emsisoft.com/v1/workspaces: REJECTED — 401 identical prod/apitest/apistage fabricated docs dead remains, needs non-example ID
+[FINAL] 1) [HYP posit] Unauth cross-tenant disclosure via predictable UUIDv7 share subdomains (78) 2) [HYP emsisoft] BOLA via 401 vs 404 oracle on /v1/workspaces (72) 3) [HYP posit] SPA catch-all vs true JSON leak on staging __api__/v1/content (65)
+[NEXT] PROBE: 5 parallel unauth read-only GETs -D + body sha256 to close PII vs SPA gap: for h in 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud 019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud 0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud; do echo "=== $h ==="; curl -s -D - https://$h/ -o /tmp/$h.body -w "len=%{size_download} type=%{content_type} code=%{http_code}\n"; sha256sum /tmp/$h.body | cut -c1-16; done; plus Accept: application/json variant on staging.connect.posit.cloud/__api__/v1/content
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists dead per 2026-08-26 directive — keep dropped
+[LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed alive 2026-09-14 01:40
+[LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874 differential persists unauth 2026-09-14 01:40 — per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ https://staging.connect.posit.cloud/__api__/v1/content: staging-only 200 len2526 == /nonexistent vs https://api.connect.posit.cloud 404 systemic SPA fallback alive needs Accept negotiation
+[RISK] 72 — systemic enumerability alive: 65-endpoint swagger 3-env public unauth + BOLA oracle (401 vs 404) plus 9x200 vs 3x404 unauth share subdomain variance with dynamic len178193/13874/50444 unauth content exposure; staging SPA catch-all was prod-wide but now staging-isolated, prod api correctly 404 hardens but staging misrouting persists
