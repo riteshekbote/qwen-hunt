@@ -3910,3 +3910,12 @@
 - NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -D + body sha256 + 200-char snippet to close PII vs SPA gap — curl -i -s https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
 - LEARN: NO_NEW_LEARN this cycle — reconfirmed ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json 
+
+## RANKED HYPOTHESES 2026-09-15 11:40:27 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -D + body sha256 + 200-char snippet to close PII vs template gap — curl -i -s https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.co
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: NO_NEW_LEARN this cycle — reconfirmed ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404 per-object variance alive (needs body PII proof); ACCEPTED MISCON
+- LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/ : NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-15 persists — class dead, drop from queue
