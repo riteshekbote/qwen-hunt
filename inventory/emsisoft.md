@@ -918,3 +918,6 @@
 ## 2026-09-15 14:26:48 UTC
 
 ## 2026-09-15 15:41:39 UTC
+
+## 2026-09-15 18:25:16 UTC
+- NEW api.emsisoft.com/v1/licenses -> 404 vs /v1/workspaces 401 differential reconfirmed 2026-09-15 15:41 extends 401 vs 404 oracle beyond workspaces (probe 11:40/15:41)
