@@ -2191,3 +2191,8 @@
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
 - CHANGED admin.pa1.dealertrack.com: 503 at 2026-09-15 09:34/11:40 -> 403 at 2026-09-15 14:26/15:41 flapping indicates WAF/Access Gateway inconsistency (probe_allow: dealertrack)
+
+## 2026-09-15 19:13:55 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
