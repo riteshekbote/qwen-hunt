@@ -945,3 +945,9 @@
 - 2026-09-14 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle on /v1/workspaces/000... reconfirmed 22:47 alive - systemic enumeration
 - 2026-09-14 ACCEPTED MISCONFIG @ admin.pa1.dealertrack.com: 503 vs sso.dealertrack.com 200 len0 xml vs api.unifi 403 differential flapping reconfirmed 22:47 - infra disclosure alive, not fixed
 - 2026-09-14 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists - class dead drop per 2026-08-26 directive
+- 2026-09-15 REJECTED SSRF @ https://docker-registry.docker
+- 2026-09-15 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle alive reconfirmed 2026-09-14 22:47
+- 2026-09-15 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential len178193/13874 persists unauth 2026-09-14 — per-object variance alive needs body PII proof to upgrade severity
+- 2026-09-15 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 vs 403 vs 503 flapping reconfirmed 22:47 infra disclosure alive
+- 2026-09-15 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists per directive — keep dropped
+- 2026-09-15 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID for BOLA

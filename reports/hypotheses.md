@@ -3874,3 +3874,15 @@
 - LEARN: ACCEPTED MISCONFIG @ admin.pa1.dealertrack.com: 503 vs sso.dealertrack.com 200 len0 xml vs api.unifi 403 differential flapping reconfirmed 22:47 - infra disclos
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists - class dead drop per 2026-08-26 directive
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains - need non-example ID
+
+## RANKED HYPOTHESES 2026-09-15 00:56:50 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -D + body sha256 + 200-char snippet to close PII vs SPA gap — GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle alive reconfirmed 2026-09-14 22:47
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential len178193/13874 persists unauth 2026-09-14 — per-object variance alive needs body 
+- LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET leak + 200 vs 403 vs 503 flapping reconfirmed 22:47 infra dis
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-14 persists per directive — keep dropped
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID f
