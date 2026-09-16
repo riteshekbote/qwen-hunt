@@ -984,3 +984,5 @@
 - 2026-09-15 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential reconfirmed 2026-09-15 21:41 — per-object variance alive, needs body PII proof to upgrade severity
 - 2026-09-15 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-15 persists — class dead per directive, drop from queue remains
 - 2026-09-15 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage — fabricated docs, example-token BOLA dead remains, need non-example ID for BOLA
+- 2026-09-16 REJECTED SSRF @ https://docker-registry.docker
+- 2026-09-16 NO_NEW_LEARN 2026-09-15 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists and REJECTED AUTH @ api.emsisoft.com example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404 per-object variance alive needs body PII proof; ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints 3-env +401vs404 oracle alive; ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1 infra disclosure + 200 vs 403 differential alive — no class transition
