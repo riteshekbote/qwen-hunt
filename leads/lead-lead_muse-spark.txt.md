@@ -8178,3 +8178,37 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-16 persists dead per directive drop
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID
 [RISK] 68 — share.connect 9x200 unauth variance with enumerability from CT inventory retains IDOR-PII potential (body proof pending), emsisoft 3-env 65-endpoint public spec + 401/404 oracle systemic alive, dealertrack SSO infra leak + inconsistent auth persists; SSRF registry + example-token AUTH + api.secrets 404 classes remain dead — overall exposure medium-high but not critical until PII confirmed
+## 2026-09-16 09:47:27 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 68
+reasoning: 9x200 vs 3x404 differential reconfirmed 2026-09-16 04:41-05:16 unauth; 0190c2c9 178193 vs 019c9000 13874 len variance proves per-object content not SPA uniform; CT inventory shows predictable UUIDv7 share IDs enumerability alive
+evidence_needed: Body PII vs SPA template — sha256 + 200-char snippet + content-disposition/mime variance across 200 hosts vs 404 hosts
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -i -s ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -i -s ; GET https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -i -s ; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -i -s ; GET https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -i -s — capture status, len, content-type, sha256(body), 200-char body prefix passive
+impact: Cross-tenant unauth content enumeration — if bodies contain app data/PII, IDOR-PII high; else MISCONFIG enumerability medium; business_value: Posit Connect Cloud shares
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 82
+reasoning: Swagger 200 unauth at 05:16 prod/apitest/apistage 65 endpoints persistent; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 reconfirmed 05:16 proves unauth endpoint oracle; /v1/licenses 404 vs /v1/account 401 extends oracle
+evidence_needed: Confirm oracle stable across 3 envs + non-guessable UUID path returns 404 not 401, proving mapper leaks existence without auth; needs non-example ID for BOLA upgrade
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -i (capture len/etag); GET https://api.emsisoft.com/v1/workspaces -i; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -i; GET https://api.emsisoft.com/v1/licenses -i; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json -i — compare status 401 vs 404 passive
+impact: Attacker maps full API surface (65 endpoints, schema with GUIDs/emails) without auth — enables targeted BOLA/fuzzing; severity medium (enumeration) -> high if BOLA found
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com
+confidence: 71
+reasoning: sso.dealertrack.com 200 len0 text/xml unauth vs api.unifi.dealertrack.com 403 vs admin.pa1.dealertrack.com 503->502 flap at 05:16 proves inconsistent auth; redirect chain leaks REALMOID/SMAGENTNAME/TARGET params (historical ACCEPTED 2026-09-15 21:41 reconfirmed)
+evidence_needed: Location header + body leak on redirect, status differential persistence, header fingerprint (Server: Apache, CA SMAGENTNAME)
+verify_steps: GET https://sso.dealertrack.com/ -i -s -L ; GET https://sso.dealertrack.com -i -s ; GET https://admin.pa1.dealertrack.com/ -i -s ; GET https://api.unifi.dealertrack.com/ -i -s ; GET https://api.unifi2np.dealertrack.com/ -i -s — capture status, len, Location, Server, Set-Cookie passive
+impact: Infra disclosure (CA Access Gateway version/routing) + inconsistent access control suggests auth bypass candidate; severity medium, chaining to admin path possible
+testability: PASSIVE
+[PARKED] SSRF @ docker-registry.docker.com/v2/?param=169.254.169.254: REJECTED per KNOWLEDGE 2026-08-26 NXDOMAIN across 5+ cycles 08-26 to 09-16 persist dead — class dead, do not re-probe (aggregated NEXT dupes from hypotheses-qwen14b/8b)
+[FINAL] 1: [HYP emsisoft] Endpoint existence oracle via 401 vs 404 differential — 82 (strongest gate_ease + fresh reconf)
+[FINAL] 2: [HYP coxautomotive] CA Access Gateway infra disclosure + inconsistent auth — 71 (fresh flap)
+[FINAL] 3: [HYP posit] Per-object unauth content disclosure via UUIDv7 share variance — 68 (needs PII proof to upgrade)
+[NEXT] PROBE: 5 parallel unauth GET -D + sha256 + snippet to close PII vs SPA gap on share.connect.posit.cloud — curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | tee /tmp/a.txt; sha256sum /tmp/a.txt; head -c 200 /tmp/a.txt; curl -i -s https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | same; curl -i -s https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ | same; curl -i -s https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -i ; curl -i -s https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -i — PASSIVE read-only
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-16 persists dead per directive — drop class
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 05:16 fabricated docs dead — need non-example ID for BOLA, oracle MISCONFIG remains alive
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 vs 403 vs 502 flap + REALMOID leak reconfirmed 05:16 alive — infra disclosure persists
+[RISK] 74 reason: 3 systemic ALIVE exposures: 9x200 vs 3x404 unauth share variance (enumerability + per-object len variance needs PII proof), 65-endpoint Swagger public on 3 envs + stable 401 vs 404 oracle (full surface map unauth), CA gateway REALMOID leak + 200/403/502 inconsistent auth flap — no new SSRF/AUTH bypass proven, but exposure breadth high
