@@ -8212,3 +8212,37 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 05:16 fabricated docs dead — need non-example ID for BOLA, oracle MISCONFIG remains alive
 [LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 vs 403 vs 502 flap + REALMOID leak reconfirmed 05:16 alive — infra disclosure persists
 [RISK] 74 reason: 3 systemic ALIVE exposures: 9x200 vs 3x404 unauth share variance (enumerability + per-object len variance needs PII proof), 65-endpoint Swagger public on 3 envs + stable 401 vs 404 oracle (full surface map unauth), CA gateway REALMOID leak + 200/403/502 inconsistent auth flap — no new SSRF/AUTH bypass proven, but exposure breadth high
+## 2026-09-16 09:59:37 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 62
+reasoning: 9x200 vs 3x404 UUIDv7 differential persists unauth 2026-09-16 09:47 on share.connect.posit.cloud, len variance 178193/13874/50444 across hosts (019c9000 13874 vs 0190c2c9 178193), vs 01912861 404 control. 200 len reused across cycles suggests real per-object content, not uniform 404. SPA template vs real PII not yet distinguished — needs body hash/snippet.
+evidence_needed: body sha256 + 200-char snippet + content-type + response headers to prove per-object unique content vs shared SPA fallback; PII markers (email/title/dataset name) inside 178193 body
+verify_steps: PASSIVE unauth GET -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ , https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ , https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ , https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ , https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ ; compute sha256, compare; no auth, no brute-force
+impact: unauth cross-tenant content enumeration / PII dump if 178193 body is user dataset/app — high, Passively discoverable share IDs via CT logs
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 88
+reasoning: 65 endpoints on 3 envs (api/apitest/apistage) 200 public unauth reconfirmed 2026-09-16 09:47 Cloudflare, application/json;charset=utf-8. 401 vs 404 oracle reconfirmed: GET /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404, /v1/licenses 404. Example swagger GUIDs 401 identical prod/apitest fabricated docs — AUTH via examples dead, but enumeration oracle alive. Full spec exposes schemas, billing structures, token formats.
+evidence_needed: spec byte length + endpoint count + 401 vs 404 differential on UUID path to confirm oracle; no credential use
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json compare length; GET https://api.emsisoft.com/v1/workspaces ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 ; headers only
+impact: full API surface map unauth, enables targeted BOLA/IDOR on real IDs, low direct PII but high chaining value — medium
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com
+confidence: 68
+reasoning: sso.dealertrack.com 200 len0 text/xml unauth vs api.unifi.dealertrack.com 403 vs admin.pa1.dealertrack.com 502->503->502 flapping reconfirmed 2026-09-16 09:47. Historical redirect leak: CA Access Gateway REALMOID/SMAGENTNAME/TARGET in Location on admin.dealertrack.com. Inconsistent auth handling + empty XML response suggests infra disclosure / access control variance, not SSO oracle (REJECTED class avoided).
+evidence_needed: status + headers (Server, Location) + body len0 vs 403 vs 502 differential; Location leak capture with curl -i -s -D - without following redirects
+verify_steps: GET -i -s -D - https://sso.dealertrack.com/ ; GET -i -s -D - https://sso.dealertrack.com ; GET -i -s -D - https://admin.pa1.dealertrack.com/ ; GET -i -s -D - https://api.unifi.dealertrack.com/ ; compare Server: Apache vs status codes, do not follow redirects to capture REALMOID leak
+impact: infrastructure disclosure (CA Access Gateway version/REALMOID), inconsistent auth may enable bypass to admin portal — medium
+testability: PASSIVE
+[PARKED] none: all hypotheses confidence >=40, classes not on REJECTED list (SSRF docker-registry, AUTH via swagger examples, SSO-discovery oracle excluded), verify_steps concrete passive
+[FINAL] 1: [HYP emsisoft] MISCONFIG @ api.emsisoft.com/swagger (88) — strongest passive signal, systemic 3-env exposure + live oracle 2: [HYP coxautomotive] MISCONFIG @ sso.dealertrack.com (68) — infra disclosure + 200 vs 403 vs 502 differential 3: [HYP posit] IDOR @ share.connect.posit.cloud (62) — per-object variance alive but needs body PII proof to upgrade from MISCONFIG to IDOR-PII
+[NEXT] PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap on share.connect.posit.cloud — curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -n 50; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | head -n 50; curl -i -s -D - https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ | head -n 20; curl -i -s -D - https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ | head -n 50; plus sha256sum of bodies and grep -i for email|title|dataset|shiny|posit
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-16 5+ cycles dead per 2026-08-26 directive — keep dropped
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-16 09:47 alive — systemic enumeration
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential unauth reconfirmed 2026-09-16 09:47 per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 403 vs 502 differential + REALMOID leak persists 2026-09-16 — infra disclosure alive
+[RISK] 58 reason: high-value unauth enumeration surfaces persist (emsisoft 65-endpoint swagger 3-env public + 401 vs 404 oracle, posit share 9x200 vs 3x404 per-object variance with 178k vs 13k len, Cox sso 200 len0 vs 403 vs 502 flap with gateway leak) but no proven PII dump or session/auth bypass yet; staging SPA fallback isolated to staging since 2026-09-13 reduces prod risk; SSRF and example-token AUTH classes dead, remaining risk is passive MISCONFIG/IDOR requiring body proof
