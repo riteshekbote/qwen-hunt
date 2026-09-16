@@ -8144,3 +8144,37 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-16 persists — class dead per directive
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage persists — fabricated docs, example-token BOLA dead
 [RISK] 71 reason: 3 systemic alive positives (emsisoft swagger 3-env 65-endpoint exposure with 401/404 oracle, posit share 9x200 vs 3x404 enumerability with len variance, dealertrack gateway REALMOID leak + status differential) + 2 staging SPA false-positive risks requiring Accept negotiation proof; no SSRF/auth bypass proven, but breadth of unauth info disclosure keeps exposure HIGH
+## 2026-09-16 05:15:51 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 62
+reasoning: 9x200 vs 3x404 differential persists unauth 2026-09-16 04:41 with len variance 178193 vs 13874 vs 50444 on share.connect.posit.cloud; inventory lists 28 UUIDv7 share hosts from CT; 019c1fdf 200 at 04:41 extends 200 set; CloudFront+S3 backend
+evidence_needed: body sha256 + 200-char snippet + content-type to prove PII/private notebook vs SPA template; 200 vs 404 header diff across 5 hosts
+verify_steps: curl -i -s https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -i -s https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -i -s https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ ; curl -i -s https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ ; curl -i -s https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ — record -D headers + body len + sha256 + grep -i "posit|shiny|email|user"
+impact: unauth cross-tenant PII / private app content dump via enumerable UUIDv7 subdomains — high severity IDOR-PII if body contains user data
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 78
+reasoning: 200 unauth on prod/apitest/apistage with Cloudflare+HSTS+Swagger UI; /swagger/v1.0/swagger.json exposes 65 endpoints, 353 GUIDs/emails/tokens; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 confirms oracle alive through 04:41; example-GUID AUTH dead but oracle alive
+evidence_needed: spec size + 401 vs 404 differential on 3 envs to keep BOLA path alive (need non-example ID)
+verify_steps: curl -i -s https://api.emsisoft.com/swagger/v1.0/swagger.json | head -c 500 ; curl -i -s https://api.emsisoft.com/v1/workspaces ; curl -i -s https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 ; curl -i -s https://apitest.emsisoft.com/swagger/v1.0/swagger.json | head -c 200
+impact: full API surface map + endpoint discovery oracle enables targeted BOLA/IDOR without auth — medium severity enumeration
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com/
+confidence: 58
+reasoning: sso.dealertrack.com 200 len0 text/xml vs sso.qa/uat1 variants, admin.pa1.dealertrack.com 503 vs admin.pa 200 diff, api.unifi* 403 consistent through 04:41; historic redirect leaks REALMOID/SMAGENTNAME/TARGET; Apache HTTP Server + CA Access Gateway - Error Report
+evidence_needed: Location header + body on redirect chain to capture REALMOID/SMAGENTNAME/TARGET + 200 vs 403 vs 503 differential
+verify_steps: curl -i -s https://sso.dealertrack.com/ ; curl -i -s https://sso.dealertrack.com ; curl -i -s https://admin.pa1.dealertrack.com/ ; curl -i -s https://api.unifi.dealertrack.com/ ; curl -i -sL https://admin.pa1.dealertrack.com/ | head -n 50
+impact: infrastructure fingerprint + WAF/SSO bypass hints + auth inconsistency could lead to access control bypass — medium severity
+testability: PASSIVE
+[PARKED] NONE — all 3 hypotheses confidence >=40, classes not on REJECTED list (SSRF docker-registry NXDOMAIN, api.secrets.posit.cloud 404, swagger example-token AUTH remain dropped), verify_steps concrete passive
+[FINAL] 1: [HYP emsisoft] Public OpenAPI mass enumeration + 401 vs 404 endpoint existence oracle (78) 2: [HYP posit] Unauthenticated share subdomain content disclosure via predictable UUIDv7 (62) 3: [HYP coxautomotive] CA Access Gateway infra disclosure + inconsistent auth (58)
+[NEXT] PROBE: 5 parallel unauth GET -D + body sha256 + 200-char snippet to close PII vs SPA template gap — curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -o /tmp/b1.html; sha256sum /tmp/b1.html; head -c 200 /tmp/b1.html; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -o /tmp/b2.html; sha256sum /tmp/b2.html; head -c 200 /tmp/b2.html; curl -i -s https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/; curl -i -s https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -o /tmp/b3.html; sha256sum /tmp/b3.html
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential unauth reconfirmed 2026-09-16 04:41 per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-16 04:41 alive
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 vs 403 vs 503 + REALMOID leak reconfirmed 2026-09-16 04:41 alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-16 persists dead per directive drop
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID
+[RISK] 68 — share.connect 9x200 unauth variance with enumerability from CT inventory retains IDOR-PII potential (body proof pending), emsisoft 3-env 65-endpoint public spec + 401/404 oracle systemic alive, dealertrack SSO infra leak + inconsistent auth persists; SSRF registry + example-token AUTH + api.secrets 404 classes remain dead — overall exposure medium-high but not critical until PII confirmed
