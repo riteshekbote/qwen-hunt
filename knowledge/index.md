@@ -1019,3 +1019,8 @@
 - 2026-09-16 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential unauth persists 2026-09-16 14:44 per-object variance alive needs body PII proof
 - 2026-09-16 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest dead remains 2026-09-16 (fabricated docs, need non-example ID for BOLA)
 - 2026-09-16 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN 2026-08-26 to 2026-09-16 per directive dead drop no re-probe
+- 2026-09-16 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-16 14:58 per directive — class dead, drop from queue
+- 2026-09-16 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 2026-09-16 14:58 fabricated docs dead — need non-example ID for BOLA, oracle MISCONFIG remains ACCEPTED
+- 2026-09-16 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 403 vs 502 flap + REALMOID/SMAGENTNAME/TARGET leak reconfirmed 2026-09-16 14:58 alive — infra disclosure + inconsistent auth persists
+- 2026-09-16 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-16 14:58 alive
+- 2026-09-16 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 differential reconfirmed 2026-09-16 14:58 per-object variance alive — body PII proof still pending
