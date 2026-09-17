@@ -3002,6 +3002,10 @@ probe_allow: '*|0x|23andme|24sessions|84codes|abnamro|accredible|actility|aholdd
 - 2026-09-17 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 403 vs 503->403 flip + REALMOID leak reconfirmed 2026-09-17 15:14 infra disclosure alive
 - 2026-09-17 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-17 keep dropped per directive
 - 2026-09-17 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest fabricated docs dead remains need non-example ID
+- 2026-09-17 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA; oracle MISCONFIG remains alive
+- 2026-09-17 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 reconfirmed 2026-09-17 19:12 unauth per-object variance alive needs body PII proof
+- 2026-09-17 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-17 19:12 alive
+- 2026-09-17 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 vs 403 vs 503->403 flap reconfirmed 2026-09-17 19:12 infra disclosure alive
 === REAL SUBDOMAIN INVENTORY (from passive CT recon — PROBE/ANALYZE THESE, DO NOT INVENT HOSTS) ===
 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
 01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud
@@ -3559,18 +3563,6 @@ https://status.duocircle.com [[35mHSTS[0m]
 === MY LAST LEADS (tail) ===
 none
 === AGGREGATED HYPOTHESES (tail) ===
-- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-17 persists dead per 2026-08-26 directive — keep dropped
-- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for
-
-## RANKED HYPOTHESES 2026-09-17 10:25:30 UTC
-- (no NEW hypotheses this cycle — all deduped)
-- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
-- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap — curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073
-- LEARN: REJECTED SSRF @ https://docker-registry.docker
-- LEARN: NO_NEW_LEARN 2026-09-17 10:19 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists dead per 2026-08-26 directive; REJECTED AUTH @ api.emsisoft.com
-
-## RANKED HYPOTHESES 2026-09-17 15:14:02 UTC
 - (no NEW hypotheses this cycle — all deduped)
 - NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
 - NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
@@ -3599,21 +3591,19 @@ none
 - LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 403 vs 503->403 flip + REALMOID leak reconfirmed 2026-09-17 15:14 infra disc
 - LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-17 keep dropped per directive
 - LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest fabricated docs dead remains need non-example ID
-=== LATEST ROBOT PROBE RESULTS ===
-https://sso.dealertrack.com -> 200 len=0 type=text/xml
-https://api.unifi.dealertrack.com -> HTTP 403
-https://admin.pa1.dealertrack.com -> HTTP 503
-https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
 
-## 2026-09-17 10:25:36 UTC
-https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud -> 200 len=178193 type=text/html
-https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -> 200 len=178193 type=text/html
-https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=13874 type=text/html
-https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -> 200 len=? type=text/html; charset=utf-8
-https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -> HTTP 404
-https://01912861-8be7-59e2-215a-cdeffdd549f2.share.connect.posit.cloud/ -> HTTP 404
-https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
-https://api.emsisoft.com/v1/workspaces -> HTTP 401
+## RANKED HYPOTHESES 2026-09-17 19:15:38 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap on share.connect.posit.cloud — curl -i -s -D - https://0190
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-17 persists dead per 2026-08-26 directive — keep dropped
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 reconfirmed 2026-09-17 19:12 unauth per-object variance alive needs body PII proof
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-17 19:12 alive
+- LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 vs 403 vs 503->403 flap reconfirmed 2026-09-17 19:12 infra disclosure alive
+=== LATEST ROBOT PROBE RESULTS ===
 https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -> HTTP 404
 https://api.emsisoft.com/v1/licenses -> HTTP 404
 https://apitest.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -> HTTP 404
@@ -3660,3 +3650,17 @@ https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
 https://admin.pa1.dealertrack.com/ -> HTTP 403
 https://api.unifi.dealertrack.com/ -> HTTP 403
 https://admin.pa-east.unifipa.dealertrack.com -> HTTP 403
+
+## 2026-09-17 19:15:45 UTC
+https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -> 200 len=178193 type=text/html
+https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -> 200 len=13874 type=text/html
+https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -> HTTP 404
+https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ -> 200 len=? type=text/html; charset=utf-8
+https://api.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://api.emsisoft.com/v1/workspaces -> HTTP 401
+https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -> HTTP 404
+https://api.emsisoft.com/v1/licenses -> HTTP 404
+https://apitest.emsisoft.com/swagger/v1.0/swagger.json -> 200 len=? type=application/json;charset=utf-8
+https://sso.dealertrack.com/ -> 200 len=0 type=text/xml
+https://admin.pa1.dealertrack.com/ -> HTTP 503
+https://api.unifi.dealertrack.com/ -> HTTP 403
