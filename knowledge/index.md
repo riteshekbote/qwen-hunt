@@ -1045,3 +1045,7 @@
 - 2026-09-17 ACCEPTED IDOR @ share.connect.posit.cloud: reconfirmed 2026-09-17 00:28 9x200 vs 3x404 len178193/13874 per-object variance alive needs body PII proof
 - 2026-09-17 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: reconfirmed 2026-09-17 00:28 200 len0 vs 403 vs 503 + REALMOID leak alive
 - 2026-09-17 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-17 persists per 2026-08-26 directive — keep dropped
+- 2026-09-17 ACCEPTED MISCONFIG @ api.emsisoft.com/v1/licenses: 404 vs 401 base extends oracle to licenses resource alive 2026-09-17 05:11
+- 2026-09-17 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential persists 2026-09-17 unauth - per-object variance alive needs body PII proof remains
+- 2026-09-17 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth reconfirmed 2026-09-17 05:11 alive
+- 2026-09-17 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-17 persists dead per directive
