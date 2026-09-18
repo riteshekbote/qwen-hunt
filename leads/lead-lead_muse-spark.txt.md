@@ -9041,3 +9041,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential persists 2026-09-18 09:44 alive needs body PII proof
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-18 dead per directive keep dropped
 [RISK] 73 reason: systemic unauth surface — 65-endpoint swagger public 3-env + 401/404 BOLA oracle alive + 9x200 share IDOR with enumerability but PII unproven + CA gateway REALMOID leak with inconsistent 200/403/503 auth — high breadth, medium immediate exploitability until body PII/Accept negotiation proven
+## 2026-09-18 13:53:03 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 78
+reasoning: 9x200 vs 3x404 unauth differential reconfirmed 2026-09-18 09:44/10:55 on UUIDv7 share subdomains (0190c2c9 178193 vs 019c9000 13874 vs 0191a3bb 404). Content-Type text/html with len variance 13874/178193 indicates per-object variance not SPA template. CloudFront+S3 stack.
+evidence_needed: Response body diff vs SHA256 + 200-char snippet across 200 vs 404 hosts to prove PII/content leak vs shared SPA fallback; need non-template data.
+verify_steps: PASSIVE GET -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ vs https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ vs https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; compute sha256sum + head -c 200; repeat for 019c1fdf/01935672 to confirm enumerability
+impact: Unauthenticated cross-tenant access to Connect share content; if PII/project data in body then IDOR-PII High, else enumeratable misconfig Medium
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 85
+reasoning: 200 len? application/json;charset=utf-8 public without auth reconfirmed 2026-09-18 09:44 on api.emsisoft.com + apitest/apistage mirrors (65 endpoints, Cloudflare/HSTS/Swagger UI). 401 on /v1/workspaces vs 404 on /v1/workspaces/00000000-0000-0000-0000-000000000000 and /v1/licenses confirms oracle alive. Example swagger UUID tokens dead (401 identical prod/apitest/apistage) so not credential leak but surface map alive.
+evidence_needed: Swagger body 65-endpoint count + 401 vs 404 status diff on /v1/workspaces vs UUID path vs /v1/licenses
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json (check 200 + json), GET https://api.emsisoft.com/v1/workspaces (expect 401), GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 (expect 404), GET https://api.emsisoft.com/v1/licenses (expect 404), compare apitest/apistage same swagger 200
+impact: Complete unauth API surface enumeration (65 endpoints, 3 envs) + existence oracle for BOLA/IDOR fuzzing; Low-Medium alone, High when chained to workforce token leak
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com/
+confidence: 72
+reasoning: sso.dealertrack.com 200 len0 text/xml vs admin.pa1.dealertrack.com 503 vs api.unifi.dealertrack.com 403 reconfirmed 2026-09-18 09:44/10:55. Historical Location leak REALMOID/SMAGENTNAME/TARGET on admin.pa1 redirect (Apache/CA Access Gateway). admin.pa-east.unifipa 503 confirms flap 200/403/503 inconsistent auth.
+evidence_needed: Response headers + body len0 vs 403 vs 503 differential + Location header containing REALMOID on admin.pa1 redirect chain
+verify_steps: GET -i https://sso.dealertrack.com/ (check 200 len0 text/xml), GET -i https://admin.pa1.dealertrack.com/ (capture Location: REALMOID leak, 503/302), GET -i https://api.unifi.dealertrack.com/ (expect 403), GET -i https://admin.pa-east.unifipa.dealertrack.com (expect 503) with -L vs -s comparison
+impact: Infrastructure fingerprinting + potential auth bypass via inconsistent enforcement on Dealertrack (Cox Automotive dealer financial platform); Medium, High if REALMOID replayable
+testability: PASSIVE
+[FINAL] 1. [HYP emsisoft] Public Swagger Exposure + 401 vs 404 Oracle — 85
+[FINAL] 2. [HYP posit] Unauthenticated Share Subdomain IDOR — 78
+[FINAL] 3. [HYP coxautomotive] CA Access Gateway Disclosure — 72
+[NEXT] PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap on share.connect.posit.cloud — curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | tee /tmp/a.txt; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | tee /tmp/b.txt; curl -i -s -D - https://019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud/ | tee /tmp/c.txt; curl -i -s -D - https://01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud/ | tee /tmp/d.txt; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ | tee /tmp/e.txt; for f in /tmp/[abcde].txt; do echo "--- $f $(wc -c < $f) $(sha256sum $f | cut -c1-12)"; head -c 200 $f | cat -A; echo; done
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-18 persists dead per 2026-08-26 directive — keep dropped
+[LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage reconfirmed 2026-09-18 10:55 — fabricated docs dead, need non-example ID for BOLA; oracle MISCONFIG remains ACCEPTED
+[LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud 9x200 vs 3x404 UUIDv7 differential with len178193/13874 persists 2026-09-18 unauth reconfirmed — per-object variance alive needs body PII proof to upgrade to IDOR-PII
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-18 alive — systemic enumeration
+[RISK] 71 reason: Posit share IDOR enumeration alive unauth with 9x200 vs 3x404 + len variance (PII proof pending), Emsisoft 65-endpoint swagger public 3-env + 401/404 oracle systemic, Cox DTI sso 200 len0 vs 403 vs 503 + REALMOID leak flap alive; no SSRF/auth bypass proven this cycle but broad misconfig surface
