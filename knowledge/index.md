@@ -1094,3 +1094,7 @@
 - 2026-09-18 ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 text/xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak reconfirmed 2026-09-18 05:12 alive
 - 2026-09-18 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-18 dead per directive — keep dropped
 - 2026-09-18 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage persists fabricated docs dead — need non-example ID for BOLA, oracle MISCONFIG remains alive
+- 2026-09-18 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential len178193/13874 persists unauth 2026-09-18 per-object variance alive — needs body PII proof to upgrade to IDOR-PII
+- 2026-09-18 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-18 alive — systemic enumeration
+- 2026-09-18 ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 text/xml vs admin.pa1 503 vs api.unifi 403 differential + REALMOID leak reconfirmed alive
+- 2026-09-18 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-18 persists dead per directive — keep dropped
