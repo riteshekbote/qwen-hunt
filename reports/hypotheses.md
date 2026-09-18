@@ -4248,3 +4248,15 @@
 - LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 vs 403 vs 503 flap + REALMOID leak reconfirmed 2026-09-17 alive
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN persists 2026-08-26 to 2026-09-17 dead per directive keep dropped
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
+
+## RANKED HYPOTHESES 2026-09-18 00:15:50 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap on share.connect.posit.cloud — curl -i -s -D - https://0190
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-17 reconfirmed dead — keep dropped per 2026-08-26 direct
+- LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage reconfirmed 22:23 — fabricated docs, need non-
+- LEARN: ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 differential len178193/13874 persists unauth 22:23 — per-object variance alive, needs b
+- LEARN: ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 22:23 — systemic enume
+- LEARN: ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 text/xml vs admin.pa1 503 vs api.unifi 403 differential + REALMOID leak reconfirmed 22:23 — infra dis
