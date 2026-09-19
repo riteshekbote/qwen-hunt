@@ -9652,3 +9652,35 @@ testability: PASSIVE
 [NEXT] PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap on share.connect.posit.cloud — curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | head -c 2000; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | sha256sum; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ | head; repeat for 019c1fdf-8931-0546-bc6f-91d96cc94731.share.connect.posit.cloud and 01935672-54e8-441b-d1c8-3d791ba3c047.share.connect.posit.cloud
 [LEARN] NO_NEW_LEARN 2026-09-19 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists per 2026-08-26 directive; REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs 3x404 per-object variance alive needs body PII proof; ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json 65 endpoints 3-env +401 vs 404 oracle alive; ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1 200 vs 503 vs 403 +REALMOID leak alive — no class transition
 [RISK] 68 — posit share IDOR enumeration unauth with len variance persistent but PII not yet proven, emsisoft 65-endpoint swagger + oracle systemic exposure on 3 envs, coxautomotive CA gateway disclosure + inconsistent auth; docker SSRF dead reduces cloud-surface risk
+## 2026-09-19 20:20:54 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 72
+reasoning: 9x200 vs 3x404 differential reconfirmed 2026-09-19 19:19:04 unauth; len variance 178193 vs 13874 vs 50444 + dynamic 4745/12178 indicates per-object content not static SPA; 0191a3bb 404 proves not wildcard; share.connect.posit.cloud = user-published Connect content (high PII/business risk).
+evidence_needed: body sha256 + 200-char snippet differential proving distinct user content/PII vs identical SPA template; Content-Type text/html suggests rendered app — need raw HTML diff
+verify_steps: GET -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ (expect 404) ; compute sha256 + head -c 200 and compare; repeat with Accept: application/json to test API leak
+impact: cross-tenant PII/app source dump unauth, enumerability via UUIDv7, severity High (IDOR-PII if body confirms)
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 85
+reasoning: 200 len=? application/json;charset=utf-8 public unauth on prod/apitest/apistage reconfirmed 2026-09-19 19:19 with Cloudflare/HSTS; 65 endpoints + example GUIDs/emails/billing structures; probe shows 401 on /v1/workspaces vs 404 on /v1/workspaces/00000000-0000-0000-0000-000000000000 and /v1/licenses 404 differential = endpoint-existence oracle despite example-token AUTH dead.
+evidence_needed: swagger fetch + endpoint count + 401 vs 404 status diff across prod/apitest/apistage proving systemic enumeration
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json (expect 200) ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json (expect 200) ; GET https://api.emsisoft.com/v1/workspaces (expect 401) ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 (expect 404) ; GET https://api.emsisoft.com/v1/licenses (expect 404)
+impact: full API surface map unauth, facilitates BOLA/IDOR targeting via oracle, systemic 3-env exposure, severity Medium-High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com
+confidence: 78
+reasoning: sso.dealertrack.com 200 len0 text/xml and /sso/login 200 len0 reconfirmed 2026-09-19 19:19 vs api.unifi.dealertrack.com 403 vs admin.pa1.dealertrack.com 503 flip; historic Location leaks REALMOID/SMAGENTNAME/TARGET on admin; sso 200 len0 xml suggests incomplete hardening / auth bypass surface.
+evidence_needed: status + headers + body len0 + Location REALMOID leak on redirect chain
+verify_steps: GET -i -s -D - https://sso.dealertrack.com/ (expect 200 len0 text/xml) ; GET -i -s -D - https://sso.dealertrack.com/sso/login (expect 200 len0) ; GET -i -s -D - https://admin.pa1.dealertrack.com/ (expect 503 vs 200 flap) ; GET -i -s -D - https://api.unifi.dealertrack.com/ (expect 403) ; capture SMAGENTNAME/REALMOID/TARGET if Location present
+impact: infra disclosure + inconsistent auth suggests potential auth bypass/SSO logic flaw, severity Medium
+testability: PASSIVE
+[FINAL] Ranked survivors: 1) [HYP emsisoft] Public Swagger + BOLA oracle (85) 2) [HYP coxautomotive] CA Gateway infra disclosure (78) 3) [HYP posit] Share UUIDv7 IDOR-PII (72)
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-19 persists dead per 2026-08-26 directive — keep dropped reconfirmed 2026-09-19 19:19:04
+[LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA, oracle MISCONFIG remains alive reconfirmed 2026-09-19 19:19:04
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential persists unauth 2026-09-19 — per-object variance alive needs body PII proof remains
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-19 alive
+[LEARN] ACCEPTED MISCONFIG @ https://sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 503 vs 403 + REALMOID leak reconfirmed 2026-09-19 alive
+[RISK] 74 — unauth enumerability (9x200 vs 3x404) on Posit Connect shares with len variance suggests real cross-tenant content, plus systemic public swagger 65 endpoints on 3 envs with 401 vs 404 oracle, plus persistent CA gateway REALMOID leak + inconsistent 200/403/503; no critical SSRF/auth bypass proven but attack surface remains broadly exposed unauth.
