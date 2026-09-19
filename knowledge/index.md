@@ -1147,3 +1147,7 @@
 - 2026-09-19 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env 401 vs 404 oracle reconf 2026-09-19 alive
 - 2026-09-19 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 per-object variance len178193/13874 persists needs body PII proof — not yet upgraded to IDOR-PII
 - 2026-09-19 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 503 vs 403 + REALMOID leak alive reconf 2026-09-19
+- 2026-09-19 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead — need non-example ID for BOLA; oracle MISCONFIG remains alive
+- 2026-09-19 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-19 alive
+- 2026-09-19 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 per-object variance len178193/13874 persists unauth alive — needs body PII proof to upgrade to IDOR-PII
+- 2026-09-19 ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1.dealertrack.com: 200 len0 xml vs 503 vs 403 + REALMOID leak + /sso/login 200 len0 reconfirmed alive
