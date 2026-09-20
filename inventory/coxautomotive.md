@@ -2522,3 +2522,8 @@
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
 - NEW NO_DELTA — no new subdomains or status transitions vs 2026-09-20 16:30/17:24 cycles; 9x200 vs 3x404 share differential (178193/13874/64888 len), api.emsisoft.com swagger 200, sso.dealertrack.com 200 l
+
+## 2026-09-20 19:41:37 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
