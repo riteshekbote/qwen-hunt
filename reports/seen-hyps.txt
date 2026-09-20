@@ -27,3 +27,6 @@ d16afdbfa3b7d382 Posit Connect Share Unauthenticated Cross-Tenant Content Disclo
 acdd239e4bca01ac Public OpenAPI spec + 401 vs 404 endpoint existence oracle systemic exposure
 ab7778f83687d5db SPA catch-all false-positive risk on staging/connect __api__/v1/content needs content-negotiation proof
 a40f92d011ddd203 Unauthenticated share subdomain IDOR enumerates private content via 200 vs 404 differential
+16ce8df263bb8e4c Unauthenticated per-object content leak via predictable UUIDv7 share subdomains
+ce8cf7eca8828f16 Public OpenAPI spec disclosure enables endpoint oracle enumeration
+7e4d7152f62fa423 CA Access Gateway infra disclosure + inconsistent auth differential
