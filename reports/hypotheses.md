@@ -4748,3 +4748,11 @@
 - LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com: 200 len0 text/xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak reconfirmed 2026-09-21 alive
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-21 persists dead per directive
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
+
+## RANKED HYPOTHESES 2026-09-21 07:10:04 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA gap — run individually: curl -i -s -D - https://0190c2c9-dd44-d440-0f97-
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: NO_NEW_LEARN 2026-09-21: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists dead; REJECTED AUTH @ api.emsisoft.com example GUIDs 401 fabricated de

@@ -1243,3 +1243,4 @@
 - 2026-09-21 ACCEPTED MISCONFIG @ sso.dealertrack.com: 200 len0 text/xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak reconfirmed 2026-09-21 alive
 - 2026-09-21 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-21 persists dead per directive
 - 2026-09-21 REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
+- 2026-09-21 NO_NEW_LEARN 2026-09-21: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists dead; REJECTED AUTH @ api.emsisoft.com example GUIDs 401 fabricated dead; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints 3-env +401vs404 oracle, ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1 200vs403vs503 REALMOID leak remain alive
