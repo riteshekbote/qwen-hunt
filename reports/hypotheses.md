@@ -4800,3 +4800,11 @@
 - NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA gap — run individually (avoid brace expansion):
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
 - LEARN: NO_NEW_LEARN 2026-09-21 — REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists dead per 2026-08-26 directive; REJECTED AUTH @ api.emsisoft.com/v1/wo
+
+## RANKED HYPOTHESES 2026-09-21 20:55:08 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 4 parallel unauth GET -i -s -D - + sha256 + snippet to close PII vs SPA gap for share.connect (avoid brace expansion, run individually): curl -i -s -D - 
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: NO_NEW_LEARN 2026-09-21: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN persists 2026-08-26 to 2026-09-21 dead per directive; REJECTED AUTH @ api.emsis
