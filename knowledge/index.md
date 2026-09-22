@@ -1298,3 +1298,8 @@
 - 2026-09-22 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/64888 per-object variance reconfirmed 2026-09-22 alive needs body PII proof
 - 2026-09-22 ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak reconfirmed 2026-09-22 alive
 - 2026-09-22 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
+- 2026-09-22 ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/64888 unauth per-object variance persists 2026-09-22 - enumerability alive needs body PII proof
+- 2026-09-22 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle to /v1/workspaces/000... reconfirmed 2026-09-22 with share UUID 019c9000 404 - oracle alive
+- 2026-09-22 ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak + TARGET param handling reconfirmed 2026-09-22 - infra disclosure alive, open redirect not yet proven
+- 2026-09-22 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-22 persists per directive - class dead drop
+- 2026-09-22 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs and share UUID 019c9000: 401 vs 404 but no 200 - fabricated docs BOLA dead, need non-example real ID
