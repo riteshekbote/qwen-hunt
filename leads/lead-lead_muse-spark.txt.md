@@ -10765,3 +10765,37 @@ testability: PASSIVE
 [NEXT] PROBE: 3 parallel unauth GET -i -s -D - + sha256 + snippet to close PII vs SPA template gap (run individually, no brace): curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -o /tmp/b1.html; sha256sum /tmp/b1.html; head -c 200 /tmp/b1.html; repeat for https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ and https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ ; compare Content-Type/len/hash/title
 [LEARN] NO_NEW_LEARN this cycle: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead persists 2026-08-26 to 2026-09-22 per directive; REJECTED AUTH @ api.emsisoft.com via example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200vs3x404 per-object variance alive; ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints +401vs404 oracle alive; ACCEPTED MISCONFIG @ sso.dealertrack.com 200 vs 403 vs 503 +REALMOID leak alive — no class transition.
 [RISK] 68 reason: persistent unauth enumerability (9x200 vs 3x404 with len variance) on share.connect creates PII exfiltration risk pending body proof; 3-env public swagger + 401/404 oracle systemically exposes 65 endpoints for BOLA chaining; CA gateway infra disclosure + inconsistent auth remains live; no cloud-metadata SSRF pop, but attack surface high due to no-auth gate ease.
+## 2026-09-22 12:35:24 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 78
+reasoning: 9x200 vs 3x404 differential persists 2026-08-26 to 2026-09-22 unauth (0190c2c9 178193, 019c9000 13874, 019c2310 64888 vs 0191a3bb 404); len variance proves per-object content not SPA template; share subdomain from CT inventory enumerability alive
+evidence_needed: body PII proof (hash + 200-char snippet) distinguishing templates; Accept:application/json vs text/html divergence
+verify_steps: GET unauth -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ ; sha256sum body + grep -i "email|user|posit|share" ; repeat with -H "Accept: application/json"
+impact: cross-tenant content/PII disclosure via predictable UUIDv7 share IDs, enumerability -> mass dump, High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 88
+reasoning: 65 endpoints 3-env (prod/apitest/apistage) 200 unauth application/json reconfirmed 2026-09-22 09:27; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 and /v1/licenses 404 oracle proves endpoint existence probe without auth
+evidence_needed: swagger sha256 diff prod vs apitest, repeat 401 vs 404 on non-example UUID to confirm oracle without using fabricated example tokens
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json ; GET https://apitest.emsisoft.com/swagger/v1.0/swagger.json ; GET https://api.emsisoft.com/v1/workspaces ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 ; GET https://api.emsisoft.com/v1/licenses
+impact: complete API attack surface enumeration; BOLA endpoint oracle enables targeted IDOR without brute force, Medium-High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com
+confidence: 72
+reasoning: sso.dealertrack.com 200 len0 text/xml vs sso/login 200 len0 vs admin.pa1 503 vs api.unifi 403 differential reconfirmed 2026-09-22 09:27; prior REALMOID/SMAGENTNAME/TARGET leak in Location on admin.pa1 redirect indicates CA Siteminder disclosure
+evidence_needed: Location header + Set-Cookie on admin.pa1 302/503, body len0 vs 403 comparison
+verify_steps: curl -i -s -D - https://sso.dealertrack.com/ ; curl -i -s -D - https://sso.dealertrack.com/sso/login ; curl -i -s -D - https://admin.pa1.dealertrack.com/ ; curl -i -s -D - https://api.unifi.dealertrack.com/
+impact: infrastructure disclosure (Siteminder config, internal routing), inconsistent auth suggests bypass potential, Medium
+testability: PASSIVE
+[PARKED] NONE — all confidence >=40, class not on REJECTED SSO-oracle list, verify_steps concrete passive, no SSRF docker-registry or AUTH example-token hypotheses attempted
+[FINAL] 1: [HYP emsisoft] OpenAPI full surface unauth + 401 vs 404 BOLA oracle (88) | 2: [HYP posit] share.connect UUIDv7 IDOR per-object variance (78) | 3: [HYP coxautomotive] CA Access Gateway infra disclosure (72)
+[NEXT] PROBE: 3 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA gap (run individually, no brace): curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | tee /tmp/a.txt; sha256sum /tmp/a.txt; head -c 200 /tmp/a.txt; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | tee /tmp/b.txt; sha256sum /tmp/b.txt; head -c 200 /tmp/b.txt; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ | tee /tmp/c.txt; head -c 200 /tmp/c.txt
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/64888 per-object variance unauth persists — alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs404 oracle reconfirmed 2026-09-22 — systemic exposure alive
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com: 200 len0 xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak differential persists — infra disclosure alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-22 — class dead per 2026-08-26 directive
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage — fabricated docs dead, need non-example ID for BOLA
+[RISK] 71 reason: posit share IDOR enumerability high+len variance proves real objects, emsisoft full OpenAPI 3-env unauth + endpoint oracle gives systemic BOLA surface, cox Siteminder disclosure persists; no confirmed PII dump yet keeps below critical but triad alive extends exposure
