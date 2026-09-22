@@ -4843,3 +4843,11 @@
 - LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874/64888 per-object variance persists unauth 2026-09-21 — needs body PII proof to 
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-21 persists dead per directive
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
+
+## RANKED HYPOTHESES 2026-09-22 04:12:36 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA gap for share.connect (run individually, no brace): curl -i -s -D - http
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: NO_NEW_LEARN 2026-09-22: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead 2026-08-26 to 2026-09-22 persists; REJECTED AUTH @ api.emsisoft.com/v1/wor

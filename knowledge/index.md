@@ -1271,3 +1271,4 @@
 - 2026-09-22 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 UUIDv7 len178193/13874/64888 per-object variance persists unauth 2026-09-21 — needs body PII proof to upgrade
 - 2026-09-22 REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-21 persists dead per directive
 - 2026-09-22 REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
+- 2026-09-22 NO_NEW_LEARN 2026-09-22: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead 2026-08-26 to 2026-09-22 persists; REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints 3-env +401 vs404 oracle, ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1 REALMOID leak + 200 vs403 vs503 remain alive — no class transition

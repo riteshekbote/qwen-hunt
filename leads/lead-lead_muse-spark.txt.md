@@ -10671,3 +10671,33 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-21 persists dead per directive
 [LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains
 [RISK] 68 — systemic unauth surface persists: enumerable 9x200 share differential with len variance requires PII proof, 65-endpoint 3-env OpenAPI public + reliable 401/404 oracle enables targeted BOLA, CA gateway REALMOID disclosure + 200/403/503 differential alive; no active SSRF or example-token AUTH bypass but chaining IDOR->PII or oracle->BOLA is high-value
+## 2026-09-22 04:12:25 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 68
+reasoning: 9x200 vs 3x404 unauth differential persists 2026-09-10 to 2026-09-22 with len variance 178193/13874/64888; all 200 unauth text/html without auth header; staging SPA fallback isolated but share subdomains remain per-object variance
+evidence_needed: body sha256 + 200-char snippet to prove non-template PII/content vs identical SPA shell
+verify_steps: GET -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth; GET -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET -i -s -D - https://019c2310-d1f3-c202-b65d-2af52db09a6c.share.connect.posit.cloud/ unauth; GET -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth expect 404; sha256sum bodies + head -c 200
+impact: cross-tenant unauth disclosure of private Posit Connect share content/PII – High (IDOR-PII if body variance confirmed)
+testability: PASSIVE
+class: IDOR
+asset: api.emsisoft.com
+confidence: 62
+reasoning: /swagger/v1.0/swagger.json 65 endpoints public unauth on prod/apitest/apistage reconf 2026-09-22; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 differential proves endpoint existence oracle alive; example swagger GUIDs 401 dead confirms need non-example ID
+evidence_needed: distinct 401 vs 404 vs 200 on valid vs invalid UUID to confirm enumerability
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth; GET https://api.emsisoft.com/v1/workspaces unauth expect 401; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 unauth expect 404; GET https://api.emsisoft.com/v1/licenses unauth expect 404; diff status + Cloudflare headers
+impact: BOLA enumeration of workspaces/licenses/billing data – High if valid UUID yields 200 vs 401
+testability: PASSIVE
+class: MISCONFIG
+asset: sso.dealertrack.com
+confidence: 71
+reasoning: sso.dealertrack.com 200 len0 text/xml vs admin.pa1.dealertrack.com 503 vs api.unifi.dealertrack.com 403 differential reconf 2026-09-22; Location redirect leaks REALMOID/SMAGENTNAME/TARGET CA Siteminder params; /sso/login 200 len0 confirms surface
+evidence_needed: Location header + body len0 xml vs 403 vs 503 to confirm infra disclosure and auth inconsistency
+verify_steps: GET -i -s -D - https://sso.dealertrack.com/ unauth; GET -i -s -D - https://sso.dealertrack.com/sso/login unauth; GET -i -s -D - https://admin.pa1.dealertrack.com/ unauth; GET -i -s -D - https://api.unifi.dealertrack.com/ unauth; capture Location REALMOID
+impact: infra disclosure + inconsistent auth enables Siteminder bypass/session fixation/open redirect chain – Medium-High
+testability: PASSIVE
+[FINAL] Ranked survivors:
+[PARKED] none — all confidence >=40, classes not on REJECTED (SSO oracle/OATH/auth-example/SSRF docker-registry avoided), concrete verify_steps present
+[NEXT] PROBE: 5 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA gap for share.connect (run individually, no brace): curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | tee /tmp/a.txt; sha256sum /tmp/a.txt; head -c 200 /tmp/a.txt; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | tee /tmp/b.txt; sha256sum /tmp/b.txt; head -c 200 /tmp/b.txt; curl -i -s -D - https://019c2310-d1f3-c202-b65d-2af52db09a6c.share.connect.posit.cloud/ | tee /tmp/c.txt; sha256sum /tmp/c.txt; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ | tee /tmp/d.txt; cat /tmp/d.txt
+[LEARN] NO_NEW_LEARN 2026-09-22: REJECTED SSRF @ docker-registry.docker.com/v2/ NXDOMAIN dead 2026-08-26 to 2026-09-22 persists; REJECTED AUTH @ api.emsisoft.com/v1/workspaces via example GUIDs 401 fabricated dead persists; ACCEPTED IDOR @ share.connect.posit.cloud 9x200 vs3x404, ACCEPTED MISCONFIG @ api.emsisoft.com/swagger.json 65 endpoints 3-env +401 vs404 oracle, ACCEPTED MISCONFIG @ sso.dealertrack.com/admin.pa1 REALMOID leak + 200 vs403 vs503 remain alive — no class transition
+[RISK] 68 — systemic unauth exposure persists across 3 targets (share.connect per-object 200 variance unauth, 65-endpoint swagger public 3-env +401 vs404 oracle, CA Siteminder REALMOID leak + inconsistent auth) but PII not yet proven and staging SPA fallback false-positive risk remains; SSRF/AUTH bypass via examples confirmed dead reduces overall exploitability
