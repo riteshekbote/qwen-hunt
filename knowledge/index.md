@@ -1303,3 +1303,7 @@
 - 2026-09-22 ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak + TARGET param handling reconfirmed 2026-09-22 - infra disclosure alive, open redirect not yet proven
 - 2026-09-22 REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-22 persists per directive - class dead drop
 - 2026-09-22 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs and share UUID 019c9000: 401 vs 404 but no 200 - fabricated docs BOLA dead, need non-example real ID
+- 2026-09-22 ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-22 20:29 alive
+- 2026-09-22 REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces/019c9000-f3f9-6599-47b4-1cff4047c68f: 404 vs 401 base but no 200 — share UUID not valid workspace ID, fabricated docs BOLA dead remains need non-example real ID
+- 2026-09-22 REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-22 persists dead per directive — drop class
+- 2026-09-22 ACCEPTED MISCONFIG @ https://sso.dealertrack.com/sso/login: 200 len0 vs admin.pa1 503 vs api.unifi 403 differential + TARGET external handling persists — infra disclosure alive, open redirect not proven
