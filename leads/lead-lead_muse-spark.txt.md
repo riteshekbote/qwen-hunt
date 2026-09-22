@@ -10899,3 +10899,37 @@ testability: PASSIVE
 [LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle reconfirmed 2026-09-22 — systemic exposure alive
 [LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com: 200 len0 xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak differential persists — infra disclosure alive
 [RISK] 68 — high enumerability on Posit Connect share subdomain (9x200 unauth variance) + systemic swagger exposure on 3 emsisoft envs with reliable 401/404 oracle + persistent CA gateway infra leak on dealertrack SSO; no critical SSRF/auth bypass proven this cycle, but PII via IDOR remains one body-proof away from High severity
+## 2026-09-22 20:28:59 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 72
+reasoning: 9x200 vs 3x404 unauth differential persisted 2026-09-03 to 2026-09-22 across 0190c2c9/019c9000 vs 0191a3bb with len variance 178193 vs 13874 vs 64888 and 404 control. text/html unauth without session. Mirrors staging/connect SPA fallback narrative but per-object variance proves not global SPA catch-all. Requires PII proof to upgrade MISCONFIG->IDOR-PII.
+evidence_needed: body hash + 200-char snippet diff vs 404 host + content-type/headers proving app content not SPA shell; Accept: application/json negotiation to bypass SPA fallback
+verify_steps: 1) GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -i -D - 2) GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -i -D - 3) GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -i -D - (all unauth, capture sha256 + snippet, compare)
+impact: Unauthenticated enumeration and view of private Shiny/Connect apps possibly containing customer data, dashboards, PII — cross-tenant IDOR, High
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 85
+reasoning: 200 unauth on prod/apitest/apistage with 65 endpoints, Cloudflare/HSTS, reconfirmed 2026-09-22. 401 on /v1/workspaces vs 404 on /v1/workspaces/00000000-0000-0000-0000-000000000000 and /v1/licenses/000... proves endpoint existence oracle without auth. Example swagger GUID tokens all 401 identical prod/apitest dead for direct auth bypass.
+evidence_needed: 401 vs 404 differential on non-example UUID + swagger version diff to prove enumerability remains; evidence that non-example ID still 401 not 404
+verify_steps: 1) GET https://api.emsisoft.com/swagger/v1.0/swagger.json 2) GET https://api.emsisoft.com/v1/workspaces -H "Authorization: Bearer 00000000-0000-0000-0000-000000000000" 3) GET https://api.emsisoft.com/v1/workspaces/019c9000-f3f9-6599-47b4-1cff4047c68f (non-example from inventory format) unauth to check 401 vs 404
+impact: Full API surface map + existence oracle for BOLA/IDOR fuzzing; if any endpoint lacks object-level auth, leads to workspace/license/PII leak — Medium-High (currently MISCONFIG, escalates to AUTH if BOLA found)
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com/sso/login
+confidence: 68
+reasoning: 200 len0 text/xml unauth on / and /sso/login vs 503 on admin.pa1.dealertrack.com vs 403 on api.unifi.dealertrack.com persistent differential indicates inconsistent auth. Probe 2026-09-22 17:17 sso.dealertrack.com/sso/login?TARGET=https://example.com -> 200 len0 not 302 suggests filter but REALMOID/SMAGENTNAME leak in redirect chain per history. Requires parameter tamper test.
+evidence_needed: Location header or body reflection of TARGET with external domain; 302 vs 200 behavior on TARGET, comparison with admin.pa1 503 leak
+verify_steps: 1) GET https://sso.dealertrack.com/sso/login?TARGET=https://example.com -i 2) GET https://sso.dealertrack.com/sso/login?TARGET=https://evil.example.com%2F%2Fwhitelisted.com -i 3) GET https://admin.pa1.dealertrack.com/ -i to capture REALMOID leak Location
+impact: Open redirect -> OAuth code theft / SSO token exfiltration -> ATO on dealer portals (Dealertrack handles financial data) — High if chainable
+testability: PASSIVE
+[PARKED] NONE: all 3 hypotheses confidence >=68, class not on REJECTED list (SSRF@docker-registry, SSO-oracle, example-GUID AUTH bypass remain excluded), verify_steps concrete passive unauth GETs.
+[FINAL] Ranked: 1) [HYP emsisoft] MISCONFIG swagger oracle 85, 2) [HYP posit] IDOR share 72, 3) [HYP coxautomotive] MISCONFIG sso TARGET 68
+[NEXT] PROBE: 3 parallel unauth GET -i -D - + sha256 + 200-char snippet to close PII vs SPA template gap (run individually, no brace): curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | tee /tmp/a.txt; sha256sum /tmp/a.txt; head -c 200 /tmp/a.txt; then same for https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ and https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ ; also GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -H "Accept: application/json" -i
+[LEARN] ACCEPTED MISCONFIG @ https://api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env 200 unauth +401 vs 404 oracle reconfirmed 2026-09-22 alive
+[LEARN] ACCEPTED IDOR @ https://share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874/64888 per-object variance reconfirmed 2026-09-22 alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ https://sso.dealertrack.com: 200 len0 xml vs admin.pa1 503 vs api.unifi 403 + REALMOID leak reconfirmed 2026-09-22 alive
+[LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-22 persists dead per directive
+[LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
+[RISK] 71 reason: 3 ACCEPTED MISCONFIG/IDOR alive with unauth gate_ease 10 (share enumeration, swagger surface, sso infra leak) but no proven PII dump or BOLA bypass yet; persistent 9x200 vs 3x404 enumerability + 65-endpoint oracle keeps systemic exposure High, while dead SSRF and example-token AUTH classes limit immediate RCE/ATO.
