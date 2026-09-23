@@ -11072,3 +11072,32 @@ testability: PASSIVE
 [LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-23 persists dead per directive
 [RISK] 66 reason: systemic unauth exposure on 2 high-value surfaces (share.connect.posit.cloud per-object 200 variance enumerability + api.emsisoft.com 65-endpoint swagger 3-env public unauth with 401 vs 404 oracle) + persistent infra disclosure on sso.dealertrack.com/admin.pa1 vs api.unifi differential; no authenticated exploit yet but enumeration is trivially passable and PII proof remains open.
+## 2026-09-23 05:03:06 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 72
+reasoning: 9x200 vs 3x404 UUIDv7 unauth differential persists 2026-08-28 to 2026-09-23 via CloudFront; len 178193/13874/64888 variance indicates distinct objects not SPA template; 0191a3bb 404 control proves not catch-all; body PII not yet hashed
+evidence_needed: sha256 + 200-char snippet for 2x200 hosts vs 404 to prove non-template PII vs SPA boilerplate
+verify_steps: curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ | sha256sum + snippet
+impact: Unauth cross-tenant content enumeration + potential PII/data leak — High if body proves PII, Medium as enumerability alone
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 92
+reasoning: 200 application/json;charset=utf-8 unauth on prod/apitest/apistage reconfirmed 2026-09-23; 65 endpoints exposed; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses 404 confirms endpoint existence oracle extends to UUID path
+evidence_needed: Reconfirm 401 vs 404 differential on non-example UUID to keep BOLA path viable
+verify_steps: curl -i -s https://api.emsisoft.com/swagger/v1.0/swagger.json | head -c 500; curl -i -s https://api.emsisoft.com/v1/workspaces ; curl -i -s https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000
+impact: Full API surface map + endpoint oracle for BOLA fuzzing — Medium (info disclosure)
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com/sso/login
+confidence: 78
+reasoning: https://sso.dealertrack.com/sso/login 200 len0 text/xml vs https://admin.pa1.dealertrack.com 503 vs https://api.unifi.dealertrack.com 403 differential persists; redirect chain leaks REALMOID/SMAGENTNAME/TARGET; TARGET=https://example.com still 200 len0 not redirect — open redirect not proven
+evidence_needed: Location header or body proving external TARGET redirect vs 200 len0 sink; REALMOID param leakage in Location
+verify_steps: curl -i -s "https://sso.dealertrack.com/sso/login?TARGET=https://example.com" ; curl -i -s "https://sso.dealertrack.com/sso/login" ; curl -i -s https://admin.pa1.dealertrack.com/ ; compare status/len/content-type
+impact: Infra disclosure + auth bypass probe surface — Low-Medium (infra), High if open redirect -> OAuth theft chain
+testability: PASSIVE
+[FINAL] Ranked survivors: 1) [HYP posit] IDOR per-object variance 72, 2) [HYP emsisoft] MISCONFIG swagger+oracle 92, 3) [HYP coxautomotive] MISCONFIG CA gateway 78 — ordered by exploitability: posit PII proof gates severity upgrade, emsisoft oracle enables next BOLA chain
+[NEXT] PROBE: 3 parallel unauth read-only GETs to close PII vs SPA template gap — run individually no brace: curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ | tee /tmp/a.txt; sha256sum /tmp/a.txt; head -c 200 /tmp/a.txt; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ | tee /tmp/b.txt; sha256sum /tmp/b.txt; head -c 200 /tmp/b.txt; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ | tee /tmp/c.txt; sha256sum /tmp/c.txt
+[LEARN]
+[RISK] 68 — posit share enumerability (9x200 vs 3x404) + emsisoft systemic swagger exposure (65 endpoints 3-env) + coxautomotive CA gateway infra disclosure are stable alive; no new RCE/SSRF-metadata chain proven, but IDOR-PII upgrade via body proof would raise to 82
