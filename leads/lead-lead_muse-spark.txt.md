@@ -11135,3 +11135,38 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-23 persists dead per directive — drop class
 [LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
 [RISK] 72 reason: persistent unauth enumerability on Posit share (9x200 vs 3x404 with len variance) + public 65-endpoint swagger with live 401/404 oracle on 3 envs + gateway infra leak with inconsistent auth — no direct PII dump yet but attack surface remains fully exposed and chainable, no fix observed since 2026-08-27.
+## 2026-09-23 09:53:08 UTC (model muse-spark)
+class: IDOR
+asset: 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud
+confidence: 75
+reasoning: Inventory holds 30+ share.connect.posit.cloud UUIDv7 hosts. Live probes 2026-09-23 07:44 show 0190c2c9 200 len178193 text/html and 019c9000 200 len13874 vs 0191a3bb 404 deterministically. Identical path / with divergent 200 vs 404 and len variance proves per-object authz variance, not SPA wildcard. CloudFront+S3 fronted.
+evidence_needed: Body hash/snippet diff proving 200 hosts serve distinct user content (not same SPA template), evidence of PII/project names
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -i -D - ; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -i -D - ; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -i -D - ; compute sha256, capture first 200 chars, compare Content-Type and hashes
+impact: Unauthenticated cross-tenant content/PII dump via share ID enumeration; severity High (confidential app data exposure)
+testability: PASSIVE
+class: MISCONFIG
+asset: api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 90
+reasoning: /swagger/v1.0/swagger.json 200 application/json unauth on api/apitest/apistage reconfirmed 2026-09-23 07:44 with 65 endpoints, 353 GUIDs/tokens per history. /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 and /v1/licenses 404 differential reconfirmed proves endpoint existence oracle without auth. No auth needed for spec.
+evidence_needed: Fresh spec fetch showing 65 endpoints unauth, and 401 vs 404 differential on UUID path vs base
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json -i ; GET https://api.emsisoft.com/v1/workspaces -i ; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -i ; GET https://apitest.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 -i ; diff status codes
+impact: Full API surface map + valid-object oracle for brute-force / BOLA without credentials; severity Medium-High (information disclosure, attack pre-condition)
+testability: PASSIVE
+class: MISCONFIG
+asset: sso.dealertrack.com/sso/login
+confidence: 65
+reasoning: sso.dealertrack.com/sso/login 200 len0 text/xml unauth vs admin.pa1.dealertrack.com flipping 403/503 vs api.unifi.dealertrack.com 403 differential reconfirmed 2026-09-23. History shows REALMOID/SMAGENTNAME/TARGET leak in redirect Location. Latest probe sso.dealertrack.com/sso/login?TARGET=https://example.com -> 200 len0 (not 302) suggests TARGET not validated via redirect but may be stored/handled server-side.
+evidence_needed: Response headers Disclosure (Location with REALMOID/SMAGENTNAME/TARGET), and TARGET external value reflection vs ignore
+verify_steps: GET https://sso.dealertrack.com/sso/login -i -D - ; GET https://sso.dealertrack.com/sso/login?TARGET=https://example.com -i -D - ; GET https://admin.pa1.dealertrack.com/ -i -D - ; GET https://api.unifi.dealertrack.com/ -i -D - ; inspect Location, Set-Cookie, REALMOID/SMAGENTNAME
+impact: Infrastructure disclosure (CA gateway version/config) + auth bypass/open redirect primitive if TARGET honored; severity Medium (chaining to ATO)
+testability: PASSIVE
+[FINAL] 1: [HYP emsisoft] Unauthenticated OpenAPI exhaustive enumeration + 401 vs 404 ID oracle (90) — strongest gate_ease 10 + tech_exposure 9 + repeatable across 3 envs
+[FINAL] 2: [HYP posit] Unauthenticated share subdomain per-object IDOR (75) — needs PII proof but variance alive across 9x200 vs 3x404
+[FINAL] 3: [HYP coxautomotive] CA Siteminder infra disclosure + inconsistent auth + TARGET handling (65) — lower cloud_surface but consistent differential
+[NEXT] PROBE: 3 parallel unauth read-only GETs to close PII vs SPA template gap on share.connect.posit.cloud — run individually, no brace expansion, capture headers+sha256+200-char snippet: curl -i -s -D - https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ -o /tmp/a.html && sha256sum /tmp/a.html && head -c 200 /tmp/a.html; curl -i -s -D - https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ -o /tmp/b.html && sha256sum /tmp/b.html && head -c 200 /tmp/b.html; curl -i -s -D - https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ -i -D -
+[LEARN] ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints public unauth + 401 vs 404 oracle reconfirmed 2026-09-23 07:44 alive
+[LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 differential persists 2026-09-23 per-object variance alive needs body PII proof
+[LEARN] ACCEPTED MISCONFIG @ sso.dealertrack.com/sso/login: 200 len0 vs admin.pa1 403 vs api.unifi 403 + REALMOID leak persists alive
+[LEARN] REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-23 persists dead per directive — do not re-probe
+[LEARN] REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains — need non-example ID for BOLA
+[RISK] 68 — Posit share subdomain IDOR variance and Emsisoft swagger 3-env 65-endpoint + 401/404 oracle remain unhardened and unauth; Cox Siteminder differential + REALMOID leak persists — high enumerability, but SSRF@docker-registry and AUTH via example tokens proven dead reduce immediate RCE/ATO chain
