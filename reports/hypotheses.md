@@ -4952,3 +4952,15 @@
 - LEARN: REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces/019c9000-f3f9-6599-47b4-1cff4047c68f: 404 vs 401 base but no 200 — share UUID not valid workspace ID, fab
 - LEARN: REJECTED SSRF @ https://docker-registry.docker.com/v2/?param=169.254.169.254: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-22 persists dead per directive — d
 - LEARN: ACCEPTED MISCONFIG @ https://sso.dealertrack.com/sso/login: 200 len0 vs admin.pa1 503 vs api.unifi 403 differential + TARGET external handling persists — infra 
+
+## RANKED HYPOTHESES 2026-09-23 00:12:00 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 3 parallel unauth GET -i -s -D - + sha256 + 200-char snippet to close PII vs SPA template gap (run individually, no brace): curl -i -s -D - https://0190c
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs404 oracle reconf 2026-09-22 alive
+- LEARN: ACCEPTED IDOR @ 0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud: 9x200 vs3x404 len178193/13874 per-object variance persists unauth needs body PII
+- LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com: 200 len0 vs admin.pa1 503 vs api.unifi 403 differential persists infra disclosure alive 2026-09-22
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles through 2026-09-22 persists dead per 2026-08-26 directive
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID

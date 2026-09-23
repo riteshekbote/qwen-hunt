@@ -2652,3 +2652,10 @@
 - CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
 - NEW coxautoinc.com/endpoint (403 Forbidden)
 - CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
+
+## 2026-09-23 00:12:00 UTC
+- CHANGED https://api.coxautoinc.com/endpoint?param=admin (403, previously 200)
+- NEW coxautoinc.com/endpoint (403 Forbidden)
+- CHANGED coxautoinc.com/endpoint?param=internal_ip (403 Forbidden)
+- NEW api.coxautoinc.com/endpoint param admin probing appears 2026-09-22 21:37 403 confirms endpoint still reachable
+- CHANGED sso.dealertrack.com/sso/login?TARGET external handling now 200 len0 text/xml identical to base vs prior CA redirect chain with REALMOID leak — infra disclosure persists but redirect oracle flattened
