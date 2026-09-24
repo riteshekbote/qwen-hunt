@@ -11668,3 +11668,31 @@ testability: PASSIVE
 [LEARN] REJECTED SSRF @ https://docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-24 persists dead per directive — drop class
 [LEARN] REJECTED AUTH @ https://api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead — need non-example ID for BOLA
 [RISK] 66 reason: posit share connect shows systemic unauth per-object 200 variance with enumerability (9x200) not yet proven PII but high breach potential; emsisoft 65-endpoint public swagger + 401/404 oracle on 3 envs remains live enumeration chain surface; cox sso 200 vs 403 infra disclosure persists; SSRF/AUTH bypass via example tokens and docker-registry confirmed dead reduces overall exploitability
+## 2026-09-24 19:54:06 UTC (model muse-spark)
+class: IDOR
+asset: https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/
+confidence: 68
+reasoning: 9x200 vs 3x404 reconfirmed 2026-09-24 via 0190c2c9 178193 vs 019c9000 13874 vs 0191a3bb 404; len variance 13874/178193 indicates per-object content not SPA fallback. Hosts from REAL INVENTORY, LIVE probe 200 text/html unauth.
+evidence_needed: body hash/PII proof that 200s contain tenant-specific content (not generic template); diff between 2x200 bodies + 404 body
+verify_steps: GET https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ unauth; GET https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ unauth; GET https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ unauth; compare status, len, title, sha256 body, Content-Type
+impact: unauth enumeration and disclosure of customer-shared apps/content; if PII in body = IDOR-PII high; else MISCONFIG enumerability medium
+testability: PASSIVE
+class: MISCONFIG
+asset: https://api.emsisoft.com/swagger/v1.0/swagger.json
+confidence: 78
+reasoning: 65 endpoints 3-env (prod/apitest/apistage) 200 unauth reconfirmed 2026-09-24; /v1/workspaces 401 vs /v1/workspaces/00000000-0000-0000-0000-000000000000 404 vs /v1/licenses/000... 404 proves oracle alive; Cloudflare/HSTS.
+evidence_needed: 401 vs 404 differential confirms unauth endpoint existence disclosure; need non-example GUID for true BOLA (example GUIDs 401 fabricated dead per 2026-08-22)
+verify_steps: GET https://api.emsisoft.com/swagger/v1.0/swagger.json unauth; GET https://api.emsisoft.com/v1/workspaces unauth; GET https://api.emsisoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000 unauth; GET https://api.emsisoft.com/v1/licenses/00000000-0000-0000-0000-000000000000 unauth; compare prod vs apitest vs apistage
+impact: full API surface disclosure without auth accelerates BOLA/BFLA hunting; oracle leaks existence of resources, low-medium alone, high if chained to IDOR
+testability: PASSIVE
+class: MISCONFIG
+asset: https://sso.dealertrack.com/sso/login
+confidence: 62
+reasoning: sso.dealertrack.com/sso/login 200 len0 text/xml unauth vs admin.pa1.dealertrack.com 403/503 vs api.unifi.dealertrack.com 403 reconfirmed 2026-09-24; REALMOID/SMAGENTNAME/TARGET leak in redirect chain per 2026-08-26; TARGET=https://example.com still 200 len0 no redirect shows handler ignores external TARGET.
+evidence_needed: 200 vs 403 differential proves inconsistent auth; header/URL leak proves infra disclosure; TARGET handling 200 len0 indicates no open redirect currently
+verify_steps: GET https://sso.dealertrack.com/sso/login unauth; GET https://sso.dealertrack.com/sso/login?TARGET=https://example.com unauth; GET https://admin.pa1.dealertrack.com/ unauth; GET https://api.unifi.dealertrack.com/ unauth; record status, Location, Set-Cookie, body len
+impact: infra fingerprinting (CA Siteminder) + inconsistent access control may enable auth bypass; info disclosure low, inconsistent 200 vs 403 medium
+testability: PASSIVE
+[FINAL] Survivors re-ranked: 1) emsisoft MISCONFIG swagger oracle (78), 2) posit IDOR share enumerability (68), 3) coxautomotive MISCONFIG sso infra disclosure (62) — all confidence >=40, class not on REJECTED list, concrete verify_steps present — no PARKED
+[NEXT] PROBE: 3 parallel unauth read-only GETs individually (no brace) to close PII vs template gap — curl -i -s https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.connect.posit.cloud/ ; curl -i -s https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud/ ; curl -i -s https://0191a3bb-a4f7-69b1-92d5-bd0c7502fde7.share.connect.posit.cloud/ — record status, content-type, len, title, sha256 body tail
+[RISK] 68 reason: persistent unauth 9x200 vs 3x404 per-object variance on share.connect.posit.cloud needs body PII proof to upgrade, plus 3-env 65-endpoint swagger public + 401 vs 404 oracle gives systemic enumeration, plus sso.dealertrack 200 len0 vs 403 differential with REALMOID leak gives infra disclosure; SSRF at docker-registry NXDOMAIN and BOLA via example swagger GUIDs remain dead per 2026-08-26 reducing cloud RCE/ATO blast radius
