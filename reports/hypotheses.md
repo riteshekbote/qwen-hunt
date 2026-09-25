@@ -5223,3 +5223,16 @@
 - LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces: swagger example GUIDs 401 identical prod/apitest/apistage fabricated docs dead remains
 - LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN 2026-08-26 to 2026-09-24 persists — class dead drop per directive
 - LEARN: REJECTED SSRF @ https://docker-registry.docker
+
+## RANKED HYPOTHESES 2026-09-25 01:47:40 UTC
+- (no NEW hypotheses this cycle — all deduped)
+- NEXT(hypotheses-lead_muse-spark.txt.txt): PROBE: 3 parallel unauth read-only GETs individually no brace to close PII vs template gap — curl -i -s https://0190c2c9-dd44-d440-0f97-f3b3bf073d0f.share.conne
+- NEXT(hypotheses-qwen8b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- NEXT(hypotheses-qwen14b.txt): PROBE https://docker-registry.docker.com/v2/?param=http://169.254.169.254
+- LEARN: ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth + 401 vs 404 oracle reconfirmed 2026-09-25 00:33 alive
+- LEARN: ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 per-object variance persists unauth 2026-09-25 00:33 alive needs body PII proof
+- LEARN: ACCEPTED MISCONFIG @ sso.dealertrack.com: CA REALMOID/SMAGENTNAME/TARGET infra disclosure + 200 vs 403 vs 503 differential persists alive 2026-09-25 00:33
+- LEARN: REJECTED OTHER @ sso.dealertrack.com/sso/login?TARGET=https://example.com: 200 len0 no Location redirect same as base confirms open-redirect dead 2026-09-25 00:
+- LEARN: REJECTED SSRF @ docker-registry.docker.com/v2/: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-25 persists dead per 2026-08-26 directive
+- LEARN: REJECTED AUTH @ api.emsisoft.com/v1/workspaces via swagger example GUIDs: 401 identical prod/apitest/apistage fabricated docs dead remains need non-example ID f
+- LEARN: REJECTED SSRF @ https://docker-registry.docker
