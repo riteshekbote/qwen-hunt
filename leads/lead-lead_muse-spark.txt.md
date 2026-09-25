@@ -11866,3 +11866,4 @@ testability: PASSIVE
 [LEARN] ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 per-object variance unauth persists reconfirmed 2026-09-25 01:47 needs body PII proof
 [RISK] 68 high enumerability on share.connect.posit.cloud unauth 200 vs 404 + public swagger 65 endpoints on 3 envs + 401 vs 404 oracle, but no proven PII leak yet and auth bypass via example GUIDs dead; infra disclosure on dealertrack persists but open-redirect dead; overall systemic enumeration risk with PII uplift pending
 ## 2026-09-25 07:25:04 UTC (model muse-spark)
+## 2026-09-25 10:33:11 UTC (model muse-spark)
