@@ -1411,3 +1411,4 @@
 - 2026-09-25 REJECTED SSRF @ docker-registry.docker.com/v2/?param=169.254.169.254: NXDOMAIN across 5+ cycles 2026-08-26 to 2026-09-25 persists dead per directive — drop class
 - 2026-09-25 ACCEPTED MISCONFIG @ api.emsisoft.com/swagger/v1.0/swagger.json: 65 endpoints 3-env public unauth +401 vs 404 oracle to /v1/workspaces/000... reconfirmed alive 2026-09-25 01:47
 - 2026-09-25 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 per-object variance unauth persists reconfirmed 2026-09-25 01:47 needs body PII proof
+- 2026-09-26 REJECTED SSRF @ https://docker-registry.docker
