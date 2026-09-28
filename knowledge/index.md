@@ -1413,3 +1413,4 @@
 - 2026-09-25 ACCEPTED IDOR @ share.connect.posit.cloud: 9x200 vs 3x404 len178193/13874 per-object variance unauth persists reconfirmed 2026-09-25 01:47 needs body PII proof
 - 2026-09-26 REJECTED SSRF @ https://docker-registry.docker
 - 2026-09-27 REJECTED SSRF @ https://docker-registry.docker
+- 2026-09-28 REJECTED SSRF @ https://docker-registry.docker
