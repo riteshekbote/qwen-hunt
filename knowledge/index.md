@@ -1432,3 +1432,4 @@
 - 2026-10-14 REJECTED SSRF @ https://docker-registry.docker
 - 2026-10-15 REJECTED SSRF @ https://docker-registry.docker
 - 2026-10-16 REJECTED SSRF @ https://docker-registry.docker
+- 2026-10-17 REJECTED SSRF @ https://docker-registry.docker
